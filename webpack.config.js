@@ -31,11 +31,7 @@ module.exports = (env, options) => {
                 {
                     from: path.join(__dirname, "assets", "models"),
                     to: "models/[name].[ext]"
-                },
-                {
-                    from: path.join(__dirname, "assets", "textures"),
-                    to: "textures/[name].[ext]"
-                }
+                } 
             ]
         }),
         new WebpackPwaManifest({
