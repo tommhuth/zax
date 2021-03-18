@@ -1,27 +1,18 @@
-
-import ReactDOM from "react-dom"
-import { Canvas, useFrame, useThree } from "react-three-fiber"
-import { Box3, BoxBufferGeometry, Quaternion, Sphere, BasicShadowMap, Vector3, CameraHelper, Matrix4, MeshLambertMaterial, TextureLoader, RepeatWrapping, NearestFilter, CubeReflectionMapping, CubeUVReflectionMapping, LinearMipmapLinearFilter, LinearMipMapLinearFilter } from "three"
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import useStore, { createBullet, setPlayerPosition, createFighter, hitPlayer, removeBullet, removeFighter, createObstacle, hitObstacle, generateWorld, updateStats, removeParticle, createParticle, removeObstacle, createTurret, removeTurret } from "../data/store"
-import Config from "../data/Config"
-import { clamp } from "../utils"
+import { useFrame } from "react-three-fiber"
+import { Vector3, Matrix4 } from "three"
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react"
+import useStore, { hitPlayer, removeBullet, removeFighter, hitObstacle, createParticle } from "../data/store"
 import random from "@huth/random"
-import Model, { useGeometry } from "../Model"
-
 
 export default function Bullets() {
     let bullets = useStore(i => i.bullets.list)
     let count = 75
     let ref = useRef()
-    let matrix = useMemo(()=> new Matrix4(), []) 
-    let setPosition = useCallback((index, position) => { 
+    let matrix = useMemo(() => new Matrix4(), [])
+    let setPosition = useCallback((index, position) => {
         ref.current.setMatrixAt(index, matrix.setPosition(position))
-    }, [matrix])
-
-    useFrame(() => {
         ref.current.instanceMatrix.needsUpdate = true
-    })
+    }, [matrix])
 
     return (
         <>
@@ -69,7 +60,7 @@ function Bullet({ x, y, z, speed, index, position, id, setPosition, owner }) {
                     removeBullet(id, index)
                     hitObstacle(obstacle.id, 1)
 
-                    for (let i = 0; i < random.integer(0, 3); i++) (
+                    for (let i = 0; i < random.integer(0, 2); i++) (
                         createParticle([position.x, position.y, obstacle.position[2] - obstacle.depth / 2], [
                             random.float(-.5, .5),
                             random.float(-.5, .5),

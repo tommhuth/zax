@@ -1,13 +1,6 @@
-
-import { Canvas, useFrame, useThree } from "react-three-fiber"
-import { Box3, BoxBufferGeometry, Quaternion, Sphere, BasicShadowMap, Vector3, CameraHelper, Matrix4, MeshLambertMaterial, TextureLoader, RepeatWrapping, NearestFilter, CubeReflectionMapping, CubeUVReflectionMapping, LinearMipmapLinearFilter, LinearMipMapLinearFilter, MathUtils } from "three"
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import useStore, { createBullet, setPlayerPosition, createFighter, hitPlayer, removeBullet, removeFighter, createObstacle, hitObstacle, generateWorld, updateStats, removeParticle, createParticle, removeObstacle, createTurret, removeTurret } from "../data/store"
-import Config from "../data/Config"
-import { clamp } from "../utils"
-import random from "@huth/random"
-import Model, { useGeometry } from "../Model"
-
+import {  useFrame, useThree } from "react-three-fiber"
+import { useEffect, useLayoutEffect, useRef } from "react"
+import useStore from "../data/store"
 
 export default function Camera() {
     let { camera } = useThree()
@@ -27,7 +20,6 @@ export default function Camera() {
 
     useFrame(() => {
         camera.position.z += (playerPosition.current[2] + 10 - camera.position.z) * .1
-
     })
 
     return null

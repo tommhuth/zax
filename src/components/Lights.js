@@ -1,14 +1,6 @@
-
-import ReactDOM from "react-dom"
-import { Canvas, useFrame, useThree } from "react-three-fiber"
-import { Box3, BoxBufferGeometry, Quaternion, Sphere, BasicShadowMap, Vector3, CameraHelper, Matrix4, MeshLambertMaterial, TextureLoader, RepeatWrapping, NearestFilter, CubeReflectionMapping, CubeUVReflectionMapping, LinearMipmapLinearFilter, LinearMipMapLinearFilter } from "three"
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import useStore, { createBullet, setPlayerPosition, createFighter, hitPlayer, removeBullet, removeFighter, createObstacle, hitObstacle, generateWorld, updateStats, removeParticle, createParticle, removeObstacle, createTurret, removeTurret } from "../data/store"
-import Config from "../data/Config"
-import { clamp } from "../utils"
-import random from "@huth/random"
-import Model, { useGeometry } from "../Model"
-
+import { useThree } from "react-three-fiber"
+import { useEffect, useRef } from "react"
+import useStore from "../data/store"
 
 export default function Lights() {
     let { scene, viewport } = useThree()
@@ -20,16 +12,13 @@ export default function Lights() {
         scene.add(ref.current.target)
 
         ref2.current.target.position.set(5, -1, 1)
-        scene.add(ref2.current.target)
-
-        ref2.current.updateMatrixWorld()
+        scene.add(ref2.current.target) 
     }, [scene])
 
     useEffect(() => {
-        return useStore.subscribe(([x, , z]) => {
+        return useStore.subscribe(([, , z]) => {
             ref.current.position.z = z
-            ref.current.target.position.z = z
-            //ref.current.target.position.y =
+            ref.current.target.position.z = z 
             ref.current.shadow.camera.updateMatrixWorld()
             ref.current.updateMatrixWorld()
         }, store => store.player.position)

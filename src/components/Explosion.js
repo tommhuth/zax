@@ -1,72 +1,85 @@
-import random from "@huth/random";
-import { useLayoutEffect, useMemo, useRef } from "react"
+import random from "@huth/random"
+import { useMemo, useRef, useCallback, useState } from "react"
 import { useFrame } from "react-three-fiber"
-import { clamp, easeInOutSine } from "../utils"
-
-
-
-function easeInSine(x) {
-    return 1 - Math.cos((x * Math.PI) / 2)
-}
+import { Quaternion, Vector3, Matrix4, SphereBufferGeometry, MeshBasicMaterial, Color } from "three"
+import { clamp, easeInSine } from "../utils"
 
 
 export default function Explosion({
-    x = 2,
-    y = 3,
-    z = -16,
+    x = 0,
+    y = 0,
+    z = 0,
     height = 6,
     depth = 6,
     width = 6,
     count = 5,
-    radius = 7, 
+    radius = 7,
 }) {
+    let material = useMemo(() => new MeshBasicMaterial({ color: new Color("orange").convertGammaToLinear() }), [])
+    let geometry = useMemo(() => new SphereBufferGeometry(1, 14, 14), [])
     let parts = useMemo(() => {
         let res = []
 
         for (let i = 0; i < count; i++) {
+            let yi = random.float(-height / 2, height / 2)
+            let xi = random.float(-width / 2, width / 2)
+            let zi = random.float(-depth / 2, depth / 2)
+
             res.push({
-                y: random.float(-height / 2, height / 2),
-                x: random.float(-width / 2, width / 2),
-                z: random.float(-depth / 2, depth / 2),
                 delay: i * 4,
                 radius: i + .5,
-                id: random.id()
+                id: random.id(),
+                lifetime: random.integer(13, 19),
+                position: new Vector3(x + xi, y + yi, z + zi),
+                index: i
             })
         }
 
         return res
-    }, [count, width, height, depth])
+    }, [count, width, height, depth, x, y, z])
+    let ref = useRef()
+    let [visible, setVisible] = useState(true)
+    let matrix = useMemo(() => new Matrix4(), [])
+    let scaling = useMemo(() => new Vector3(), [])
+    let origin = useMemo(() => new Vector3(x, y, z), [x, y, z])
+    let quaternion = useMemo(() => new Quaternion(), [])
+    let setProperties = useCallback((index, position, scale = 1) => {
+        scaling.set(scale, scale, scale)
+
+        ref.current.setMatrixAt(index, matrix.compose(position, quaternion, scaling))
+        ref.current.instanceMatrix.needsUpdate = true
+    }, [quaternion, matrix, scaling])
 
     return (
-        <group position={[x, y, z]}>
-            {parts.map((i) => {
+        <>
+            {parts.map((i, index) => {
                 return (
                     <Part
                         key={i.id}
+                        index={index}
+                        setProperties={setProperties}
+                        visible={visible}
                         {...i}
                     />
                 )
             })}
-
             <Part
-                y={0}
                 radius={radius}
                 lifetime={40}
-                z={0}
-                x={0}
+                setProperties={setProperties}
                 delay={30}
+                index={count}
+                position={origin}
+                done={() => setVisible(false)}
+                visible={visible}
             />
-        </group>
+            <instancedMesh visible={visible} ref={ref} args={[geometry, material, count + 1]} />
+        </>
     )
 }
 
-function Part({ x = 0, y = 0, z = 0, radius = 4, lifetime = 18, start = 0, delay }) {
-    let ref = useRef()
+function Part({ radius = 4, done, visible, lifetime = 18, start = 0, delay, position, index, setProperties }) {
     let tid = useRef(start)
-
-    useLayoutEffect(() => {
-        ref.current.scale.set(0, 0, 0)
-    }, [])
 
     useFrame(() => {
         tid.current++
@@ -77,15 +90,13 @@ function Part({ x = 0, y = 0, z = 0, radius = 4, lifetime = 18, start = 0, delay
 
         let s = 1 - easeInSine(clamp((tid.current - delay) / lifetime, 0, 1))
 
-        ref.current.scale.set(s, s, s)
+        setProperties(index, position, s * radius)
 
+        if ((tid.current - delay) >= lifetime && done && visible) {
+            done()
+        }
     })
 
 
-    return (
-        <mesh ref={ref} position={[x, y, z]}>
-            <sphereBufferGeometry args={[Math.max(0, radius), 10, 10]} />
-            <meshBasicMaterial color="orange" />
-        </mesh>
-    )
+    return null
 }

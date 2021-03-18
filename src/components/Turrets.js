@@ -1,14 +1,12 @@
-import { Canvas, useFrame, useThree } from "react-three-fiber"
-import { Box3, BoxBufferGeometry, Quaternion, Sphere, BasicShadowMap, Vector3, CameraHelper, Matrix4, MeshLambertMaterial, TextureLoader, RepeatWrapping, NearestFilter, CubeReflectionMapping, CubeUVReflectionMapping, LinearMipmapLinearFilter, LinearMipMapLinearFilter } from "three"
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import useStore, { createBullet, setPlayerPosition, createFighter, hitPlayer, removeBullet, removeFighter, createObstacle, hitObstacle, generateWorld, updateStats, removeParticle, createParticle, removeObstacle, createTurret, removeTurret } from "../data/store"
+import { Quaternion, Vector3, Matrix4, MeshLambertMaterial } from "three"
+import { useCallback, useEffect, useRef, useState, useMemo } from "react"
+import useStore, { createBullet, createObstacle, createParticle, removeObstacle, removeTurret } from "../data/store"
 import random from "@huth/random"
-import Model, { useGeometry } from "../Model"
+import { useGeometry } from "../Model"
 import Explosion from "./Explosion"
 
-const material = new MeshLambertMaterial({ color: "#ccc" })
-
 export default function Turrets() {
+    let material = useMemo(()=>   new MeshLambertMaterial({ color: "#ccc" }), [])
     let turrets = useStore(i => i.world.turrets)
     let count = 75
     let ref = useRef()
@@ -19,11 +17,8 @@ export default function Turrets() {
         let scaling = new Vector3(scale, scale, scale)
 
         ref.current.setMatrixAt(index, matrix.compose(position, quat, scaling))
-    }, [])
-
-    useFrame(() => {
         ref.current.instanceMatrix.needsUpdate = true
-    })
+    }, [])
 
     return (
 
@@ -39,7 +34,7 @@ function Turret({ setPosition, position, id, index, x = 0, y = 0, z = 0, width =
     let [dead, setDead] = useState(false)
     let [gone, setGone] = useState(false)
     let [explode, setExplode] = useState(false)
-    let ob = useStore(i => i.obstacles.find(i => i.id === obstacleId))
+    let obstacle = useStore(i => i.obstacles.find(i => i.id === obstacleId))
     let playerPosition = useRef([0, 0, 0])
     let tid = useRef()
 
@@ -86,13 +81,13 @@ function Turret({ setPosition, position, id, index, x = 0, y = 0, z = 0, width =
     }, [x, y, z])
 
     useEffect(() => {
-        if (ob?.health === 0) {
+        if (obstacle?.health === 0) {
             setExplode(true)
             clearTimeout(tid.current)
             setTimeout(() => setDead(true), 500)
-            setTimeout(() => setGone(true), 1900)
+            setTimeout(() => setGone(true), 1100)
         }
-    }, [ob?.health])
+    }, [obstacle?.health])
 
     useEffect(() => {
         if (dead) {

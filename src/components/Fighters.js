@@ -1,13 +1,9 @@
-
-import ReactDOM from "react-dom"
-import { Canvas, useFrame, useThree } from "react-three-fiber"
-import { Box3, BoxBufferGeometry, Quaternion, Sphere, BasicShadowMap, Vector3, CameraHelper, Matrix4, MeshLambertMaterial, TextureLoader, RepeatWrapping, NearestFilter, CubeReflectionMapping, CubeUVReflectionMapping, LinearMipmapLinearFilter, LinearMipMapLinearFilter } from "three"
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import useStore, { createBullet, setPlayerPosition, createFighter, hitPlayer, removeBullet, removeFighter, createObstacle, hitObstacle, generateWorld, updateStats, removeParticle, createParticle, removeObstacle, createTurret, removeTurret } from "../data/store"
-import Config from "../data/Config"
-import { clamp } from "../utils"
+import { useFrame } from "react-three-fiber"
+import { Vector3, Matrix4, MeshLambertMaterial } from "three"
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react"
+import useStore, { createBullet, createFighter, hitPlayer, removeFighter } from "../data/store"
 import random from "@huth/random"
-import Model, { useGeometry } from "../Model"
+import { useGeometry } from "../Model"
 
 const material = new MeshLambertMaterial({ color: "red" })
 
@@ -16,9 +12,10 @@ export default function Fighters() {
     let fighters = useStore(i => i.fighters.list)
     let geomtery = useGeometry("fighter1")
     let ref = useRef()
-    let matrix = useMemo(()=> new Matrix4(), []) 
-    let setPosition = useCallback((index, position) => { 
+    let matrix = useMemo(() => new Matrix4(), [])
+    let setPosition = useCallback((index, position) => {
         ref.current.setMatrixAt(index, matrix.setPosition(position))
+        ref.current.instanceMatrix.needsUpdate = true
     }, [matrix])
 
     useLayoutEffect(() => {
@@ -29,24 +26,20 @@ export default function Fighters() {
         }
 
         ref.current.instanceMatrix.needsUpdate = true
-    }, [matrix,count])
+    }, [matrix, count])
 
-    useFrame(() => {
-        ref.current.instanceMatrix.needsUpdate = true
-    })
 
     useEffect(() => {
         setInterval(() => {
             if (!document.hidden) {
-                //createFighter()
+                createFighter()
             }
         }, 1500)
     }, [])
 
     return <>
         {fighters.map(i => <Fighter setPosition={setPosition} {...i} key={i.id} />)}
-        <instancedMesh ref={ref} castShadow receiveShadow args={[geomtery, material, count]}> 
-        </instancedMesh>
+        <instancedMesh ref={ref} castShadow receiveShadow args={[geomtery, material, count]} />
     </>
 }
 
@@ -67,13 +60,13 @@ function Fighter({ position, index, setPosition, y = 5, speed = .2, straight, id
     }, [index, setPosition])
 
     useEffect(() => {
-        const fire = () => { 
-            if (!document.hidden && playerPosition.current[2] > position.z - 25 &&  playerPosition.current[2] < position.z) {
+        const fire = () => {
+            if (!document.hidden && playerPosition.current[2] > position.z - 25 && playerPosition.current[2] < position.z) {
                 createBullet(position.x, position.y, position.z, "enemy")
             }
 
             tid.current = setTimeout(fire, random.boolean() ? 200 : random.integer(500, 1000))
-        } 
+        }
 
         fire()
 

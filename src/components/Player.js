@@ -1,13 +1,9 @@
-
-import ReactDOM from "react-dom"
-import { Canvas, useFrame, useThree } from "react-three-fiber"
-import { Box3, BoxBufferGeometry, Quaternion, Sphere, BasicShadowMap, Vector3, CameraHelper, Matrix4, MeshLambertMaterial, TextureLoader, RepeatWrapping, NearestFilter, CubeReflectionMapping, CubeUVReflectionMapping, LinearMipmapLinearFilter, LinearMipMapLinearFilter } from "three"
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import useStore, { createBullet, setPlayerPosition, createFighter, hitPlayer, removeBullet, removeFighter, createObstacle, hitObstacle, generateWorld, updateStats, removeParticle, createParticle, removeObstacle, createTurret, removeTurret } from "../data/store"
-import Config from "../data/Config"
+import { useFrame } from "react-three-fiber"
+import { Box3,   Vector3 } from "three"
+import {  useEffect, useMemo, useRef, useState } from "react"
+import useStore, { createBullet, setPlayerPosition, hitPlayer } from "../data/store"
 import { clamp } from "../utils"
-import random from "@huth/random"
-import Model, { useGeometry } from "../Model"
+import Model from "../Model"
 
 export default function Player({ width = 3, height = .75, depth = 5 }) {
     let ref = useRef()
@@ -31,8 +27,7 @@ export default function Player({ width = 3, height = .75, depth = 5 }) {
         })
 
         window.addEventListener("click", () => {
-            createBullet(ref.current.position.x, ref.current.position.y, ref.current.position.z, "player")
-
+            createBullet(ref.current.position.x, ref.current.position.y, ref.current.position.z, "player") 
         })
     }, [])
 
@@ -64,7 +59,7 @@ export default function Player({ width = 3, height = .75, depth = 5 }) {
 
         ref.current.position.x += (x.current - ref.current.position.x) * .1
         ref.current.position.y += (y.current - ref.current.position.y) * .1
-        ref.current.position.z += dead ? 0 : .15 
+        ref.current.position.z += dead ? 0 : .3 
 
         setPlayerPosition([ref.current.position.x, ref.current.position.y, ref.current.position.z])
     })

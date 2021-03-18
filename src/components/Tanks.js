@@ -1,15 +1,12 @@
-import { Canvas, useFrame, useThree } from "react-three-fiber"
-import { Box3, BoxBufferGeometry, Quaternion, Sphere, BasicShadowMap, Vector3, CameraHelper, Matrix4, MeshLambertMaterial, TextureLoader, RepeatWrapping, NearestFilter, CubeReflectionMapping, CubeUVReflectionMapping, LinearMipmapLinearFilter, LinearMipMapLinearFilter } from "three"
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import useStore, { createBullet, removeTank, createFighter, hitPlayer, removeBullet, removeFighter, createObstacle, hitObstacle, generateWorld, updateStats, removeParticle, createParticle, removeObstacle, createTurret, removeTurret } from "../data/store"
+import { Quaternion, Vector3, Matrix4, MeshLambertMaterial } from "three"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import useStore, { createObstacle, createParticle, removeObstacle, removeTurret } from "../data/store"
 import { useGeometry } from "../Model"
 import Explosion from "../components/Explosion"
-
 import random from "@huth/random"
 
-const mat = new MeshLambertMaterial({ color: "#ccc" })
-
 export default function Tanks() {
+    let material = useMemo(()=>  new MeshLambertMaterial({ color: "#ccc" }), [])
     let tanks = useStore(i => i.world.tanks)
     let count = 75
     let ref = useRef()
@@ -21,17 +18,14 @@ export default function Tanks() {
         scaling.set(scale, scale, scale)
 
         ref.current.setMatrixAt(index, matrix.compose(position, quaternion, scaling))
-    }, [quaternion, matrix, scaling])
-
-    useFrame(() => {
         ref.current.instanceMatrix.needsUpdate = true
-    })
+    }, [quaternion, matrix, scaling])
 
     return (
 
         <>
             {tanks.map((i) => <Tank setPosition={setPosition} {...i} key={i.id} />)}
-            <instancedMesh receiveShadow ref={ref} args={[geometry, mat, count]} />
+            <instancedMesh receiveShadow ref={ref} args={[geometry, material, count]} />
         </>
     )
 }
@@ -72,12 +66,12 @@ function Tank({ setPosition, position, id, index, x = 0, y = 0, z = 0, width = 5
 
     useEffect(() => {
         if (obstacle?.health === 0) {
-            setExplode(true) 
+            setExplode(true)
             setTimeout(() => setDead(true), 500)
-            setTimeout(() => setGone(true), 1900)
+            setTimeout(() => setGone(true), 1100)
         }
     }, [obstacle?.health])
- 
+
 
 
     useEffect(() => {

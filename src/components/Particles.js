@@ -1,28 +1,23 @@
- 
-import { Canvas, useFrame, useThree } from "react-three-fiber"
-import { Box3, BoxBufferGeometry, Quaternion, Sphere, BasicShadowMap, Vector3, CameraHelper, Matrix4, MeshLambertMaterial, TextureLoader, RepeatWrapping, NearestFilter, CubeReflectionMapping, CubeUVReflectionMapping, LinearMipmapLinearFilter, LinearMipMapLinearFilter } from "three"
+import { useFrame } from "react-three-fiber"
+import { Quaternion, Vector3, Matrix4 } from "three"
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import useStore, { createBullet, setPlayerPosition, createFighter, hitPlayer, removeBullet, removeFighter, createObstacle, hitObstacle, generateWorld, updateStats, removeParticle, createParticle, removeObstacle, createTurret, removeTurret } from "../data/store"
-import random from "@huth/random" 
- 
+import useStore, { removeParticle } from "../data/store"
+import random from "@huth/random"
+
 export default function Particles() {
     let particles = useStore(i => i.particles.list)
     let count = 400
     let ref = useRef()
-    let matrix = useMemo(()=> new Matrix4(), [])
-    let scaling = useMemo(()=> new Vector3(), [])
-    let quaternion = useMemo(()=> new Quaternion(), [])
-    let setPosition = useCallback((index, position, scale = 1) => {  
-        scaling.set(scale, scale, scale) 
+    let matrix = useMemo(() => new Matrix4(), [])
+    let scaling = useMemo(() => new Vector3(), [])
+    let quaternion = useMemo(() => new Quaternion(), [])
+    let setPosition = useCallback((index, position, scale = 1) => {
+        scaling.set(scale, scale, scale)
         ref.current.setMatrixAt(index, matrix.compose(position, quaternion, scaling))
+        ref.current.instanceMatrix.needsUpdate = true
     }, [matrix, quaternion, scaling])
 
-    useFrame(() => {
-        ref.current.instanceMatrix.needsUpdate = true
-    })
-
     return (
-
         <>
             {particles.map((i) => <Particle setPosition={setPosition} {...i} key={i.id} />)}
             <instancedMesh castShadow ref={ref} args={[null, null, count]}>

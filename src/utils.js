@@ -1,6 +1,10 @@
 import { createContext, useCallback, useEffect, useState } from "react"
 
 
+export function easeInSine(x) {
+    return 1 - Math.cos((x * Math.PI) / 2)
+}
+
 export function clamp(num, min, max) {
     return num <= min ? min : num >= max ? max : num
 } 
