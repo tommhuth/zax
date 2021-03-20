@@ -30,7 +30,7 @@ export default function Tanks() {
     )
 }
 
-function Tank({ setPosition, position, id, index, x = 0, y = 0, z = 0, width = 5, height = 3, depth = 5 }) {
+function Tank({ setPosition, position, health, id, index, x = 0, y = 0, z = 0, width = 5, height = 3, depth = 5 }) {
     let [obstacleId, setObstacleId] = useState()
     let obstacle = useStore(i => i.obstacles.find(i => i.id === obstacleId))
     let playerPosition = useRef([0, 0, 0])
@@ -47,9 +47,9 @@ function Tank({ setPosition, position, id, index, x = 0, y = 0, z = 0, width = 5
     useEffect(() => {
         let oid = createObstacle({
             width,
-            height,
-            depth,
-            health: 3,
+            height, 
+            depth, 
+            health,
             position: [x, y, z],
         })
 
@@ -58,7 +58,7 @@ function Tank({ setPosition, position, id, index, x = 0, y = 0, z = 0, width = 5
         return () => {
             removeObstacle(oid)
         }
-    }, [width, height, depth, id, x, y, z, setPosition, index, position])
+    }, [width, height, depth, id, x, y, z,health, setPosition, index, position])
 
     useEffect(() => {
         setPosition(index, position)

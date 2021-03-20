@@ -152,7 +152,7 @@ export function generateWorld(viewportDiagonal) {
 
 }
 
-export function createTurret(x, y, z) {
+export function createTurret(x, y, z, health) {
     let index = (store.getState().world.turretIndex + 1) % 75
     let id = random.id()
 
@@ -166,6 +166,7 @@ export function createTurret(x, y, z) {
                     x,
                     y,
                     z,
+                    health,
                     id,
                     index,
                     position: new Vector3(x, y, z),
@@ -186,7 +187,7 @@ export function removeTurret(id) {
     })
 }
 
-export function createTank(x, y, z) {
+export function createTank(x, y, z,health) {
     let index = (store.getState().world.tankIndex + 1) % 75
     let id = random.id()
 
@@ -201,6 +202,7 @@ export function createTank(x, y, z) {
                     y,
                     z,
                     id,
+                    health,
                     index,
                     position: new Vector3(x, y, z),
                 }
@@ -358,14 +360,7 @@ export function setPlayerPosition(position) {
 export function hitObstacle(id, power) {
     let obstacle = store.getState().obstacles.find(i => i.id === id)
     let health = clamp(obstacle.health - power, 0, Infinity)
-
-    /*
-    if (health === 0) {
-        store.setState({
-            obstacles: store.getState().obstacles.filter(i => i.id !== id)
-        })
-    } else {
-        */
+ 
     store.setState({
         obstacles: [
             ...store.getState().obstacles.filter(i => i.id !== id),
@@ -387,8 +382,8 @@ export function createObstacle({
     width,
     height,
     depth,
-    position,
     radius,
+    position,
     health = Infinity
 }) {
     let container
@@ -397,7 +392,10 @@ export function createObstacle({
     if (radius) {
         container = new Sphere(radius)
     } else {
-        container = new Box3().setFromCenterAndSize(new Vector3(position[0], position[1] + height / 2, position[2]), new Vector3(width, height, depth))
+        container = new Box3().setFromCenterAndSize(
+            new Vector3(position[0], position[1] + height / 2, position[2]), 
+            new Vector3(width, height, depth)
+        )
     }
 
     store.setState({

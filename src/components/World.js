@@ -6,12 +6,10 @@ import { clamp } from "../utils"
 import random from "@huth/random"
 import Model, { useGeometry } from "../Model"
 import Wall from "./Wall"
+import { PlaneBufferGeometry } from "three"
+import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils"
 
-
-
-
-
-function SpawnTurret({ x, y, z, health = 3 }) {
+function SpawnTurret({ x, y, z, health = 2 }) {
     useEffect(() => {
         let id = createTurret(x, y, z, health)
 
@@ -21,7 +19,7 @@ function SpawnTurret({ x, y, z, health = 3 }) {
     return null
 }
 
-function SpawnTank({ x, y, z, health = 3 }) {
+function SpawnTank({ x, y, z, health = 1 }) {
     useEffect(() => {
         let id = createTank(x, y, z, health)
 
@@ -31,7 +29,7 @@ function SpawnTank({ x, y, z, health = 3 }) {
     return null
 }
 
-function SpawnFighter({ x, y, z, health = 3 }) {
+function SpawnFighter({ x, y, z, health = 1 }) {
     useEffect(() => {
         let id = createFighter(x, y, z, health)
 
@@ -147,11 +145,16 @@ function AsteroidMediumBlock({ z, depth }) {
 
 export default function World() {
     let { gl } = useThree()
-    let blocks = useStore(i => i.world.blocks)
-    let coverLeft = useRef()
-    let coverRight = useRef()
+    let blocks = useStore(i => i.world.blocks) 
+    let cover = useRef()
     let { viewport } = useThree()
     let playerPosition = useRef([0, 0, 0])
+    let geometry = useMemo(() => {
+        let right = new PlaneBufferGeometry(50, 400, 1, 1).rotateX(-Math.PI / 2).translate(-65, 16, 0)
+        let left = new PlaneBufferGeometry(40, 400, 1, 1).rotateX(-Math.PI / 2).translate(25, 30, 0)
+
+        return BufferGeometryUtils.mergeBufferGeometries([left, right])
+    }, [])
 
     useEffect(() => {
         return useStore.subscribe(position => {
@@ -174,8 +177,7 @@ export default function World() {
     }, [viewport])
 
     useFrame(() => {
-        coverLeft.current.position.z = playerPosition.current[2]
-        coverRight.current.position.z = playerPosition.current[2]
+        cover.current.position.z = playerPosition.current[2]
     })
 
     useFrame(() => {
@@ -184,14 +186,9 @@ export default function World() {
 
     return (
         <>
-            <mesh ref={coverRight} position={[-65, 16, 0]} rotation-x={-Math.PI / 2}>
-                <planeBufferGeometry args={[50, 200]} />
-                <meshBasicMaterial color="black" />
-            </mesh>
-            <mesh ref={coverLeft} position={[25, 30, 0]} rotation-x={-Math.PI / 2} visible={true}>
-                <planeBufferGeometry args={[40, 200]} />
-                <meshBasicMaterial color="black" />
-            </mesh>
+            <mesh ref={cover} position-x={0} geometry={geometry}>
+                <meshBasicMaterial color="black" /> 
+            </mesh> 
             {blocks.map(i => {
                 switch (i.type) {
                     case "asteroid-start":

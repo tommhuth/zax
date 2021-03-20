@@ -29,7 +29,7 @@ export default function Turrets() {
     )
 }
 
-function Turret({ setPosition, position, id, index, x = 0, y = 0, z = 0, width = 3, height = 6, depth = 3 }) {
+function Turret({ setPosition, health, position, id, index, x = 0, y = 0, z = 0, width = 3, height = 6, depth = 3 }) {
     let [obstacleId, setObstacleId] = useState()
     let [dead, setDead] = useState(false)
     let [gone, setGone] = useState(false)
@@ -49,7 +49,7 @@ function Turret({ setPosition, position, id, index, x = 0, y = 0, z = 0, width =
             width,
             height,
             depth,
-            health: 3,
+            health,
             position: [x, y, z],
         })
 
@@ -58,7 +58,7 @@ function Turret({ setPosition, position, id, index, x = 0, y = 0, z = 0, width =
         return () => {
             removeObstacle(oid)
         }
-    }, [width, height, depth, id, x, y, z, setPosition, index, position])
+    }, [width, height, depth, id, x, y, z, setPosition,health, index, position])
 
     useEffect(() => {
         setPosition(index, position)
