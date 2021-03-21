@@ -19,10 +19,10 @@ import Lights from "./components/Lights"
 import Camera from "./components/Camera"
 import Tanks from "./components/Tanks"
 import Explosion from "./components/Explosion"
-  
+
 function App() {
     let obstacles = useStore(i => i.obstacles)
-    let health = useStore(i => i.player.health) 
+    let health = useStore(i => i.player.health)
 
 
     return (
@@ -35,15 +35,15 @@ function App() {
                     zIndex: 1000
                 }}
             >
-                health={(health* 100).toFixed(0)}<br /> 
+                health={(health).toFixed(0)}<br />
             </div>
             <Canvas
                 orthographic
                 webgl1
                 pixelRatio={window.devicePixelRatio * (.2 + (window.devicePixelRatio > 1 ? -.1 : 0))}
                 style={{
-                    width: window.innerWidth + (window.innerWidth%2 === 0 ? 0: 1),
-                    height: window.innerHeight + (window.innerHeight%2 === 0 ? 0: 1)
+                    width: window.innerWidth + (window.innerWidth % 2 === 0 ? 0 : 1),
+                    height: window.innerHeight + (window.innerHeight % 2 === 0 ? 0 : 1)
                 }}
                 camera={{
                     zoom: 24, // 24,
@@ -57,24 +57,26 @@ function App() {
                     depth: true,
                     stencil: false,
                     alpha: true,
-                    
+
                 }}
                 shadowMap={{
                     type: BasicShadowMap
                 }}
             >
-                {obstacles.map(i => { 
-                    return null 
+                {obstacles.map(i => {
+                    return null
                     
-                    return <mesh key={i.id} receiveShadow position={[i.position[0], i.position[1] + i.height / 2, i.position[2]]}>
-                        <boxBufferGeometry args={[i.width, i.height, i.depth]} />
-                        <meshLambertMaterial wireframe color="red" />
-                    </mesh>
+                    return (
+                        <mesh key={i.id} receiveShadow position={[i.position[0], i.position[1] + i.height / 2, i.position[2]]}>
+                            <boxBufferGeometry args={[i.width, i.height, i.depth]} />
+                            <meshLambertMaterial wireframe color="red" />
+                        </mesh>
+                    )
                 })}
                 <Camera />
                 <Lights />
                 <Player />
-                <World /> 
+                <World />
 
                 <Fighters />
                 <Particles />

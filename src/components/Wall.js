@@ -15,7 +15,7 @@ export default function Wall({ x, y = 0, z, width, height }) {
             width,
             height,
             depth: 2,
-            position: [x, y, z],
+            x,y,z
         })
 
         return () => {

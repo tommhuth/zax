@@ -1,12 +1,13 @@
 import { useFrame } from "react-three-fiber"
-import { Box3,   Vector3 } from "three"
-import {  useEffect, useMemo, useRef, useState } from "react"
+import { Box3, Vector3 } from "three"
+import { useEffect, useMemo, useRef, useState } from "react"
 import useStore, { createBullet, setPlayerPosition, hitPlayer } from "../data/store"
 import { clamp } from "../utils"
 import Model from "../Model"
 
-export default function Player({ width = 3, height = .75, depth = 5 }) {
+export default function Player({ width = 2.5, height = .65, depth = 5 }) {
     let ref = useRef()
+    //let ref2 = useRef()
     let keys = useRef({})
     let x = useRef(-7.5)
     let [dead, setDead] = useState(false)
@@ -21,13 +22,17 @@ export default function Player({ width = 3, height = .75, depth = 5 }) {
     useEffect(() => {
         window.addEventListener("keydown", e => {
             keys.current[e.key] = true
+ 
+            if (e.key === " ") {
+                createBullet(ref.current.position.x, ref.current.position.y, ref.current.position.z, "player")
+            }
         })
         window.addEventListener("keyup", e => {
             delete keys.current[e.key]
         })
 
         window.addEventListener("click", () => {
-            createBullet(ref.current.position.x, ref.current.position.y, ref.current.position.z, "player") 
+            createBullet(ref.current.position.x, ref.current.position.y, ref.current.position.z, "player")
         })
     }, [])
 
@@ -35,10 +40,10 @@ export default function Player({ width = 3, height = .75, depth = 5 }) {
         if (!ref.current) {
             return
         }
-        let xLeftEdge = 2  
-        let xRightEdge = -18  
+        let xLeftEdge = 2
+        let xRightEdge = -18
         let yUpperEdge = 16
-        let yLowerEdge = 1.5
+        let yLowerEdge = 2.5
 
         for (let [key] of Object.entries(keys.current)) {
             switch (key.toLowerCase()) {
@@ -49,17 +54,19 @@ export default function Player({ width = 3, height = .75, depth = 5 }) {
                     x.current = clamp(x.current - .25, xRightEdge, xLeftEdge)
                     break
                 case "w":
-                    y.current = clamp(y.current + .25, yLowerEdge, yUpperEdge)
+                    y.current = clamp(y.current + .2, yLowerEdge, yUpperEdge)
                     break
                 case "s":
-                    y.current = clamp(y.current - .25, yLowerEdge, yUpperEdge)
+                    y.current = clamp(y.current - .2, yLowerEdge, yUpperEdge)
                     break
             }
         }
 
         ref.current.position.x += (x.current - ref.current.position.x) * .1
         ref.current.position.y += (y.current - ref.current.position.y) * .1
-        ref.current.position.z += dead ? 0 : .3 
+        ref.current.position.z += dead ? 0 : .3
+
+        //ref2.current.position.set(...ref.current.position.toArray())
 
         setPlayerPosition([ref.current.position.x, ref.current.position.y, ref.current.position.z])
     })
@@ -69,7 +76,7 @@ export default function Player({ width = 3, height = .75, depth = 5 }) {
     }, [health])
 
     useFrame(() => {
-        if (!ref.current) {
+        if (!ref.current || dead) {
             return
         }
 
@@ -77,7 +84,8 @@ export default function Player({ width = 3, height = .75, depth = 5 }) {
 
         for (let obstacle of obstacles) {
             if (obstacle.health > 0 && obstacle.container.intersectsBox(container)) {
-                hitPlayer(1)
+                hitPlayer(100) 
+                break
             }
         }
     })
@@ -90,7 +98,7 @@ export default function Player({ width = 3, height = .75, depth = 5 }) {
 }
 
 /*
- <mesh position={[0, 15, -40]}>
+            <mesh ref={ref2} position={[0, 15, -40]}>
                 <boxBufferGeometry args={[width, height, depth]} />
                 <meshLambertMaterial wireframe color="red" />
             </mesh>

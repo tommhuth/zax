@@ -1,13 +1,12 @@
 import { useFrame, useThree } from "react-three-fiber"
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import useStore, { generateWorld, createTurret, removeTurret, createTank, removeTank, createFighter, removeFighter } from "../data/store"
-import Config from "../data/Config"
-import { clamp } from "../utils"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import useStore, { generateWorld, createTurret, createObstacle, removeObstacle, removeTurret, createTank, removeTank, createFighter, removeFighter } from "../data/store"
 import random from "@huth/random"
-import Model, { useGeometry } from "../Model"
+import Model, { mat } from "../Model"
 import Wall from "./Wall"
 import { PlaneBufferGeometry } from "three"
-import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils"
+import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils"
+import { Only } from "../utils"
 
 function SpawnTurret({ x, y, z, health = 2 }) {
     useEffect(() => {
@@ -39,7 +38,6 @@ function SpawnFighter({ x, y, z, health = 1 }) {
     return null
 }
 
-
 function AsteroidStart({ z, depth }) {
     return (
         <>
@@ -50,10 +48,151 @@ function AsteroidStart({ z, depth }) {
     )
 }
 
-function AsteroidWall({ z }) {
-    let [x] = useState(random.pick(-12, -8))
+function Forcefield({ y = 0, z }) {
+    let [height] = useState(() => random.integer(6, 12))
+    let [active] = useState(() => random.boolean())
+    let [x] = useState(-8)
+    let ref = useRef()
+    let t = useRef(0)
+    let totalHeight = 17
+    let width = 28
+    let wall = useMemo(() => {
+        let left = random.integer(6, 12)
+        let middle = random.integer(7, 12)
+        let right = width - left - middle
 
-    return <Wall x={x} y={0} z={z} width={35} height={11} />
+        return [
+            {
+                z: z,
+                y: 0,
+                x: x + right / 2 - width / 2,
+                width: right,
+                height: height,
+            },
+            {
+                x: x + (right + middle / 2) - width / 2,
+                z: z,
+                y: -4,
+                width: middle,
+                height: height,
+            },
+            {
+                x: x + (right + middle + left / 2) - width / 2,
+                y: 0,
+                z: z,
+                width: left,
+                height: height,
+            }
+        ]
+    }, [width, height, x, z])
+
+    useEffect(() => {
+        let ids = []
+
+        if (active) {
+            ids.push(
+                createObstacle({
+                    depth: 2,
+                    width: width,
+                    height: totalHeight - height - 1,
+                    x,
+                    y: height + .5,
+                    z
+                })
+            )
+        }
+
+        for (let part of wall) {
+            ids.push(createObstacle({
+                depth: 2,
+                width: part.width,
+                height: height,
+                x: part.x,
+                y: part.y,
+                z: part.z
+            }))
+        }
+
+        return () => {
+            removeObstacle(...ids)
+        }
+    }, [active, wall, height, totalHeight, width, x, z])
+
+
+    useFrame(() => {
+        if (!ref.current || !active) {
+            return
+        }
+
+        t.current += .5
+        ref.current.material.opacity = (Math.cos(t.current) + 1) / 2 * .35
+    })
+
+    return (
+        <>
+            <Model name="forcefield" position={[x, y, z]} />
+
+            <Only if={active}>
+                <mesh ref={ref} position={[x, height + (totalHeight - height) / 2, z]} >
+                    <boxBufferGeometry args={[width, totalHeight - height, .5]} />
+                    <meshBasicMaterial color="red" transparent opacity={.15} />
+                </mesh>
+            </Only>
+
+            {wall.map((i, index) => {
+                return (
+                    <mesh material={mat} receiveShadow position={[i.x, i.y + i.height / 2, i.z]} key={index} >
+                        <boxBufferGeometry args={[i.width, i.height, 2]} />
+                    </mesh>
+                )
+            })}
+        </>
+    )
+}
+
+function AsteroidWall({ z }) {
+    let [type] = useState(() => random.pick("simple", "simple", "simple", "fancy"))
+    let [x] = useState(random.pick(-12, -8))
+    let [width] = useState(() => random.integer(14, 17))
+    let [height] = useState(() => random.integer(5, 8))
+
+    useEffect(() => {
+        let id
+
+        if (type === "fancy") {
+            id = createObstacle({
+                width: 35,
+                height: 11,
+                depth: 2,
+                x,
+                y: 0,
+                z
+            })
+        } else {
+            id = createObstacle({
+                width,
+                height,
+                depth: 2,
+                x,
+                y: 0,
+                z
+            })
+        }
+
+        return () => {
+            removeObstacle(id)
+        }
+    }, [type, height, width, x, z])
+
+    if (type === "fancy") {
+        return <Model name="wall1" position={[x, 0, z]} />
+    }
+
+    return (
+        <mesh material={mat} position={[x, height / 2, z]} >
+            <boxBufferGeometry args={[width, height, 2]} />
+        </mesh>
+    )
 }
 
 function useGrid({ width = 20, depth = 80, size = 10 }) {
@@ -92,7 +231,7 @@ function AsteroidMediumBlock({ z, depth }) {
     let grid = useGrid({ width: 20, depth, size: 15 })
     let [scaleZ] = useState(random.pick(-1, 1))
     let [scaleX] = useState(random.pick(-1, 1))
-    let deco = useMemo(() => random.pick(null, "wall3", "building1", "wall3", "building1", "wall3", "building1"), [])
+    let deco = useMemo(() => random.pick(null, "wall3", "building1", "wall3"), [])
     let turrets = useMemo(() => {
         let res = []
 
@@ -145,12 +284,12 @@ function AsteroidMediumBlock({ z, depth }) {
 
 export default function World() {
     let { gl } = useThree()
-    let blocks = useStore(i => i.world.blocks) 
+    let blocks = useStore(i => i.world.blocks)
     let cover = useRef()
     let { viewport } = useThree()
     let playerPosition = useRef([0, 0, 0])
     let geometry = useMemo(() => {
-        let right = new PlaneBufferGeometry(50, 400, 1, 1).rotateX(-Math.PI / 2).translate(-65, 16, 0)
+        let right = new PlaneBufferGeometry(50, 400, 1, 1).rotateX(-Math.PI / 2).translate(-66, 18, 0)
         let left = new PlaneBufferGeometry(40, 400, 1, 1).rotateX(-Math.PI / 2).translate(25, 30, 0)
 
         return BufferGeometryUtils.mergeBufferGeometries([left, right])
@@ -187,8 +326,8 @@ export default function World() {
     return (
         <>
             <mesh ref={cover} position-x={0} geometry={geometry}>
-                <meshBasicMaterial color="black" /> 
-            </mesh> 
+                <meshBasicMaterial color="black" />
+            </mesh>
             {blocks.map(i => {
                 switch (i.type) {
                     case "asteroid-start":
@@ -197,6 +336,8 @@ export default function World() {
                         return <AsteroidWall {...i} key={i.id} />
                     case "asteroid-medium-block":
                         return <AsteroidMediumBlock {...i} key={i.id} />
+                    case "forcefield":
+                        return <Forcefield {...i} key={i.id} />
                 }
             })}
         </>

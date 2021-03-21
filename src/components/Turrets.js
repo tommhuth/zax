@@ -50,7 +50,7 @@ function Turret({ setPosition, health, position, id, index, x = 0, y = 0, z = 0,
             height,
             depth,
             health,
-            position: [x, y, z],
+            x,y,z, 
         })
 
         setObstacleId(oid)

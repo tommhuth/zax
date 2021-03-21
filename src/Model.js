@@ -17,7 +17,8 @@ let blank = new BufferGeometry()
 
 let map = {
     black,
-    gray,blue:darkblue,darkblue:blue
+    gray,blue:darkblue,darkblue:blue,
+    mat
 }
 
 
@@ -51,8 +52,7 @@ export default forwardRef((
     },
     ref
 ) => {
-    let [object, setObject] = useState()
-    let {gl} = useThree()
+    let [object, setObject] = useState() 
 
     useEffect(() => { 
         loader.load(`/models/${name}.glb`, ({ scene }) => {
@@ -62,7 +62,7 @@ export default forwardRef((
                     object.receiveShadow = receiveShadow 
                     object.material = map[object.material.name] || mat 
                 }
-            }) 
+            })  
 
             setObject(scene.children[0] )
         })

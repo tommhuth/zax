@@ -50,7 +50,7 @@ function Tank({ setPosition, position, health, id, index, x = 0, y = 0, z = 0, w
             height, 
             depth, 
             health,
-            position: [x, y, z],
+            x,y,z, 
         })
 
         setObstacleId(oid)

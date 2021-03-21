@@ -14,6 +14,7 @@ export default function Camera() {
             Math.PI / 4  // 45 degrees, between positive X and Z axes, thus on XZ-plane
         ) 
         camera.lookAt(0, 0, 0)
+        camera.position.x += 14
     }, [camera])
 
     useEffect(() => {

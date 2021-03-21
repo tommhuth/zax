@@ -32,7 +32,7 @@ export default function Fighters() {
     useEffect(() => {
         setInterval(() => {
             if (!document.hidden) {
-                createFighter()
+                //createFighter()
             }
         }, 1500)
     }, [])

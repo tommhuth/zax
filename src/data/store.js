@@ -43,7 +43,7 @@ const store = create(() => ({
         turretIndex: 0,
         tanks: [],
         tankIndex: 0,
-        blocks: [ 
+        blocks: [
             {
                 type: "asteroid-start",
                 z: 0,
@@ -51,11 +51,11 @@ const store = create(() => ({
                 id: random.id()
             },
             {
-                type: "asteroid-wall",
+                type: "forcefield",
                 z: 15,
                 depth: 0,
                 id: random.id()
-            }, 
+            },
             {
                 type: "asteroid-medium-block",
                 z: 15,
@@ -68,6 +68,8 @@ const store = create(() => ({
                 depth: 80,
                 id: random.id()
             }
+
+            /**/
         ]
     }
 }))
@@ -76,17 +78,28 @@ function getBlock(blocks) {
     let lastBlock = blocks[blocks.length - 1]
     let type = random.pick(
         "asteroid-medium-block",
-        "asteroid-medium-block",
-        "asteroid-medium-block",
-        "asteroid-wall"
+        "asteroid-wall",
+        "asteroid-wall",
+        "asteroid-wall",
+        "asteroid-wall",
+        "asteroid-wall",
+        "asteroid-wall",
+        "asteroid-wall",
+        "forcefield"
     )
 
-    if (type === "asteroid-wall" && lastBlock.type !== "asteroid-wall") {
+    if (type === "asteroid-wall" && lastBlock.type === "asteroid-medium-block") {
         return {
             type: "asteroid-wall",
             depth: 0
         }
-    } else {
+    } else if (type === "forcefield" && lastBlock.type === "asteroid-medium-block") {
+        return {
+            type: "forcefield",
+            depth: 0,
+        }
+
+    } else   {
         return {
             type: "asteroid-medium-block",
             depth: 80,
@@ -187,7 +200,7 @@ export function removeTurret(id) {
     })
 }
 
-export function createTank(x, y, z,health) {
+export function createTank(x, y, z, health) {
     let index = (store.getState().world.tankIndex + 1) % 75
     let id = random.id()
 
@@ -237,8 +250,8 @@ export function createFighter(x = random.integer(-10, 10), y = 5, z = store.getS
             list: [
                 ...store.getState().fighters.list,
                 {
-                    x, 
-                    y, 
+                    x,
+                    y,
                     z,
                     id,
                     index,
@@ -339,11 +352,11 @@ export function removeFighter(id, index) {
     })
 }
 
-export function hitPlayer(power = .2) {
+export function hitPlayer(power = 20) {
     store.setState({
         player: {
             ...store.getState().player,
-            health: clamp(store.getState().player.health - power, 0, 1),
+            health: clamp(store.getState().player.health - power, 0, 100),
         }
     })
 }
@@ -360,7 +373,7 @@ export function setPlayerPosition(position) {
 export function hitObstacle(id, power) {
     let obstacle = store.getState().obstacles.find(i => i.id === id)
     let health = clamp(obstacle.health - power, 0, Infinity)
- 
+
     store.setState({
         obstacles: [
             ...store.getState().obstacles.filter(i => i.id !== id),
@@ -372,9 +385,9 @@ export function hitObstacle(id, power) {
     })
 }
 
-export function removeObstacle(id) {
+export function removeObstacle(...id) {
     store.setState({
-        obstacles: store.getState().obstacles.filter(i => i.id !== id)
+        obstacles: store.getState().obstacles.filter(i => !id.includes(i.id))
     })
 }
 
@@ -383,7 +396,7 @@ export function createObstacle({
     height,
     depth,
     radius,
-    position,
+    x, y, z,
     health = Infinity
 }) {
     let container
@@ -393,7 +406,7 @@ export function createObstacle({
         container = new Sphere(radius)
     } else {
         container = new Box3().setFromCenterAndSize(
-            new Vector3(position[0], position[1] + height / 2, position[2]), 
+            new Vector3(x, y + height / 2, z),
             new Vector3(width, height, depth)
         )
     }
@@ -405,7 +418,7 @@ export function createObstacle({
                 width,
                 height,
                 depth,
-                position,
+                position: [x, y, z],
                 health,
                 container,
                 radius,
