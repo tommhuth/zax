@@ -30,7 +30,7 @@ export default function Tanks() {
     )
 }
 
-function Tank({ setPosition, position, health, id, index, x = 0, y = 0, z = 0, width = 5, height = 3, depth = 5 }) {
+function Tank({ setPosition, position, health, id, index, x = 0, y = 0, z = 0, width = 5, height = 3.25, depth = 5 }) {
     let [obstacleId, setObstacleId] = useState()
     let obstacle = useStore(i => i.obstacles.find(i => i.id === obstacleId))
     let playerPosition = useRef([0, 0, 0])

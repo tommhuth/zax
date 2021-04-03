@@ -30,10 +30,11 @@ export default function Turrets() {
 }
 
 function Turret({ setPosition, health, position, id, index, x = 0, y = 0, z = 0, width = 3, height = 6, depth = 3 }) {
-    let [obstacleId, setObstacleId] = useState()
+
     let [dead, setDead] = useState(false)
     let [gone, setGone] = useState(false)
-    let [explode, setExplode] = useState(false)
+    let [explode, setExplode] = useState(false)    
+    let [obstacleId, setObstacleId] = useState()
     let obstacle = useStore(i => i.obstacles.find(i => i.id === obstacleId))
     let playerPosition = useRef([0, 0, 0])
     let tid = useRef()

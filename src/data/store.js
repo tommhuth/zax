@@ -4,22 +4,35 @@ import { Box3, Sphere, Vector3 } from "three"
 import create from "zustand"
 import { clamp } from "../utils"
 
-const WorldMode = {
-    ASTEROID: "as",
-    SPACE: "space",
-}
 
 const BlockType = {
     ASTEROID_START: "asteroid-start",
-    ASTEROID_MEDIUM_BLOCK: "asteroid-medium-block"
+    ASTEROID_END: "asteroid-end",
+    ASTEROID_FORCEFIELD: "asteroid-forcefield",
+    ASTEROID_MEDIUM_BLOCK: "asteroid-medium-block",
+    SPACE: "space"
 }
 
+export { BlockType }
+
+let i = 2
+const map = [
+    [BlockType.SPACE],
+    [BlockType.ASTEROID_START],
+    [BlockType.ASTEROID_FORCEFIELD],
+    [BlockType.ASTEROID_MEDIUM_BLOCK],
+    [BlockType.ASTEROID_MEDIUM_BLOCK],
+    [BlockType.ASTEROID_MEDIUM_BLOCK],
+    [BlockType.ASTEROID_FORCEFIELD],
+    [BlockType.ASTEROID_END],
+]
 
 
 const store = create(() => ({
     player: {
         position: [0, 15, -40],
-        health: 100
+        health: 1000,
+        warp: false,
     },
     stats: {},
     bullets: {
@@ -36,8 +49,7 @@ const store = create(() => ({
     },
     obstacles: [],
     world: {
-        stageCount: 0,
-        mode: "asteroid",
+        stageCount: 0, 
         modeCount: 0,
         turrets: [],
         turretIndex: 0,
@@ -45,66 +57,53 @@ const store = create(() => ({
         tankIndex: 0,
         blocks: [
             {
-                type: "asteroid-start",
+                type: BlockType.SPACE,
                 z: 0,
-                depth: 15,
+                depth: 600,
                 id: random.id()
             },
             {
-                type: "forcefield",
-                z: 15,
-                depth: 0,
+                type: BlockType.ASTEROID_START,
+                z: 600,
+                depth: 27,
                 id: random.id()
             },
-            {
-                type: "asteroid-medium-block",
-                z: 15,
-                depth: 80,
-                id: random.id()
-            },
-            {
-                type: "asteroid-medium-block",
-                z: 95,
-                depth: 80,
-                id: random.id()
-            }
-
-            /**/
         ]
     }
 }))
 
-function getBlock(blocks) {
-    let lastBlock = blocks[blocks.length - 1]
-    let type = random.pick(
-        "asteroid-medium-block",
-        "asteroid-wall",
-        "asteroid-wall",
-        "asteroid-wall",
-        "asteroid-wall",
-        "asteroid-wall",
-        "asteroid-wall",
-        "asteroid-wall",
-        "forcefield"
-    )
-
-    if (type === "asteroid-wall" && lastBlock.type === "asteroid-medium-block") {
-        return {
-            type: "asteroid-wall",
-            depth: 0
-        }
-    } else if (type === "forcefield" && lastBlock.type === "asteroid-medium-block") {
-        return {
-            type: "forcefield",
-            depth: 0,
-        }
-
-    } else   {
-        return {
-            type: "asteroid-medium-block",
-            depth: 80,
-        }
+function makeBlock(type) {
+    switch (type) {
+        case BlockType.ASTEROID_FORCEFIELD:
+            return {
+                depth: 0,
+                type
+            }
+        case BlockType.SPACE:
+            return {
+                depth: 600,
+                type
+            }
+        case BlockType.ASTEROID_MEDIUM_BLOCK:
+            return {
+                depth: 65,
+                type
+            }
+        case BlockType.ASTEROID_START:
+        case BlockType.ASTEROID_END:
+            return {
+                depth: 27,
+                type
+            }
     }
+}
+
+function getBlock() {
+    let type = random.pick(...map[i])
+
+    i = i < map.length - 1 ? i + 1 : 0
+
+    return makeBlock(type)
 }
 
 function addBlock() {
@@ -141,12 +140,21 @@ export function updateStats(stats) {
     })
 }
 
+export function setWarp(status) {
+    store.setState({
+        player: {
+            ...store.getState().player,
+            warp: status
+        }
+    })
+}
+
 
 export function generateWorld(viewportDiagonal) {
     let { world, player } = store.getState()
     let lastBlock = world.blocks[world.blocks.length - 1]
     let firstBlock = world.blocks[0]
-    let bufferFront = viewportDiagonal * .9
+    let bufferFront = viewportDiagonal * 1
     let bufferBack = viewportDiagonal * .6
     let z = player.position[2]
 
@@ -403,7 +411,7 @@ export function createObstacle({
     let id = random.id()
 
     if (radius) {
-        container = new Sphere(radius)
+        container = new Sphere(new Vector3(x, y, z), radius)
     } else {
         container = new Box3().setFromCenterAndSize(
             new Vector3(x, y + height / 2, z),
