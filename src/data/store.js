@@ -10,14 +10,22 @@ const BlockType = {
     ASTEROID_END: "asteroid-end",
     ASTEROID_FORCEFIELD: "asteroid-forcefield",
     ASTEROID_MEDIUM_BLOCK: "asteroid-medium-block",
-    SPACE: "space"
+    SPACE: "space",
+    SPACE_START: "space-start",
+    SPACE_MID: "space-mid",
+    SPACE_END: "space-end",
 }
 
 export { BlockType }
 
-let i = 2
+let i = 1
 const map = [
-    [BlockType.SPACE],
+    [BlockType.SPACE_START],
+    [BlockType.SPACE_MID],
+    [BlockType.SPACE_MID],
+    [BlockType.SPACE_MID],
+    [BlockType.SPACE_MID],
+    [BlockType.SPACE_END],
     [BlockType.ASTEROID_START],
     [BlockType.ASTEROID_FORCEFIELD],
     [BlockType.ASTEROID_MEDIUM_BLOCK],
@@ -49,7 +57,7 @@ const store = create(() => ({
     },
     obstacles: [],
     world: {
-        stageCount: 0, 
+        stageCount: 0,
         modeCount: 0,
         turrets: [],
         turretIndex: 0,
@@ -57,31 +65,35 @@ const store = create(() => ({
         tankIndex: 0,
         blocks: [
             {
-                type: BlockType.SPACE,
-                z: 0,
-                depth: 600,
-                id: random.id()
-            },
-            {
-                type: BlockType.ASTEROID_START,
-                z: 600,
-                depth: 27,
-                id: random.id()
-            },
+                type: BlockType.SPACE_START,
+                depth: 100,
+                id: random.id(),
+                z: 0
+            }
         ]
     }
 }))
 
 function makeBlock(type) {
     switch (type) {
+        case BlockType.SPACE_START:
+            return {
+                depth: 100,
+                type
+            }
+        case BlockType.SPACE_MID:
+            return {
+                depth: 100,
+                type
+            }
+        case BlockType.SPACE_END:
+            return {
+                depth: 100,
+                type
+            }
         case BlockType.ASTEROID_FORCEFIELD:
             return {
                 depth: 0,
-                type
-            }
-        case BlockType.SPACE:
-            return {
-                depth: 600,
                 type
             }
         case BlockType.ASTEROID_MEDIUM_BLOCK:

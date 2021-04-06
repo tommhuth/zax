@@ -62,14 +62,13 @@ export default function Player({ width = 2.5, height = .65, depth = 5 }) {
             }
         }
 
+        if (warp) {
+            y.current = 5
+        }
+
         ref.current.position.x += (x.current - ref.current.position.x) * .1
         ref.current.position.z += dead ? 0 : .3
-
-        if (warp) {
-            ref.current.position.y += (5 - ref.current.position.y) * .01
-        } else {
-            ref.current.position.y += (y.current - ref.current.position.y) * .1
-        }
+        ref.current.position.y += (  y.current  - ref.current.position.y) * (warp ? .01: .1 )
 
         setPlayerPosition([ref.current.position.x, ref.current.position.y, ref.current.position.z])
     })
@@ -87,14 +86,14 @@ export default function Player({ width = 2.5, height = .65, depth = 5 }) {
 
         for (let obstacle of obstacles) {
             if (obstacle.health > 0 && obstacle.container.intersectsBox(container)) {
-                setWarp(false) 
+                setWarp(false)
                 hitPlayer(100)
                 break
             }
         }
     })
 
-    return ( 
+    return (
         <Model receiveShadow={false} castShadow position={[0, 15, -40]} name="player" ref={ref} />
     )
-} 
+}

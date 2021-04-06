@@ -14,6 +14,9 @@ import AsteroidStart from "./blocks/AsteroidStart"
 import AsteroidEnd from "./blocks/AsteroidEnd"
 import AsteroidForcefield from "./blocks/AsteroidForcefield"
 import Starfield from "./blocks/Starfield"
+import SpaceEnd from "./blocks/SpaceEnd"
+import SpaceMid from "./blocks/SpaceMid"
+import SpaceStart from "./blocks/SpaceStart"
 
 export function SpawnTurret({ x, y, z, health = 2 }) {
     useEffect(() => {
@@ -94,7 +97,7 @@ function AsteroidWall({ z }) {
 
 export default function World() {
     let { gl } = useThree()
-    let blocks = useStore(i => i.world.blocks)
+    let blocks = useStore(i => i.world.blocks) 
     let cover = useRef()
     let { viewport } = useThree()
     let playerPosition = useRef([0, 0, 0])
@@ -103,7 +106,7 @@ export default function World() {
         let left = new PlaneBufferGeometry(40, 400, 1, 1).rotateX(-Math.PI / 2).translate(25, 30, 0)
 
         return BufferGeometryUtils.mergeBufferGeometries([left, right])
-    }, [])
+    }, []) 
 
     useEffect(() => {
         return useStore.subscribe(position => {
@@ -119,6 +122,8 @@ export default function World() {
                 generateWorld(diagonal)
             }
         }, 150)
+
+        generateWorld(diagonal)
 
         return () => {
             clearInterval(id)
@@ -144,8 +149,12 @@ export default function World() {
                         return <AsteroidStart {...i} key={i.id} />
                     case BlockType.ASTEROID_END:
                         return <AsteroidEnd {...i} key={i.id} />
-                    case BlockType.SPACE:
-                        return <Space {...i} key={i.id} />
+                    case BlockType.SPACE_END:
+                        return <SpaceEnd {...i} key={i.id} />
+                    case BlockType.SPACE_MID:
+                        return <SpaceMid {...i} key={i.id} />
+                    case BlockType.SPACE_START:
+                        return <SpaceStart {...i} key={i.id} />
                     case "asteroid-wall":
                         return <AsteroidWall {...i} key={i.id} />
                     case BlockType.ASTEROID_MEDIUM_BLOCK:

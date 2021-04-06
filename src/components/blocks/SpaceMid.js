@@ -4,41 +4,23 @@ import useStore, { createObstacle, removeObstacle, setWarp } from "../../data/st
 import random from "@huth/random"
 import { useMeteor } from "../Models"
 
-export default function Space({ z, depth }) {
-    let playerPosition = useRef([0, 0, 0])
-    let health = useStore(i => i.player.health)
+export default function SpaceMid({ z, depth }) { 
     let [meteors, setMeteors] = useState(() => {
-        return new Array(40).fill().map((i,index) => {
-            let zd = z + index/40 * (depth-300) + 150
+        let count = random.integer(10, 15)
 
+        return new Array(count).fill().map((i, index) => {
             return {
                 id: random.id(),
                 x: random.integer(-20, 20),
                 radius: random.integer(2, 5),
                 y: 5,
-                z: zd 
+                z: z + index / count * depth
             }
         })
     })
     let removeMeteor = useCallback((id) => {
         setMeteors(i => i.filter(i => i.id !== id))
-    }, [])
-
-    useEffect(() => {
-        return useStore.subscribe(position => {
-            playerPosition.current = position
-        }, store => store.player.position)
-    }, [])
-
-    useFrame(() => {
-        let buffer = 100
-
-        setWarp(
-            health > 0 
-            && playerPosition.current[2] > z + buffer * .65 
-            && playerPosition.current[2] < z + depth - buffer
-        )
-    })
+    }, []) 
 
     return (
         <>
@@ -84,7 +66,7 @@ function Meteor({ x = 0, y = 0, z = 0, id, removeMeteor, radius }) {
     useEffect(() => {
         if (obstacle?.health <= 0) {
             dead.current = true
-            updateMeteor({ position: [0,0,-1000]})
+            updateMeteor({ position: [0, 0, -1000] })
             removeMeteor(id)
         }
     }, [obstacle?.health, id, updateMeteor, removeMeteor])
@@ -99,7 +81,7 @@ function Meteor({ x = 0, y = 0, z = 0, id, removeMeteor, radius }) {
         rot.current.z += rotationZ
 
         updateMeteor({
-            position: [x, y,   z],
+            position: [x, y, z],
             scale: [radius * 2, radius * 2, radius * 2],
             rotation: [rot.current.x, rot.current.y, rot.current.z]
         })
