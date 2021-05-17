@@ -1,4 +1,5 @@
 import { useThree } from "react-three-fiber"
+import { CameraHelper } from "three"
 import { useEffect, useRef } from "react"
 import useStore from "../data/store"
 
@@ -25,14 +26,13 @@ export default function Lights() {
     }, [])
 
     useEffect(() => {
-        let size = 38
-        let { width, height } = viewport()
-        let diag = Math.sqrt(width ** 2 + height ** 2)
+        let size = 38 
+        let diag = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
 
         ref.current.shadow.camera.near = -size * .5
         ref.current.shadow.camera.far = size * .5
-        ref.current.shadow.camera.left = -size * .65
-        ref.current.shadow.camera.right = size * .65
+        ref.current.shadow.camera.left = -size * .85
+        ref.current.shadow.camera.right = size * 1.125
         ref.current.shadow.camera.top = diag * .45
         ref.current.shadow.camera.bottom = -diag * .85
         ref.current.shadow.bias = .001
@@ -40,6 +40,7 @@ export default function Lights() {
 
         ref.current.shadow.camera.updateMatrixWorld()
         ref.current.updateMatrixWorld()
+        
         /*
         let g = new CameraHelper(ref.current.shadow.camera)
  

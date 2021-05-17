@@ -39,11 +39,7 @@ function App() {
             <Canvas
                 orthographic
                 webgl1
-                pixelRatio={window.devicePixelRatio * (.2 + (window.devicePixelRatio > 1 ? -.1 : 0))}
-                style={{
-                    //width: window.innerWidth + (window.innerWidth % 2 === 0 ? 0 : 1),
-                    //height: window.innerHeight + (window.innerHeight % 2 === 0 ? 0 : 1)
-                }}
+                dpr={window.devicePixelRatio * (.2 + (window.devicePixelRatio > 1 ? -.1 : 0))} 
                 camera={{
                     zoom: 24, // 24,
                     position: new Vector3(0, 15, -40),
@@ -57,12 +53,12 @@ function App() {
                     stencil: false,
                     alpha: true
                 }}
-                shadowMap={{
+                shadows={{
                     type: BasicShadowMap
                 }}
             >
                 <ModelsProvider> 
-                    {obstacles.map(i => {   
+                    {obstacles.map(i => {  
                         return null 
                         
                         return (

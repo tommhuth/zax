@@ -43,10 +43,10 @@ export default function Fighters() {
     </>
 }
 
-function Fighter({ position, index, setPosition, y = 5, speed = .2, straight, id }) {
+function Fighter({ position, index, setPosition, y = 5, speed = .2, straight, id, stationary }) {
     let dead = useRef(false)
     let t = useRef(Math.random() * 2)
-    let tid = useRef(0)
+    let tid = useRef(Math.random())
     let playerPosition = useRef([0, 0, 0])
 
     useEffect(() => {
@@ -62,7 +62,7 @@ function Fighter({ position, index, setPosition, y = 5, speed = .2, straight, id
     useEffect(() => {
         const fire = () => {
             if (!document.hidden && playerPosition.current[2] > position.z - 25 && playerPosition.current[2] < position.z) {
-                createBullet(position.x, position.y, position.z, "enemy")
+                createBullet(position.x, position.y, position.z - 4, "enemy")
             }
 
             tid.current = setTimeout(fire, random.boolean() ? 200 : random.integer(500, 1000))
@@ -75,7 +75,7 @@ function Fighter({ position, index, setPosition, y = 5, speed = .2, straight, id
 
     useFrame(() => {
         position.y = Math.cos(t.current) * .35 + y
-        position.z -= speed
+        position.z -= stationary ? 0 : speed
 
         if (!straight) {
             position.x = Math.cos(t.current * .4) * 8
@@ -87,7 +87,7 @@ function Fighter({ position, index, setPosition, y = 5, speed = .2, straight, id
     })
 
     useFrame(() => {
-        let gone = position.z < playerPosition.current[2] - 45
+        let gone = position.z < playerPosition.current[2] - 75
         let hit = position.distanceTo(new Vector3(...playerPosition.current)) < 3
 
         if ((hit || gone) && !dead.current) {

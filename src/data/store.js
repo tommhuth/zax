@@ -1,5 +1,4 @@
 import random from "@huth/random"
-import { useState } from "react"
 import { Box3, Sphere, Vector3 } from "three"
 import create from "zustand"
 import { clamp } from "../utils"
@@ -8,31 +7,43 @@ import { clamp } from "../utils"
 const BlockType = {
     ASTEROID_START: "asteroid-start",
     ASTEROID_END: "asteroid-end",
+    ASTEROID_WALL: "asteroid-wall",
     ASTEROID_FORCEFIELD: "asteroid-forcefield",
     ASTEROID_MEDIUM_BLOCK: "asteroid-medium-block",
+    ASTEROID_MEDIUM_BLOCK2: "asteroid-medium-block2",
     SPACE: "space",
     SPACE_START: "space-start",
     SPACE_MID: "space-mid",
+    SPACE_MID2: "space-mid2",
     SPACE_END: "space-end",
 }
 
 export { BlockType }
 
-let i = 1
+let i = 9
 const map = [
-    [BlockType.SPACE_START],
-    [BlockType.SPACE_MID],
-    [BlockType.SPACE_MID],
-    [BlockType.SPACE_MID],
-    [BlockType.SPACE_MID],
-    [BlockType.SPACE_END],
     [BlockType.ASTEROID_START],
     [BlockType.ASTEROID_FORCEFIELD],
     [BlockType.ASTEROID_MEDIUM_BLOCK],
-    [BlockType.ASTEROID_MEDIUM_BLOCK],
-    [BlockType.ASTEROID_MEDIUM_BLOCK],
+    [BlockType.ASTEROID_MEDIUM_BLOCK2, BlockType.ASTEROID_MEDIUM_BLOCK],
+    [BlockType.ASTEROID_MEDIUM_BLOCK2, BlockType.ASTEROID_WALL, BlockType.ASTEROID_MEDIUM_BLOCK, BlockType.ASTEROID_MEDIUM_BLOCK],
+    [BlockType.ASTEROID_MEDIUM_BLOCK2, BlockType.ASTEROID_WALL, BlockType.ASTEROID_MEDIUM_BLOCK, BlockType.ASTEROID_MEDIUM_BLOCK],
+    [BlockType.ASTEROID_MEDIUM_BLOCK2, BlockType.ASTEROID_MEDIUM_BLOCK, BlockType.ASTEROID_MEDIUM_BLOCK],
     [BlockType.ASTEROID_FORCEFIELD],
     [BlockType.ASTEROID_END],
+    [BlockType.SPACE_START],
+    [BlockType.SPACE_MID],
+    [BlockType.SPACE_MID2],
+    [BlockType.SPACE_MID, BlockType.SPACE_MID2],
+    [BlockType.SPACE_MID],
+    [BlockType.SPACE_MID, BlockType.SPACE_MID2],
+    [BlockType.SPACE_MID],
+    [BlockType.SPACE_MID, BlockType.SPACE_MID2],
+    [BlockType.SPACE_MID2],
+    [BlockType.SPACE_MID, BlockType.SPACE_MID2],
+    [BlockType.SPACE_MID2],
+    [BlockType.SPACE_MID],
+    [BlockType.SPACE_END],
 ]
 
 
@@ -65,8 +76,8 @@ const store = create(() => ({
         tankIndex: 0,
         blocks: [
             {
-                type: BlockType.SPACE_START,
-                depth: 100,
+                type: BlockType.ASTEROID_START,
+                depth: 27,
                 id: random.id(),
                 z: 0
             }
@@ -83,7 +94,12 @@ function makeBlock(type) {
             }
         case BlockType.SPACE_MID:
             return {
-                depth: 100,
+                depth: 40,
+                type
+            }
+        case BlockType.SPACE_MID2:
+            return {
+                depth: 20,
                 type
             }
         case BlockType.SPACE_END:
@@ -96,9 +112,16 @@ function makeBlock(type) {
                 depth: 0,
                 type
             }
+        case BlockType.ASTEROID_WALL:
+            return {
+                depth: 0,
+                type
+            }
         case BlockType.ASTEROID_MEDIUM_BLOCK:
+        case BlockType.ASTEROID_MEDIUM_BLOCK2:
             return {
                 depth: 65,
+                hasFighter: i > 3,
                 type
             }
         case BlockType.ASTEROID_START:
@@ -255,7 +278,7 @@ export function removeTank(id) {
     })
 }
 
-export function createFighter(x = random.integer(-10, 10), y = 5, z = store.getState().player.position[2] + 45) {
+export function createFighter(x, y, z, stationary, straight = random.boolean()) {
     if (store.getState().fighters.list.length > 110) {
         return
     }
@@ -276,7 +299,8 @@ export function createFighter(x = random.integer(-10, 10), y = 5, z = store.getS
                     id,
                     index,
                     position: new Vector3(x, y, z),
-                    straight: random.boolean()
+                    stationary,
+                    straight
                 }
             ]
         }

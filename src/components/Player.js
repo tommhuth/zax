@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import useStore, { createBullet, setPlayerPosition, hitPlayer, setWarp } from "../data/store"
 import { clamp } from "../utils"
 import Model from "../Model"
+import Config from "../data/Config"
 
 export default function Player({ width = 2.5, height = .65, depth = 5 }) {
     let ref = useRef()
@@ -40,35 +41,31 @@ export default function Player({ width = 2.5, height = .65, depth = 5 }) {
         if (!ref.current) {
             return
         }
-        let xLeftEdge = 9
-        let xRightEdge = -16
-        let yUpperEdge = 16
-        let yLowerEdge = 3
 
         for (let [key] of Object.entries(keys.current)) {
             switch (key.toLowerCase()) {
                 case "a":
-                    x.current = clamp(x.current + .25, xRightEdge, xLeftEdge)
+                    x.current = clamp(x.current + .25, Config.PLAYER_RIGHT_EDGE, Config.PLAYER_LEFT_EDGE)
                     break
                 case "d":
-                    x.current = clamp(x.current - .25, xRightEdge, xLeftEdge)
+                    x.current = clamp(x.current - .25, Config.PLAYER_RIGHT_EDGE, Config.PLAYER_LEFT_EDGE)
                     break
                 case "w":
-                    y.current = clamp(y.current + .2, yLowerEdge, yUpperEdge)
+                    y.current = clamp(y.current + .2, Config.PLAYER_LOWER_EDGE, Config.PLAYER_UPPER_EDGE)
                     break
                 case "s":
-                    y.current = clamp(y.current - .2, yLowerEdge, yUpperEdge)
+                    y.current = clamp(y.current - .2, Config.PLAYER_LOWER_EDGE, Config.PLAYER_UPPER_EDGE)
                     break
             }
         }
 
         if (warp) {
-            y.current = 5
+            y.current = Config.WARP_Y
         }
 
         ref.current.position.x += (x.current - ref.current.position.x) * .1
-        ref.current.position.z += dead ? 0 : .3
-        ref.current.position.y += (  y.current  - ref.current.position.y) * (warp ? .01: .1 )
+        ref.current.position.z += dead ? 0 : .3 + (warp ? .1 : 0)
+        ref.current.position.y += (y.current - ref.current.position.y) * (warp ? .01 : .1)
 
         setPlayerPosition([ref.current.position.x, ref.current.position.y, ref.current.position.z])
     })

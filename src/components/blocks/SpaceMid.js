@@ -3,17 +3,19 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import useStore, { createObstacle, removeObstacle, setWarp } from "../../data/store"
 import random from "@huth/random"
 import { useMeteor } from "../Models"
+import { SpawnFighter } from "../World"
+import Config from "../../data/Config"
 
 export default function SpaceMid({ z, depth }) { 
     let [meteors, setMeteors] = useState(() => {
-        let count = random.integer(10, 15)
+        let count = random.integer(5, 8)
 
         return new Array(count).fill().map((i, index) => {
             return {
                 id: random.id(),
                 x: random.integer(-20, 20),
-                radius: random.integer(2, 5),
-                y: 5,
+                radius: random.integer(2, 4), 
+                y: Config.WARP_Y,
                 z: z + index / count * depth
             }
         })
@@ -24,7 +26,7 @@ export default function SpaceMid({ z, depth }) {
 
     return (
         <>
-            {meteors.map(i => {
+            {meteors.map(i => {  
                 return (
                     <Meteor removeMeteor={removeMeteor} {...i} key={i.id} />
                 )
@@ -67,7 +69,7 @@ function Meteor({ x = 0, y = 0, z = 0, id, removeMeteor, radius }) {
         if (obstacle?.health <= 0) {
             dead.current = true
             updateMeteor({ position: [0, 0, -1000] })
-            removeMeteor(id)
+            //removeMeteor(id)
         }
     }, [obstacle?.health, id, updateMeteor, removeMeteor])
 

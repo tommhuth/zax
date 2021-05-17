@@ -50,13 +50,14 @@ function Bullet({ x, y, z, speed, index, position, id, setPosition, owner }) {
     }, [])
 
     useEffect(() => {
-        return () => setPosition(index, 0, new Vector3(0, 0, -1000))
+        return () => setPosition(index, new Vector3(0, 0, -1000))
     }, [setPosition, index])
 
     useFrame(() => {
         if (owner === "player") {
             for (let obstacle of obstacles.current) {
-                if (obstacle.health > 0 && obstacle.container.containsPoint(position)) {
+                if (obstacle.health > 0 && obstacle.container.containsPoint(position)) { 
+                    dead.current = true
                     removeBullet(id, index)
                     hitObstacle(obstacle.id, 1)
 

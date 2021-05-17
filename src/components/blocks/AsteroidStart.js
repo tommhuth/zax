@@ -16,8 +16,8 @@ export default function AsteroidStart({ z, depth }) {
     return (
         <>
             <SpawnTurret x={x} y={0} z={z + depth / 2} />
-            <Model name="asttop" receiveShadow={true} castShadow={false} position={[0, 0, z + depth]} />
-            <Model name="astbottom" receiveShadow={false} position={[0, 0, z + depth]} />
+            <Model name="asttop" receiveShadow={true} castShadow={false} position={[2, 0, z + depth]} />
+            <Model name="astbottom" receiveShadow={false} position={[2, 0, z + depth]} />
         </>
     )
 }

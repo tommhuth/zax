@@ -8,7 +8,8 @@ import { Matrix4, PlaneBufferGeometry, Vector3 } from "three"
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils"
 import { Only } from "../../utils"
 import { useMeteor } from "../Models"
-import { SpawnTank, SpawnTurret } from "../World"
+import { SpawnFighter, SpawnTank, SpawnTurret } from "../World"
+import Config from "../../data/Config"
 
 function useGrid({ width = 24, depth = 65, size = 8 }) {
     let occupied = useRef([])
@@ -42,7 +43,7 @@ function useGrid({ width = 24, depth = 65, size = 8 }) {
     return grid
 }
 
-export default function AsteroidMediumBlock({ z, depth }) {
+export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
     let grid = useGrid({ width: 20, depth, size: 15 })
     let [scaleZ] = useState(random.pick(-1, 1))
     let [scaleX] = useState(random.pick(-1, 1))
@@ -85,9 +86,37 @@ export default function AsteroidMediumBlock({ z, depth }) {
 
         return res
     }, [grid, z])
+    let fighters = useMemo(() => {
+        let res = []
+        let count = random.pick(0, 2, 1)
+
+        for (let i = 0; i < count; i++) {
+            res.push({
+                x: i / count * (Config.PLAYER_LEFT_EDGE + Math.abs(Config.PLAYER_RIGHT_EDGE)) - Config.PLAYER_LEFT_EDGE, // random.integer(-9, 16),
+                z: z + depth - random.integer(0, 15),
+                y: random.integer(10, Config.PLAYER_UPPER_EDGE),
+                id: random.id()
+            })
+        }
+
+        return res
+    }, [depth, z])
 
     return (
         <>
+            <Only if={hasFighter}>
+                {fighters.map(i => {
+                    return (
+                        <SpawnFighter
+                            x={i.x}
+                            z={i.z}
+                            y={i.y}
+                            key={i.id}
+                        />
+                    )
+                })}
+
+            </Only>
             <Model
                 name={"floor1"}
                 position={[-18, 0, z + (scaleZ === -1 ? depth : 0)]}

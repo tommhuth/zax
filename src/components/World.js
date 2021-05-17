@@ -1,15 +1,11 @@
 import { useFrame, useThree } from "react-three-fiber"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import useStore, { generateWorld, createTurret, createObstacle, removeObstacle, removeTurret, createTank, removeTank, createFighter, removeFighter, BlockType, removeBullet } from "../data/store"
 import random from "@huth/random"
 import Model, { mat } from "../Model"
-import Wall from "./Wall"
-import { Matrix4, PlaneBufferGeometry, Vector3 } from "three"
+import { PlaneBufferGeometry } from "three"
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils"
-import { Only } from "../utils"
-import { useMeteor } from "./Models"
 import AsteroidMediumBlock from "./blocks/AsteroidMediumBlock"
-import Space from "./blocks/Space"
 import AsteroidStart from "./blocks/AsteroidStart"
 import AsteroidEnd from "./blocks/AsteroidEnd"
 import AsteroidForcefield from "./blocks/AsteroidForcefield"
@@ -17,6 +13,8 @@ import Starfield from "./blocks/Starfield"
 import SpaceEnd from "./blocks/SpaceEnd"
 import SpaceMid from "./blocks/SpaceMid"
 import SpaceStart from "./blocks/SpaceStart"
+import AsteroidMediumBlock2 from "./blocks/AsteroidMediumBlock2"
+import SpaceMid2 from "./blocks/SpaceMid2"
 
 export function SpawnTurret({ x, y, z, health = 2 }) {
     useEffect(() => {
@@ -38,9 +36,9 @@ export function SpawnTank({ x, y, z, health = 1 }) {
     return null
 }
 
-export function SpawnFighter({ x, y, z, health = 1 }) {
+export function SpawnFighter({ x, y, z, health = 1, stationary = false }) {
     useEffect(() => {
-        let id = createFighter(x, y, z, health)
+        let id = createFighter(x, y, z, health, stationary)
 
         return () => removeFighter(id)
     }, [])
@@ -97,7 +95,7 @@ function AsteroidWall({ z }) {
 
 export default function World() {
     let { gl } = useThree()
-    let blocks = useStore(i => i.world.blocks) 
+    let blocks = useStore(i => i.world.blocks)
     let cover = useRef()
     let { viewport } = useThree()
     let playerPosition = useRef([0, 0, 0])
@@ -106,7 +104,7 @@ export default function World() {
         let left = new PlaneBufferGeometry(40, 400, 1, 1).rotateX(-Math.PI / 2).translate(25, 30, 0)
 
         return BufferGeometryUtils.mergeBufferGeometries([left, right])
-    }, []) 
+    }, [])
 
     useEffect(() => {
         return useStore.subscribe(position => {
@@ -115,8 +113,7 @@ export default function World() {
     }, [])
 
     useEffect(() => {
-        let { width, height } = viewport()
-        let diagonal = Math.sqrt(width ** 2 + height ** 2)
+        let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
         let id = setInterval(() => {
             if (!document.hidden) {
                 generateWorld(diagonal)
@@ -143,7 +140,8 @@ export default function World() {
             <mesh ref={cover} position-x={0} geometry={geometry}>
                 <meshBasicMaterial color="black" />
             </mesh>
-            {blocks.map(i => {
+
+            {blocks.map(i => {  
                 switch (i.type) {
                     case BlockType.ASTEROID_START:
                         return <AsteroidStart {...i} key={i.id} />
@@ -153,12 +151,16 @@ export default function World() {
                         return <SpaceEnd {...i} key={i.id} />
                     case BlockType.SPACE_MID:
                         return <SpaceMid {...i} key={i.id} />
+                    case BlockType.SPACE_MID2:
+                        return <SpaceMid2 {...i} key={i.id} />
                     case BlockType.SPACE_START:
                         return <SpaceStart {...i} key={i.id} />
-                    case "asteroid-wall":
+                    case BlockType.ASTEROID_WALL:
                         return <AsteroidWall {...i} key={i.id} />
                     case BlockType.ASTEROID_MEDIUM_BLOCK:
                         return <AsteroidMediumBlock {...i} key={i.id} />
+                    case BlockType.ASTEROID_MEDIUM_BLOCK2:
+                        return <AsteroidMediumBlock2 {...i} key={i.id} />
                     case BlockType.ASTEROID_FORCEFIELD:
                         return <AsteroidForcefield {...i} key={i.id} />
                 }
