@@ -1,6 +1,6 @@
 import random from "@huth/random"
 
-let i = 9
+let i = 0
 const BlockType = {
     ASTEROID_START: "asteroid-start",
     ASTEROID_END: "asteroid-end",
@@ -13,15 +13,29 @@ const BlockType = {
     SPACE_MID: "space-mid",
     SPACE_MID2: "space-mid2",
     SPACE_END: "space-end",
-} 
+}
 const map = [
     [BlockType.ASTEROID_START],
     [BlockType.ASTEROID_FORCEFIELD],
     [BlockType.ASTEROID_MEDIUM_BLOCK],
     [BlockType.ASTEROID_MEDIUM_BLOCK2, BlockType.ASTEROID_MEDIUM_BLOCK],
-    [BlockType.ASTEROID_MEDIUM_BLOCK2, BlockType.ASTEROID_WALL, BlockType.ASTEROID_MEDIUM_BLOCK, BlockType.ASTEROID_MEDIUM_BLOCK],
-    [BlockType.ASTEROID_MEDIUM_BLOCK2, BlockType.ASTEROID_WALL, BlockType.ASTEROID_MEDIUM_BLOCK, BlockType.ASTEROID_MEDIUM_BLOCK],
-    [BlockType.ASTEROID_MEDIUM_BLOCK2, BlockType.ASTEROID_MEDIUM_BLOCK, BlockType.ASTEROID_MEDIUM_BLOCK],
+    [
+        BlockType.ASTEROID_MEDIUM_BLOCK2,
+        BlockType.ASTEROID_WALL,
+        BlockType.ASTEROID_MEDIUM_BLOCK,
+        BlockType.ASTEROID_MEDIUM_BLOCK
+    ],
+    [
+        BlockType.ASTEROID_MEDIUM_BLOCK2,
+        BlockType.ASTEROID_WALL,
+        BlockType.ASTEROID_MEDIUM_BLOCK,
+        BlockType.ASTEROID_MEDIUM_BLOCK
+    ],
+    [
+        BlockType.ASTEROID_MEDIUM_BLOCK2,
+        BlockType.ASTEROID_MEDIUM_BLOCK,
+        BlockType.ASTEROID_MEDIUM_BLOCK
+    ],
     [BlockType.ASTEROID_FORCEFIELD],
     [BlockType.ASTEROID_END],
     [BlockType.SPACE_START],
@@ -88,11 +102,9 @@ function makeBlock(type) {
 }
 
 function getBlock() {
-    let type = random.pick(...map[i])
+    i = i < map.length  -1 ? i + 1 : 0 
 
-    i = i < map.length - 1 ? i + 1 : 0
-
-    return makeBlock(type)
+    return makeBlock(random.pick(...map[i]))
 }
 
 
