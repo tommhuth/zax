@@ -119,7 +119,7 @@ export default function World() {
             if (!document.hidden) {
                 generateWorld(diagonal)
             }
-        }, 150)
+        }, 300)
 
         generateWorld(diagonal)
 
