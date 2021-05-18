@@ -31,6 +31,7 @@ function Bullet({ x, y, z, speed, index, position, id, setPosition, owner }) {
     let playerPosition = useRef([0, 0, 0])
     let obstacles = useRef([])
     let fighters = useStore(i => i.fighters.list)
+    let warp = useStore(i => i.player.warp)
 
     useLayoutEffect(() => {
         setPosition(x, y, z)
@@ -101,7 +102,7 @@ function Bullet({ x, y, z, speed, index, position, id, setPosition, owner }) {
             return
         }
 
-        position.z += speed * (owner === "enemy" ? -1 : 1)
+        position.z += (speed + (warp ? .1 : 0)) * (owner === "enemy" ? -1 : 1)
 
         let edgeLeftBuffer = 30
         let edgeRightBuffer = 45

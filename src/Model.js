@@ -1,7 +1,6 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { useEffect, useState, forwardRef } from "react"
 import { BufferGeometry, Cache,MeshBasicMaterial,MeshLambertMaterial } from "three"
-import { useThree } from "react-three-fiber"
 
 Cache.enabled = true
 

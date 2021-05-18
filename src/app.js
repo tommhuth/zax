@@ -1,11 +1,9 @@
 import "../assets/styles/app.scss"
 
 import ReactDOM from "react-dom"
-import { Canvas, useFrame, useThree } from "react-three-fiber"
-import { Box3, BoxBufferGeometry, Quaternion, Sphere, BasicShadowMap, Vector3, CameraHelper, Matrix4, MeshLambertMaterial, TextureLoader, RepeatWrapping, NearestFilter, CubeReflectionMapping, CubeUVReflectionMapping, LinearMipmapLinearFilter, LinearMipMapLinearFilter } from "three"
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
+import { Canvas } from "react-three-fiber"
+import { BasicShadowMap, Vector3 } from "three"
 import useStore from "./data/store"
-import Config from "./data/Config"
 import Turrets from "./components/Turrets"
 import Particles from "./components/Particles"
 import Bullets from "./components/Bullets"
@@ -15,7 +13,6 @@ import World from "./components/World"
 import Lights from "./components/Lights"
 import Camera from "./components/Camera"
 import Tanks from "./components/Tanks"
-import random from "@huth/random"
 import { ModelsProvider } from "./components/Models"
 
 

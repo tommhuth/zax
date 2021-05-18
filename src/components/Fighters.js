@@ -1,7 +1,7 @@
 import { useFrame } from "react-three-fiber"
 import { Vector3, Matrix4, MeshLambertMaterial } from "three"
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react"
-import useStore, { createBullet, createFighter, hitPlayer, removeFighter } from "../data/store"
+import useStore, { createBullet, hitPlayer, removeFighter } from "../data/store"
 import random from "@huth/random"
 import { useGeometry } from "../Model"
 

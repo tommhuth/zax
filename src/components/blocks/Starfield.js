@@ -1,5 +1,5 @@
-import { useFrame, useThree } from "react-three-fiber"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useFrame } from "react-three-fiber"
+import { useEffect, useMemo, useRef } from "react"
 import useStore from "../../data/store"
 import random from "@huth/random" 
 import { Matrix4, Quaternion, Vector3 } from "three"

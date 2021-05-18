@@ -1,8 +1,6 @@
-import { useFrame, useThree } from "react-three-fiber"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import useStore, { createObstacle, removeObstacle, setWarp } from "../../data/store"
-import random from "@huth/random"
-import { useMeteor } from "../Models"
+import { useFrame } from "react-three-fiber"
+import { useEffect, useRef } from "react"
+import useStore, { setWarp } from "../../data/store"
 
 export default function SpaceStart({ z, depth }) {
     let playerPosition = useRef([0, 0, 0])

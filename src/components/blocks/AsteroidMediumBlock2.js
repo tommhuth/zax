@@ -1,15 +1,9 @@
-import { useFrame, useThree } from "react-three-fiber"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import useStore, { generateWorld, createTurret, createObstacle, removeObstacle, removeTurret, createTank, removeTank, createFighter, removeFighter, BlockType, removeBullet } from "../../data/store"
+import { useEffect, useMemo, useState } from "react"
+import { createObstacle, removeObstacle } from "../../data/store"
 import random from "@huth/random"
-import Model, { mat } from "../../Model"
-import Wall from "../Wall"
-import { Matrix4, PlaneBufferGeometry, Vector3 } from "three"
-import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils"
+import Model from "../../Model"
 import { Only } from "../../utils"
-import { useMeteor } from "../Models"
 import { SpawnTank, SpawnTurret } from "../World"
-
 
 export default function AsteroidMediumBlock2({ z, depth }) {
     let [scaleZ] = useState(random.pick(1, -1))
@@ -18,7 +12,7 @@ export default function AsteroidMediumBlock2({ z, depth }) {
     let positions = useMemo(() => {
         return [
             [random.pick(1, -3, -8, -15), 0, z + depth - random.integer(30, 45)],
-            [random.pick(1, -3, -8, -15), 0, z  + random.integer(0, 15)],
+            [random.pick(1, -3, -8, -15), 0, z + random.integer(0, 15)],
         ]
     }, [z, depth])
 
@@ -76,10 +70,10 @@ export default function AsteroidMediumBlock2({ z, depth }) {
                 z={positions[0][2]}
                 health={3}
             />
-            <SpawnTank 
+            <SpawnTank
                 x={positions[1][0]}
                 y={positions[1][1]}
-                z={positions[1][2]} 
+                z={positions[1][2]}
             />
             <Only if={deco}>
                 <Model

@@ -1,6 +1,6 @@
 import { useFrame, useThree } from "react-three-fiber"
 import { useEffect, useMemo, useRef, useState } from "react"
-import useStore, { generateWorld, createTurret, createObstacle, removeObstacle, removeTurret, createTank, removeTank, createFighter, removeFighter, BlockType, removeBullet } from "../data/store"
+import useStore, { generateWorld, createTurret, createObstacle, removeObstacle, removeTurret, createTank, removeTank, createFighter, removeFighter } from "../data/store"
 import random from "@huth/random"
 import Model, { mat } from "../Model"
 import { PlaneBufferGeometry } from "three"
@@ -15,6 +15,7 @@ import SpaceMid from "./blocks/SpaceMid"
 import SpaceStart from "./blocks/SpaceStart"
 import AsteroidMediumBlock2 from "./blocks/AsteroidMediumBlock2"
 import SpaceMid2 from "./blocks/SpaceMid2"
+import { BlockType } from "../data/block-generator"
 
 export function SpawnTurret({ x, y, z, health = 2 }) {
     useEffect(() => {

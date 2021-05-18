@@ -1,9 +1,8 @@
-import { useFrame, useThree } from "react-three-fiber"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import useStore, { createObstacle, removeObstacle, setWarp } from "../../data/store"
+import { useFrame } from "react-three-fiber"
+import { useCallback, useEffect, useRef, useState } from "react"
+import useStore, { createObstacle, removeObstacle } from "../../data/store"
 import random from "@huth/random"
 import { useMeteor } from "../Models"
-import { SpawnFighter } from "../World"
 import Config from "../../data/Config"
 
 export default function SpaceMid({ z, depth }) { 

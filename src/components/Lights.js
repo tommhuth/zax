@@ -1,5 +1,4 @@
 import { useThree } from "react-three-fiber"
-import { CameraHelper } from "three"
 import { useEffect, useRef } from "react"
 import useStore from "../data/store"
 
