@@ -8,7 +8,7 @@ import { SpawnTank, SpawnTurret } from "../World"
 export default function AsteroidMediumBlock2({ z, depth }) {
     let [scaleZ] = useState(random.pick(1, -1))
     let [scaleX] = useState(random.pick(1, -1))
-    let deco = useMemo(() => random.pick("tanks", null, "wall3"), [])
+    let deco = useMemo(() => random.pick("tanks", "building1","wall3"), [])
     let positions = useMemo(() => {
         return [
             [random.pick(1, -3, -8, -15), 0, z + depth - random.integer(30, 45)],
