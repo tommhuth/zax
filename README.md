@@ -1,10 +1,15 @@
 # zax
- 
-- drop useGrid, and use manual positioning for ground elements 
-- use enemy planes for space mode 
-- add sfx for space and player death 
+   
+- add sfx for space asteroides, player death, and figthers
+- add more decorational elements + replace the ugly ones
+- improve asteroide seperator wall handling
+- more random ground deco astroide
 - ui 
-- improve performance 
 - better sfx for forcefield 
 - support game pad (ps4)
-- gameplay loop logic 
+- gameplay loop 
+- improve performance 
+
+- add asteroid tower elements for dodging  
+- add air mines? 
+- revise color palette

@@ -3,15 +3,15 @@ import { createObstacle, removeObstacle } from "../../data/store"
 import random from "@huth/random"
 import Model from "../../Model"
 import { getGrid, Only } from "../../utils"
-import { SpawnTank, SpawnTurret } from "../World" 
+import { SpawnTank, SpawnTurret } from "../World"
 import Config from "../../data/Config"
 
 export default function AsteroidMediumBlock2({ z, depth }) {
     let index = useRef(0)
     let [scaleZ] = useState(random.pick(1, -1))
-    let grid = useMemo(() => getGrid({ width: 16, depth: depth - 10, z: z -10, remove: [0,2] }), [z,depth]) 
+    let grid = useMemo(() => getGrid({ width: 16, depth: depth - 10, z: z - 10, remove: [0, 2] }), [z, depth])
     let [scaleX] = useState(random.pick(1, -1))
-    let deco = useMemo(() => random.pick("tanks", "building1", "wall3"), []) 
+    let deco = useMemo(() => random.pick("tanks", null, "tanks", "tanks"), [])
     let turrets = useMemo(() => {
         let res = []
         let count = random.integer(1, 2)
@@ -88,7 +88,7 @@ export default function AsteroidMediumBlock2({ z, depth }) {
 
     return (
         <>
-            <Only if={Config.DEBUG}> 
+            <Only if={Config.DEBUG}>
                 {grid.map((i, index) => {
                     return (
                         <mesh key={index} position={i.position}>
@@ -103,7 +103,7 @@ export default function AsteroidMediumBlock2({ z, depth }) {
                 position={[0, 0, z]}
                 scale={[1, 1, 1]}
             />
-            
+
             {turrets.map((i, index) => <SpawnTurret key={index} {...i} />)}
             {tanks.map((i, index) => <SpawnTank key={index} {...i} />)}
             <Only if={deco}>

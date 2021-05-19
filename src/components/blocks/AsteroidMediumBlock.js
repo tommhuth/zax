@@ -11,7 +11,7 @@ export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
     let grid = useMemo(() => getGrid({ width: 24, depth, z }), [z, depth])
     let [scaleZ] = useState(random.pick(-1, 1))
     let [scaleX] = useState(random.pick(-1, 1))
-    let deco = useMemo(() => random.pick("wall3", "building1", "wall3", "building1", "wall3"), [])
+    let deco = useMemo(() => random.pick("wall3", "wall4", "hangar", "building1"), [])
     let turrets = useMemo(() => {
         let res = []
         let count = random.integer(1, 3)

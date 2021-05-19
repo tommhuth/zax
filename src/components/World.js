@@ -49,7 +49,7 @@ export function SpawnFighter({ x, y, z, stationary = false, straight = false }) 
 
 
 function AsteroidWall({ z }) {
-    let [type] = useState(() => random.pick("simple", "simple", "simple", "fancy"))
+    let [type] = useState(() => random.pick("simple"))
     let [x] = useState(random.pick(-12, -8))
     let [width] = useState(() => random.integer(12, 20))
     let [height] = useState(() => random.integer(5, 6))
