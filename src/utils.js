@@ -1,6 +1,23 @@
 import random from "@huth/random"
 import { createContext, useCallback, useEffect, useState } from "react"
 
+export function cyclic(list = [], randomness = .1) {
+    let i = 0
+
+    return function next() {
+        let result
+
+        if (random.boolean(randomness)) {
+            result = random.pick(...list)
+        } else {
+            result = list[i % (list.length)]
+            i++
+        }
+
+        return result
+    }
+}
+
 export function getGrid({ width, depth, z, remove = [1, 4] }) {
     let grid = []
     let size = 8

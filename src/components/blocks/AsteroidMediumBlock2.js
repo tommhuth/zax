@@ -9,9 +9,21 @@ import Config from "../../data/Config"
 export default function AsteroidMediumBlock2({ z, depth }) {
     let index = useRef(0)
     let [scaleZ] = useState(random.pick(1, -1))
-    let grid = useMemo(() => getGrid({ width: 16, depth: depth - 10, z: z - 10, remove: [0, 2] }), [z, depth])
+    let grid = useMemo(() => getGrid({
+        width: 16,
+        depth: depth - 10,
+        z: z - 10,
+        remove: [0, 2]
+    }), [z, depth])
     let [scaleX] = useState(random.pick(1, -1))
-    let deco = useMemo(() => random.pick("tanks", null, "tanks", "tanks"), [])
+    let deco = useMemo(() => random.pick("tanks"), [])
+    let decoPosition = useMemo(() => {
+        return [
+            36 + random.integer(-6, 4),
+            0,
+            z + 44 + random.integer(-4, 4)
+        ]
+    }, [z])
     let turrets = useMemo(() => {
         let res = []
         let count = random.integer(1, 2)
@@ -98,6 +110,7 @@ export default function AsteroidMediumBlock2({ z, depth }) {
                     )
                 })}
             </Only>
+
             <Model
                 name="floor2"
                 position={[0, 0, z]}
@@ -106,21 +119,16 @@ export default function AsteroidMediumBlock2({ z, depth }) {
 
             {turrets.map((i, index) => <SpawnTurret key={index} {...i} />)}
             {tanks.map((i, index) => <SpawnTank key={index} {...i} />)}
-            <Only if={deco}>
-                <Model
-                    name={deco}
-                    scale={[
-                        deco === "tanks" ? scaleX : 1,
-                        1,
-                        deco === "tanks" ? scaleZ : 1,
-                    ]}
-                    position={[
-                        22 + (deco === "tanks" ? 20 : 0),
-                        0,
-                        z + (deco === "tanks" ? 45 : 13)
-                    ]}
-                />
-            </Only>
+
+            <Model
+                name={deco}
+                scale={[
+                    scaleX,
+                    1,
+                    scaleZ,
+                ]}
+                position={decoPosition}
+            />
         </>
     )
 }

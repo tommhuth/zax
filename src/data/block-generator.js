@@ -16,29 +16,23 @@ const BlockType = {
 }
 const map = [
     [BlockType.ASTEROID_START],
-    [BlockType.ASTEROID_FORCEFIELD], 
+    [BlockType.ASTEROID_FORCEFIELD],
     [BlockType.ASTEROID_MEDIUM_BLOCK],
+    [BlockType.ASTEROID_WALL],
     [BlockType.ASTEROID_MEDIUM_BLOCK],
-    [BlockType.ASTEROID_MEDIUM_BLOCK],
-    [BlockType.ASTEROID_MEDIUM_BLOCK],
-    [BlockType.ASTEROID_MEDIUM_BLOCK2, BlockType.ASTEROID_MEDIUM_BLOCK],
     [
+        BlockType.ASTEROID_MEDIUM_BLOCK,
         BlockType.ASTEROID_MEDIUM_BLOCK2,
+    ],
+    [BlockType.ASTEROID_WALL],
+    [BlockType.ASTEROID_MEDIUM_BLOCK],
+    [BlockType.ASTEROID_WALL],
+    [BlockType.ASTEROID_MEDIUM_BLOCK2],
+    [
+        BlockType.ASTEROID_MEDIUM_BLOCK,
         BlockType.ASTEROID_WALL,
-        BlockType.ASTEROID_MEDIUM_BLOCK,
-        BlockType.ASTEROID_MEDIUM_BLOCK
     ],
-    [
-        BlockType.ASTEROID_MEDIUM_BLOCK2,
-        BlockType.ASTEROID_WALL,
-        BlockType.ASTEROID_MEDIUM_BLOCK,
-        BlockType.ASTEROID_MEDIUM_BLOCK
-    ],
-    [
-        BlockType.ASTEROID_MEDIUM_BLOCK2,
-        BlockType.ASTEROID_MEDIUM_BLOCK,
-        BlockType.ASTEROID_MEDIUM_BLOCK
-    ],
+    [BlockType.ASTEROID_MEDIUM_BLOCK],
     [BlockType.ASTEROID_FORCEFIELD],
     [BlockType.ASTEROID_END],
     [BlockType.SPACE_START],

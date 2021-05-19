@@ -1,16 +1,19 @@
 import { useMemo, useRef, useState } from "react"
 import random from "@huth/random"
 import Model from "../../Model"
-import { getGrid, Only } from "../../utils"
+import { cyclic, getGrid, Only } from "../../utils"
 import { SpawnFighter, SpawnTank, SpawnTurret } from "../World"
 import Config from "../../data/Config"
+
+
+let decoCycleNext = cyclic(["building1", "building2", "building3", "hangar"])
 
 export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
     let index = useRef(0)
     let grid = useMemo(() => getGrid({ width: 24, depth, z }), [z, depth])
     let [scaleZ] = useState(random.pick(-1, 1))
     let [scaleX] = useState(random.pick(-1, 1))
-    let deco = useMemo(() => random.pick("building1", "building2", "building3", "hangar"), [])
+    let deco = useMemo(() => decoCycleNext(), [])
     let turrets = useMemo(() => {
         let res = []
         let count = random.integer(1, 3)

@@ -50,9 +50,9 @@ export function SpawnFighter({ x, y, z, stationary = false, straight = false }) 
 
 function AsteroidWall({ z }) {
     let [type] = useState(() => random.pick("simple"))
-    let [x] = useState(random.pick(-12, -8))
-    let [width] = useState(() => random.integer(12, 20))
-    let [height] = useState(() => random.integer(5, 6))
+    let [x] = useState(random.pick(-18, -5))
+    let [width] = useState(() => random.pick(14, 18, 24))
+    let [height] = useState(() => random.integer(4, 5, 6))
 
     useEffect(() => {
         let id
@@ -142,7 +142,7 @@ export default function World() {
                 <meshBasicMaterial color="black" />
             </mesh>
 
-            {blocks.map(i => {  
+            {blocks.map(i => {
                 switch (i.type) {
                     case BlockType.ASTEROID_START:
                         return <AsteroidStart {...i} key={i.id} />

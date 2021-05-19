@@ -7,6 +7,7 @@ Cache.enabled = true
 let gray = new MeshLambertMaterial({ color: "#ccc" }) 
 let darkgray = new MeshLambertMaterial({ color: "#666" })
 let black = new MeshBasicMaterial({ color: "#000" }) 
+let white = new MeshBasicMaterial({ color: "#fff" }) 
 let blue = new MeshLambertMaterial({ color: "#001170" })
 let darkblue = new MeshLambertMaterial({ color: "#003cff" })
 let loader = new GLTFLoader()
@@ -15,7 +16,8 @@ let blank = new BufferGeometry()
 
 let map = {
     black,
-    gray, 
+    gray,
+    white, 
     darkgray, 
     blue, 
     darkblue
