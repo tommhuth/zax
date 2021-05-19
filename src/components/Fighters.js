@@ -43,7 +43,7 @@ export default function Fighters() {
     </>
 }
 
-function Fighter({ position, index, setPosition, y = 5, speed = .2, straight, id, stationary }) {
+function Fighter({ position, index, setPosition, y = 5, speed = .2, straight, id, stationary = false }) {
     let dead = useRef(false)
     let t = useRef(Math.random() * 2)
     let tid = useRef(Math.random())
@@ -71,7 +71,7 @@ function Fighter({ position, index, setPosition, y = 5, speed = .2, straight, id
         fire()
 
         return () => clearTimeout(tid.current)
-    }, [position])
+    }, [position]) 
 
     useFrame(() => {
         position.y = Math.cos(t.current) * .35 + y

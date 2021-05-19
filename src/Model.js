@@ -1,6 +1,6 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { useEffect, useState, forwardRef } from "react"
-import { BufferGeometry, Cache,MeshBasicMaterial,MeshLambertMaterial } from "three"
+import { BufferGeometry, Cache, MeshBasicMaterial, MeshLambertMaterial } from "three"
 
 Cache.enabled = true
 
@@ -10,29 +10,29 @@ let black = new MeshBasicMaterial({ color: "#000" })
 let gray = new MeshLambertMaterial({ color: "#666" })
 let blue = new MeshLambertMaterial({ color: "#003cff" })
 let darkblue = new MeshLambertMaterial({ color: "#001170" })
-let loader = new GLTFLoader() 
+let loader = new GLTFLoader()
 let blank = new BufferGeometry()
 
 
 let map = {
     black,
-    gray,blue:darkblue,darkblue:blue,
+    gray, blue: darkblue, darkblue: blue,
     mat
 }
 
 
 
-export {mat}
+export { mat }
 
 export function useGeometry(name) {
     let [geometry, setGeometry] = useState(blank)
 
     useEffect(() => {
-        loader.load(`/models/${name}.glb`, ({ scene }) => { 
+        loader.load(`/models/${name}.glb`, ({ scene }) => {
 
-            setGeometry(scene.children[0].geometry )
+            setGeometry(scene.children[0].geometry)
         })
-    }, [name ])
+    }, [name])
 
 
     return geometry
@@ -43,7 +43,7 @@ export default forwardRef((
         name,
         rotation,
         dispose = true,
-        visible = true, 
+        visible = true,
         scale,
         position,
         castShadow = false,
@@ -51,19 +51,19 @@ export default forwardRef((
     },
     ref
 ) => {
-    let [object, setObject] = useState() 
+    let [object, setObject] = useState()
 
-    useEffect(() => { 
+    useEffect(() => {
         loader.load(`/models/${name}.glb`, ({ scene }) => {
             scene.traverse(object => {
                 if (object.isMesh) {
                     object.castShadow = castShadow
-                    object.receiveShadow = receiveShadow 
-                    object.material = map[object.material.name] || mat 
+                    object.receiveShadow = receiveShadow
+                    object.material = map[object.material.name] || mat
                 }
-            })  
+            })
 
-            setObject(scene.children[0] )
+            setObject(scene.children[0])
         })
     }, [name, castShadow, receiveShadow])
 
@@ -71,13 +71,13 @@ export default forwardRef((
     if (!object) {
         return null
     }
- 
+
 
     return (
         <primitive
             visible={visible}
             dispose={!dispose ? null : undefined}
-            object={object} 
+            object={object}
             ref={ref}
             scale={scale}
             rotation={rotation}

@@ -37,9 +37,9 @@ export function SpawnTank({ x, y, z, health = 1 }) {
     return null
 }
 
-export function SpawnFighter({ x, y, z, health = 1, stationary = false }) {
+export function SpawnFighter({ x, y, z, stationary = false, straight = false }) {
     useEffect(() => {
-        let id = createFighter(x, y, z, health, stationary)
+        let id = createFighter(x, y, z, stationary, straight)
 
         return () => removeFighter(id)
     }, [])

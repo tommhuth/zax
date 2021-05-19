@@ -14,6 +14,8 @@ import Lights from "./components/Lights"
 import Camera from "./components/Camera"
 import Tanks from "./components/Tanks"
 import { ModelsProvider } from "./components/Models"
+import { Only } from "./utils"
+import Config from "./data/Config"
 
 
 function App() {
@@ -36,7 +38,7 @@ function App() {
             <Canvas
                 orthographic
                 webgl1
-                dpr={window.devicePixelRatio * (.2 + (window.devicePixelRatio > 1 ? -.1 : 0))} 
+                dpr={window.devicePixelRatio * (.2 + (window.devicePixelRatio > 1 ? -.1 : 0))}
                 camera={{
                     zoom: 24, // 24,
                     position: new Vector3(0, 15, -40),
@@ -54,17 +56,17 @@ function App() {
                     type: BasicShadowMap
                 }}
             >
-                <ModelsProvider> 
-                    {obstacles.map(i => {  
-                        return null 
-                        
-                        return (
-                            <mesh key={i.id} receiveShadow position={[i.position[0], i.position[1] + (i.height ?  i.height / 2:0), i.position[2]]}>
-                                {i.radius ? <sphereBufferGeometry args={[i.radius, 8,8,8]} /> :<boxBufferGeometry args={[i.width, i.height, i.depth]} />}
-                                <meshLambertMaterial wireframe color="red" />
-                            </mesh>
-                        )
-                    })}
+                <ModelsProvider>
+                    <Only if={Config.DEBUG}> 
+                        {obstacles.map(i => {
+                            return (
+                                <mesh key={i.id} receiveShadow position={[i.position[0], i.position[1] + (i.height ? i.height / 2 : 0), i.position[2]]}>
+                                    {i.radius ? <sphereBufferGeometry args={[i.radius, 8, 8, 8]} /> : <boxBufferGeometry args={[i.width, i.height, i.depth]} />}
+                                    <meshLambertMaterial wireframe color="red" />
+                                </mesh>
+                            )
+                        })}
+                    </Only>
                     <Camera />
                     <Lights />
                     <Player />

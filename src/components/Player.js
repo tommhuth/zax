@@ -21,20 +21,22 @@ export default function Player({ width = 2.5, height = .65, depth = 5 }) {
     }, [size])
 
     useEffect(() => {
+        let shoot = () => {
+            createBullet(ref.current.position.x, ref.current.position.y, ref.current.position.z + depth / 2 + 1, "player")
+        }
+
         window.addEventListener("keydown", e => {
             keys.current[e.key] = true
 
             if (e.key === " ") {
-                createBullet(ref.current.position.x, ref.current.position.y, ref.current.position.z + depth / 2 + 1, "player")
+                shoot()
             }
         })
         window.addEventListener("keyup", e => {
             delete keys.current[e.key]
         })
 
-        window.addEventListener("click", () => {
-            createBullet(ref.current.position.x, ref.current.position.y, ref.current.position.z + depth / 2 + 1, "player")
-        })
+        window.addEventListener("click", shoot)
     }, [])
 
     useFrame(() => {

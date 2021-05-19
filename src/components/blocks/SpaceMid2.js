@@ -12,7 +12,7 @@ export default function SpaceMid2({ z, depth }) {
                 id: random.id(),
                 x: index / count * (16+9) - 9, 
                 y: Config.WARP_Y,
-                z: z + random.integer(0, depth)
+                z: index/count * depth + z
             }
         })
     }, [z, depth]) 

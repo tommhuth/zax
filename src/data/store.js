@@ -179,7 +179,7 @@ export function removeTank(id) {
     })
 }
 
-export function createFighter(x, y, z, stationary, straight = random.boolean()) {
+export function createFighter(x, y, z, stationary = false, straight = random.boolean()) {
     if (store.getState().fighters.list.length > 110) {
         return
     }
@@ -208,6 +208,19 @@ export function createFighter(x, y, z, stationary, straight = random.boolean()) 
     })
 
     return id
+}
+
+export function removeFighter(id, index) {
+    store.setState({
+        fighters: {
+            ...store.getState().fighters,
+            list: store.getState().fighters.list.filter(i => i.id !== id),
+            indexes: [
+                ...store.getState().fighters.indexes,
+                index
+            ]
+        }
+    })
 }
 
 export function createBullet(x, y, z, owner) {
@@ -283,19 +296,6 @@ export function removeParticle(id, index) {
     })
 }
 
-
-export function removeFighter(id, index) {
-    store.setState({
-        fighters: {
-            ...store.getState().fighters,
-            list: store.getState().fighters.list.filter(i => i.id !== id),
-            indexes: [
-                ...store.getState().fighters.indexes,
-                index
-            ]
-        }
-    })
-}
 
 export function hitPlayer(power = 20) {
     store.setState({

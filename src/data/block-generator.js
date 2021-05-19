@@ -1,6 +1,6 @@
 import random from "@huth/random"
 
-let i = 0
+let index = 0
 const BlockType = {
     ASTEROID_START: "asteroid-start",
     ASTEROID_END: "asteroid-end",
@@ -17,6 +17,12 @@ const BlockType = {
 const map = [
     [BlockType.ASTEROID_START],
     [BlockType.ASTEROID_FORCEFIELD],
+    [BlockType.ASTEROID_MEDIUM_BLOCK2],
+    [BlockType.ASTEROID_MEDIUM_BLOCK2],
+    [BlockType.ASTEROID_MEDIUM_BLOCK2],
+    [BlockType.ASTEROID_MEDIUM_BLOCK2],
+    [BlockType.ASTEROID_MEDIUM_BLOCK2],
+    [BlockType.ASTEROID_MEDIUM_BLOCK],
     [BlockType.ASTEROID_MEDIUM_BLOCK],
     [BlockType.ASTEROID_MEDIUM_BLOCK2, BlockType.ASTEROID_MEDIUM_BLOCK],
     [
@@ -89,7 +95,7 @@ function makeBlock(type) {
         case BlockType.ASTEROID_MEDIUM_BLOCK2:
             return {
                 depth: 65,
-                hasFighter: i > 3,
+                hasFighter: index > 3,
                 type
             }
         case BlockType.ASTEROID_START:
@@ -102,9 +108,9 @@ function makeBlock(type) {
 }
 
 function getBlock() {
-    i = i < map.length  -1 ? i + 1 : 0 
+    index = index < map.length - 1 ? index + 1 : 0
 
-    return makeBlock(random.pick(...map[i]))
+    return makeBlock(random.pick(...map[index]))
 }
 
 

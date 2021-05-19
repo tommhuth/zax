@@ -1,5 +1,37 @@
+import random from "@huth/random"
 import { createContext, useCallback, useEffect, useState } from "react"
 
+export function getGrid({ width, depth, z, remove = [1, 4] }) {
+    let grid = []
+    let size = 8
+    let gap = 2
+    let killSize = random.integer(...remove)
+
+    for (let x = 0; x < Math.floor(width / size); x++) {
+        for (let z2 = 0; z2 < Math.floor((depth - (gap + size) * 2) / (size + gap)); z2++) {
+            grid.push({
+                size: 8,
+                position: [
+                    x * (size + gap) - (size + gap * 2),
+                    0,
+                    z + z2 * (size + gap) + size * 3
+                ]
+            })
+        }
+    }
+
+
+    grid = shuffle(grid)
+    grid = grid.slice(killSize, grid.length)
+
+    return shuffle(grid)
+}
+
+export function shuffle(array) {
+    return array.map((a) => ({ sort: Math.random(), value: a }))
+        .sort((a, b) => a.sort - b.sort)
+        .map((a) => a.value)
+}
 
 export function easeInSine(x) {
     return 1 - Math.cos((x * Math.PI) / 2)

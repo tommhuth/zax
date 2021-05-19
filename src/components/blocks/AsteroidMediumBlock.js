@@ -1,85 +1,49 @@
-import { useCallback, useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import random from "@huth/random"
 import Model from "../../Model"
-import { Only } from "../../utils"
+import { getGrid, Only } from "../../utils"
 import { SpawnFighter, SpawnTank, SpawnTurret } from "../World"
 import Config from "../../data/Config"
 
-function useGrid({ width = 24, depth = 65, size = 8 }) {
-    let occupied = useRef([])
-    let max = (Math.floor(width / size) + 1) * Math.floor(depth / size)
-    let pick = useCallback((tick = 0) => {
-        let xMax = Math.floor(width / (size))
-        let zMax = Math.floor(depth / size)
-        let x = random.integer(0, xMax) * size
-        let z = random.integer(1, zMax - 1) * size
-        let key = x + "." + z
-
-        if (occupied.current.length === max) {
-            return null
-        }
-
-        if (!occupied.current.includes(key)) {
-            occupied.current.push(key)
-
-            return {
-                x: x - (size / 2) - width / 2 + 5,
-                z: z + size / 2
-            }
-        } else {
-            return pick(tick + 1)
-        }
-    }, [size, width, max, depth])
-    let grid = useMemo(() => {
-        return { pick, occupied, max }
-    }, [pick, max])
-
-    return grid
-}
 
 export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
-    let grid = useGrid({ width: 20, depth, size: 15 })
+    let index = useRef(0)
+    let grid = useMemo(() => getGrid({ width: 24, depth, z }), [z, depth])
     let [scaleZ] = useState(random.pick(-1, 1))
     let [scaleX] = useState(random.pick(-1, 1))
-    let deco = useMemo(() => random.pick( "wall3", "building1", "wall3", "building1", "wall3"), [])
+    let deco = useMemo(() => random.pick("wall3", "building1", "wall3", "building1", "wall3"), [])
     let turrets = useMemo(() => {
         let res = []
+        let count = random.integer(1, 3)
 
-        for (let i = 0; i < 2; i++) {
-            let position = grid.pick()
-
-            if (!position) {
-                break
-            }
+        for (let i = 0; i < count; i++) {
+            let { position } = grid[index.current++]
 
             res.push({
-                x: position.x,
-                z: position.z + z,
-                y: random.pick(0, -2, 0),
+                x: position[0],
+                y: position[1] + random.pick(0, -2, 0),
+                z: position[2],
             })
         }
 
         return res
-    }, [grid, z])
+    }, [grid])
     let tanks = useMemo(() => {
         let res = []
+        let count = random.integer(0, 2)
 
-        for (let i = 0; i < 3; i++) {
-            let position = grid.pick()
-
-            if (!position) {
-                break
-            }
+        for (let i = 0; i < count; i++) {
+            let { position } = grid[index.current++]
 
             res.push({
-                x: position.x,
-                z: position.z + z,
-                y: 0
+                x: position[0],
+                y: position[1],
+                z: position[2],
             })
         }
 
         return res
-    }, [grid, z])
+    }, [grid])
     let fighters = useMemo(() => {
         let res = []
         let count = random.pick(0, 2, 1)
@@ -98,6 +62,16 @@ export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
 
     return (
         <>
+            <Only if={Config.DEBUG}>
+                {grid.map((i, index) => {
+                    return (
+                        <mesh key={index} position={i.position}>
+                            <boxBufferGeometry args={[i.size, 1, i.size]} />
+                            <meshBasicMaterial wireframe color="red" />
+                        </mesh>
+                    )
+                })}
+            </Only>
             <Only if={hasFighter}>
                 {fighters.map(i => {
                     return (

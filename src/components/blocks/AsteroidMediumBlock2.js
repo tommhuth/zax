@@ -1,20 +1,49 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { createObstacle, removeObstacle } from "../../data/store"
 import random from "@huth/random"
 import Model from "../../Model"
-import { Only } from "../../utils"
-import { SpawnTank, SpawnTurret } from "../World"
+import { getGrid, Only } from "../../utils"
+import { SpawnTank, SpawnTurret } from "../World" 
+import Config from "../../data/Config"
 
 export default function AsteroidMediumBlock2({ z, depth }) {
+    let index = useRef(0)
     let [scaleZ] = useState(random.pick(1, -1))
+    let grid = useMemo(() => getGrid({ width: 16, depth: depth - 10, z: z -10, remove: [0,2] }), [z,depth]) 
     let [scaleX] = useState(random.pick(1, -1))
-    let deco = useMemo(() => random.pick("tanks", "building1","wall3"), [])
-    let positions = useMemo(() => {
-        return [
-            [random.pick(1, -3, -8, -15), 0, z + depth - random.integer(30, 45)],
-            [random.pick(1, -3, -8, -15), 0, z + random.integer(0, 15)],
-        ]
-    }, [z, depth])
+    let deco = useMemo(() => random.pick("tanks", "building1", "wall3"), []) 
+    let turrets = useMemo(() => {
+        let res = []
+        let count = random.integer(1, 2)
+
+        for (let i = 0; i < count; i++) {
+            let { position } = grid[index.current++]
+
+            res.push({
+                x: position[0],
+                y: position[1] + random.pick(0, -2, 0),
+                z: position[2],
+            })
+        }
+
+        return res
+    }, [grid])
+    let tanks = useMemo(() => {
+        let res = []
+        let count = random.integer(1, 2)
+
+        for (let i = 0; i < count; i++) {
+            let { position } = grid[index.current++]
+
+            res.push({
+                x: position[0],
+                y: position[1],
+                z: position[2],
+            })
+        }
+
+        return res
+    }, [grid])
 
     useEffect(() => {
         let ids = [
@@ -59,22 +88,24 @@ export default function AsteroidMediumBlock2({ z, depth }) {
 
     return (
         <>
+            <Only if={Config.DEBUG}> 
+                {grid.map((i, index) => {
+                    return (
+                        <mesh key={index} position={i.position}>
+                            <boxBufferGeometry args={[i.size, 1, i.size]} />
+                            <meshBasicMaterial wireframe color="red" />
+                        </mesh>
+                    )
+                })}
+            </Only>
             <Model
                 name="floor2"
                 position={[0, 0, z]}
                 scale={[1, 1, 1]}
             />
-            <SpawnTurret
-                x={positions[0][0]}
-                y={positions[0][1]}
-                z={positions[0][2]}
-                health={3}
-            />
-            <SpawnTank
-                x={positions[1][0]}
-                y={positions[1][1]}
-                z={positions[1][2]}
-            />
+            
+            {turrets.map((i, index) => <SpawnTurret key={index} {...i} />)}
+            {tanks.map((i, index) => <SpawnTank key={index} {...i} />)}
             <Only if={deco}>
                 <Model
                     name={deco}
