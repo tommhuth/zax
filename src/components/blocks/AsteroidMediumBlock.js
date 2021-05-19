@@ -5,13 +5,12 @@ import { getGrid, Only } from "../../utils"
 import { SpawnFighter, SpawnTank, SpawnTurret } from "../World"
 import Config from "../../data/Config"
 
-
 export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
     let index = useRef(0)
     let grid = useMemo(() => getGrid({ width: 24, depth, z }), [z, depth])
     let [scaleZ] = useState(random.pick(-1, 1))
     let [scaleX] = useState(random.pick(-1, 1))
-    let deco = useMemo(() => random.pick("wall3", "wall4", "hangar", "building1"), [])
+    let deco = useMemo(() => random.pick("building1", "building2", "building3", "hangar"), [])
     let turrets = useMemo(() => {
         let res = []
         let count = random.integer(1, 3)

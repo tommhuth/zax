@@ -2,7 +2,7 @@ import { useFrame, useThree } from "react-three-fiber"
 import { useEffect, useMemo, useRef, useState } from "react"
 import useStore, { generateWorld, createTurret, createObstacle, removeObstacle, removeTurret, createTank, removeTank, createFighter, removeFighter } from "../data/store"
 import random from "@huth/random"
-import Model, { mat } from "../Model"
+import Model, { gray } from "../Model"
 import { PlaneBufferGeometry } from "three"
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils"
 import AsteroidMediumBlock from "./blocks/AsteroidMediumBlock"
@@ -87,7 +87,7 @@ function AsteroidWall({ z }) {
     }
 
     return (
-        <mesh material={mat} position={[x, height / 2, z]} >
+        <mesh material={gray} position={[x, height / 2, z]} >
             <boxBufferGeometry args={[width, height, 2]} />
         </mesh>
     )

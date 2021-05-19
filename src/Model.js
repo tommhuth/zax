@@ -4,25 +4,24 @@ import { BufferGeometry, Cache, MeshBasicMaterial, MeshLambertMaterial } from "t
 
 Cache.enabled = true
 
-let mat = new MeshLambertMaterial({ color: "#ccc" })
-let mat2 = new MeshLambertMaterial({ color: "#ccc" })
-let black = new MeshBasicMaterial({ color: "#000" })
-let gray = new MeshLambertMaterial({ color: "#666" })
-let blue = new MeshLambertMaterial({ color: "#003cff" })
-let darkblue = new MeshLambertMaterial({ color: "#001170" })
+let gray = new MeshLambertMaterial({ color: "#ccc" }) 
+let darkgray = new MeshLambertMaterial({ color: "#666" })
+let black = new MeshBasicMaterial({ color: "#000" }) 
+let blue = new MeshLambertMaterial({ color: "#001170" })
+let darkblue = new MeshLambertMaterial({ color: "#003cff" })
 let loader = new GLTFLoader()
 let blank = new BufferGeometry()
 
 
 let map = {
     black,
-    gray, blue: darkblue, darkblue: blue,
-    mat
+    gray, 
+    darkgray, 
+    blue, 
+    darkblue
 }
 
-
-
-export { mat }
+export { gray }
 
 export function useGeometry(name) {
     let [geometry, setGeometry] = useState(blank)
@@ -59,7 +58,7 @@ export default forwardRef((
                 if (object.isMesh) {
                     object.castShadow = castShadow
                     object.receiveShadow = receiveShadow
-                    object.material = map[object.material.name] || mat
+                    object.material = map[object.material.name] || gray
                 }
             })
 

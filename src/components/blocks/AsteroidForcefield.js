@@ -2,7 +2,7 @@ import { useFrame } from "react-three-fiber"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { createObstacle, removeObstacle } from "../../data/store"
 import random from "@huth/random"
-import Model, { mat } from "../../Model"
+import Model, { gray } from "../../Model"
 import { Only } from "../../utils"
 
 export default function AsteroidForcefield({ y = 0, z }) {
@@ -98,7 +98,7 @@ export default function AsteroidForcefield({ y = 0, z }) {
 
             {wall.map((i, index) => {
                 return (
-                    <mesh material={mat} receiveShadow position={[i.x, i.y + i.height / 2, i.z]} key={index} >
+                    <mesh material={gray} receiveShadow position={[i.x, i.y + i.height / 2, i.z]} key={index} >
                         <boxBufferGeometry args={[i.width, i.height, 2]} />
                     </mesh>
                 )
