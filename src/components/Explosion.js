@@ -12,13 +12,15 @@ export default function Explosion({
     height = 6,
     depth = 6,
     width = 6,
-    count = 5,
+    count: incomingCount = 5,
     radius = 7,
+    scale = 1
 }) {
+    let count = useMemo(() => incomingCount || random.integer(3, 5), [incomingCount])
     let material = useMemo(() => new MeshBasicMaterial({ color: new Color("orange").convertGammaToLinear() }), [])
     let geometry = useMemo(() => new SphereBufferGeometry(1, 14, 14), [])
     let parts = useMemo(() => {
-        let res = []
+        let res = [] 
 
         for (let i = 0; i < count; i++) {
             let yi = random.float(-height / 2, height / 2)
@@ -27,7 +29,7 @@ export default function Explosion({
 
             res.push({
                 delay: i * 4,
-                radius: i + .5,
+                radius: (i + .5) * scale,
                 id: random.id(),
                 lifetime: random.integer(13, 19),
                 position: new Vector3(x + xi, y + yi, z + zi),
@@ -36,7 +38,7 @@ export default function Explosion({
         }
 
         return res
-    }, [count, width, height, depth, x, y, z])
+    }, [count, width, height, depth, scale, x, y, z])
     let ref = useRef()
     let [visible, setVisible] = useState(true)
     let matrix = useMemo(() => new Matrix4(), [])

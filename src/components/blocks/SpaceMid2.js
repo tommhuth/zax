@@ -4,8 +4,8 @@ import { SpawnFighter } from "../World"
 import Config from "../../data/Config"
 
 export default function SpaceMid2({ z, depth }) { 
-    let meteors = useMemo(() => {
-        let count = random.integer(1, 4)
+    let fighters = useMemo(() => {
+        let count = random.integer(1, 2)
 
         return new Array(count).fill().map((i, index) => {
             return {
@@ -19,7 +19,7 @@ export default function SpaceMid2({ z, depth }) {
 
     return (
         <>
-            {meteors.map(i => {  
+            {fighters.map(i => {  
                 return (
                     <SpawnFighter stationary   {...i} key={i.id} />
                 )

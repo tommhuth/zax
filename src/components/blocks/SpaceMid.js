@@ -4,8 +4,10 @@ import useStore, { createObstacle, removeObstacle } from "../../data/store"
 import random from "@huth/random"
 import { useMeteor } from "../Models"
 import Config from "../../data/Config"
+import { Only } from "../../utils"
+import Explosion from "../Explosion"
 
-export default function SpaceMid({ z, depth }) { 
+export default function SpaceMid({ z, depth }) {
     let [meteors, setMeteors] = useState(() => {
         let count = random.integer(5, 8)
 
@@ -13,7 +15,7 @@ export default function SpaceMid({ z, depth }) {
             return {
                 id: random.id(),
                 x: random.integer(-20, 20),
-                radius: random.integer(2, 4), 
+                radius: random.integer(2, 4),
                 y: Config.WARP_Y,
                 z: z + index / count * depth
             }
@@ -21,11 +23,11 @@ export default function SpaceMid({ z, depth }) {
     })
     let removeMeteor = useCallback((id) => {
         setMeteors(i => i.filter(i => i.id !== id))
-    }, []) 
+    }, [])
 
     return (
         <>
-            {meteors.map(i => {  
+            {meteors.map(i => {
                 return (
                     <Meteor removeMeteor={removeMeteor} {...i} key={i.id} />
                 )
@@ -66,9 +68,10 @@ function Meteor({ x = 0, y = 0, z = 0, id, removeMeteor, radius }) {
 
     useEffect(() => {
         if (obstacle?.health <= 0) {
-            dead.current = true
-            updateMeteor({ position: [0, 0, -1000] })
-            //removeMeteor(id)
+            setTimeout(() => {
+                dead.current = true
+                updateMeteor({ position: [0, 0, -1000] })
+            }, 400)
         }
     }, [obstacle?.health, id, updateMeteor, removeMeteor])
 
@@ -88,5 +91,20 @@ function Meteor({ x = 0, y = 0, z = 0, id, removeMeteor, radius }) {
         })
     })
 
-    return null
+    return (
+        <>
+            <Only if={obstacle?.health === 0}>
+                <Explosion
+                    x={x}
+                    y={y}
+                    z={z}
+                    radius={radius * 1.5}
+                    width={radius * 1.5}
+                    height={radius * 1.5}
+                    depth={radius * 1.5}
+                    scale={1 - (1 - radius / 4) * .3}
+                />
+            </Only>
+        </>
+    )
 }

@@ -6,7 +6,7 @@ import { SpawnFighter, SpawnTank, SpawnTurret } from "../World"
 import Config from "../../data/Config"
 
 
-let decoCycleNext = cyclic(["building1", "building2", "building3", "hangar"])
+let decoCycleNext = cyclic(["hangar", "hangar", "hangar", "hangar"])
 
 export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
     let index = useRef(0)
