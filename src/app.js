@@ -1,7 +1,7 @@
 import "../assets/styles/app.scss"
 
 import ReactDOM from "react-dom"
-import { Canvas } from "react-three-fiber"
+import { Canvas } from "@react-three/fiber"
 import { BasicShadowMap, Vector3 } from "three"
 import useStore from "./data/store"
 import Turrets from "./components/Turrets"
@@ -22,7 +22,6 @@ function App() {
     let obstacles = useStore(i => i.obstacles)
     let health = useStore(i => i.player.health)
 
-
     return (
         <>
             <div
@@ -37,8 +36,8 @@ function App() {
             </div>
             <Canvas
                 orthographic
-                webgl1
-                dpr={window.devicePixelRatio * (.2 + (window.devicePixelRatio > 1 ? -.1 : 0))}
+                //webgl1
+                dpr={ window.devicePixelRatio * (.2 + (window.devicePixelRatio > 1 ? -.1 : 0))}
                 camera={{
                     zoom: 24, // 24,
                     position: new Vector3(0, 15, -40),
@@ -50,17 +49,26 @@ function App() {
                     antialias: false,
                     depth: true,
                     stencil: false,
-                    alpha: true
+                    alpha: false
                 }}
                 shadows={{
                     type: BasicShadowMap
                 }}
             >
+                <color attach="background" args={["black"]} />
+
                 <ModelsProvider>
-                    <Only if={Config.DEBUG}> 
+                    <Only if={Config.DEBUG}>
                         {obstacles.map(i => {
                             return (
-                                <mesh key={i.id} receiveShadow position={[i.position[0], i.position[1] + (i.height ? i.height / 2 : 0), i.position[2]]}>
+                                <mesh
+                                    key={i.id}
+                                    position={[
+                                        i.position[0],
+                                        i.position[1] + (i.height ? i.height / 2 : 0),
+                                        i.position[2]
+                                    ]}
+                                >
                                     {i.radius ? <sphereBufferGeometry args={[i.radius, 8, 8, 8]} /> : <boxBufferGeometry args={[i.width, i.height, i.depth]} />}
                                     <meshLambertMaterial wireframe color="red" />
                                 </mesh>

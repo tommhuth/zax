@@ -1,7 +1,7 @@
 import { useState } from "react"
 import random from "@huth/random"
 import Model from "../../Model"
-import { SpawnTurret } from "../World"
+import SpawnTurret from "../actors/SpawnTurret"
 
 export default function AsteroidStart({ z, depth }) {
     const [x] = useState(() => random.integer(-8, 8))

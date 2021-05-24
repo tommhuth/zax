@@ -6,7 +6,7 @@ import Explosion from "../components/Explosion"
 import random from "@huth/random"
 
 export default function Tanks() {
-    let material = useMemo(()=>  new MeshLambertMaterial({ color: "#ccc" }), [])
+    let material = useMemo(() => new MeshLambertMaterial({ color: "#ccc" }), [])
     let tanks = useStore(i => i.world.tanks)
     let count = 75
     let ref = useRef()
@@ -45,20 +45,22 @@ function Tank({ setPosition, position, health, id, index, x = 0, y = 0, z = 0, w
     }, [])
 
     useEffect(() => {
-        let oid = createObstacle({
+        let id = createObstacle({
             width,
-            height, 
-            depth, 
+            height,
+            depth,
             health,
-            x,y,z, 
+            x,
+            y,
+            z,
         })
 
-        setObstacleId(oid)
+        setObstacleId(id)
 
         return () => {
-            removeObstacle(oid)
+            removeObstacle(id)
         }
-    }, [width, height, depth, id, x, y, z,health, setPosition, index, position])
+    }, [width, height, depth, id, x, y, z, health, setPosition, index, position])
 
     useEffect(() => {
         setPosition(index, position)
@@ -95,8 +97,9 @@ function Tank({ setPosition, position, health, id, index, x = 0, y = 0, z = 0, w
     useEffect(() => {
         if (gone) {
             removeTurret(id)
+            removeObstacle(obstacleId)
         }
-    }, [gone, id])
+    }, [gone,obstacleId, id])
 
     return (
         <>

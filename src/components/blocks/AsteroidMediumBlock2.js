@@ -3,7 +3,8 @@ import { createObstacle, removeObstacle } from "../../data/store"
 import random from "@huth/random"
 import Model from "../../Model"
 import { getGrid, Only } from "../../utils"
-import { SpawnTank, SpawnTurret } from "../World"
+import SpawnTurret from "../actors/SpawnTurret"
+import SpawnTank from "../actors/SpawnTank"
 import Config from "../../data/Config"
 
 export default function AsteroidMediumBlock2({ z, depth }) {
@@ -33,7 +34,7 @@ export default function AsteroidMediumBlock2({ z, depth }) {
 
             res.push({
                 x: position[0],
-                y: position[1] + random.pick(0, -2, 0),
+                y: position[1],
                 z: position[2],
             })
         }

@@ -1,6 +1,8 @@
 # zax
    
 - add sfx for space asteroides, player death, and figthers
+- fighers material
+- color enemy bullets differently from player bullets
 - add more decorational elements + replace the ugly ones
 - improve asteroide seperator wall handling
 - more random ground deco astroide

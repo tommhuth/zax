@@ -1,6 +1,6 @@
 import random from "@huth/random"
 import { useMemo, useRef, useCallback, useState } from "react"
-import { useFrame } from "react-three-fiber"
+import { useFrame } from "@react-three/fiber"
 import { Quaternion, Vector3, Matrix4, SphereBufferGeometry, MeshBasicMaterial, Color } from "three"
 import { clamp, easeInSine } from "../utils"
 

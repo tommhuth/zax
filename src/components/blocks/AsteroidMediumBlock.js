@@ -2,11 +2,13 @@ import { useMemo, useRef, useState } from "react"
 import random from "@huth/random"
 import Model from "../../Model"
 import { cyclic, getGrid, Only } from "../../utils"
-import { SpawnFighter, SpawnTank, SpawnTurret } from "../World"
+import SpawnFighter from "../actors/SpawnFighter"
+import SpawnTank from "../actors/SpawnTank"
+import SpawnTurret from "../actors/SpawnTurret"
 import Config from "../../data/Config"
 
 
-let decoCycleNext = cyclic(["hangar", "hangar", "hangar", "hangar"])
+let decoCycleNext = cyclic(["hangar", "building1", "building2", "building3"])
 
 export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
     let index = useRef(0)
@@ -23,7 +25,7 @@ export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
 
             res.push({
                 x: position[0],
-                y: position[1] + random.pick(0, -2, 0),
+                y: position[1],
                 z: position[2],
             })
         }
@@ -54,7 +56,7 @@ export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
             res.push({
                 x: i / count * (Config.PLAYER_LEFT_EDGE + Math.abs(Config.PLAYER_RIGHT_EDGE)) - Config.PLAYER_LEFT_EDGE, // random.integer(-9, 16),
                 z: z + depth - random.integer(0, 15),
-                y: random.integer(10, Config.PLAYER_UPPER_EDGE),
+                y: 12,
                 id: random.id()
             })
         }

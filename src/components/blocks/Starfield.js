@@ -1,4 +1,4 @@
-import { useFrame } from "react-three-fiber"
+import { useFrame } from "@react-three/fiber"
 import { useEffect, useMemo, useRef } from "react"
 import useStore from "../../data/store"
 import random from "@huth/random" 
@@ -47,7 +47,7 @@ export default function Starfield({ z = 0, depth = 200, count = 150 }) {
                     playerPosition.current[2] + buffer * 1.25
                 )
             } else {
-                star.z -= star.depth * .0035 + (warp ? .25 * star.depth/30  : 0)
+                //star.z -= star.depth * .0035 + (warp ? .25 * star.depth/30  : 0)
             }
 
             star.scale[2] += ((warp ? scale : star.scale[0]) - star.scale[2]) * (.075 - ((star.depth / 30) * .065))

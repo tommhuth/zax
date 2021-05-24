@@ -1,8 +1,6 @@
-import { useFrame, useThree } from "react-three-fiber"
-import { useEffect, useMemo, useRef, useState } from "react"
-import useStore, { generateWorld, createTurret, createObstacle, removeObstacle, removeTurret, createTank, removeTank, createFighter, removeFighter } from "../data/store"
-import random from "@huth/random"
-import Model, { gray } from "../Model"
+import { useFrame, useThree } from "@react-three/fiber"
+import { useEffect, useMemo, useRef } from "react"
+import useStore, { generateWorld  } from "../data/store" 
 import { PlaneBufferGeometry } from "three"
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils"
 import AsteroidMediumBlock from "./blocks/AsteroidMediumBlock"
@@ -15,83 +13,8 @@ import SpaceMid from "./blocks/SpaceMid"
 import SpaceStart from "./blocks/SpaceStart"
 import AsteroidMediumBlock2 from "./blocks/AsteroidMediumBlock2"
 import SpaceMid2 from "./blocks/SpaceMid2"
-import { BlockType } from "../data/block-generator"
-
-export function SpawnTurret({ x, y, z, health = 2 }) {
-    useEffect(() => {
-        let id = createTurret(x, y, z, health)
-
-        return () => removeTurret(id)
-    }, [])
-
-    return null
-}
-
-export function SpawnTank({ x, y, z, health = 1 }) {
-    useEffect(() => {
-        let id = createTank(x, y, z, health)
-
-        return () => removeTank(id)
-    }, [])
-
-    return null
-}
-
-export function SpawnFighter({ x, y, z, stationary = false, straight = false }) {
-    useEffect(() => {
-        let id = createFighter(x, y, z, stationary, straight)
-
-        return () => removeFighter(id)
-    }, [])
-
-    return null
-}
-
-
-function AsteroidWall({ z }) {
-    let [type] = useState(() => random.pick("simple"))
-    let [x] = useState(random.pick(-18, -5))
-    let [width] = useState(() => random.pick(14, 18, 24))
-    let [height] = useState(() => random.integer(4, 5, 6))
-
-    useEffect(() => {
-        let id
-
-        if (type === "fancy") {
-            id = createObstacle({
-                width: 35,
-                height: 11,
-                depth: 2,
-                x,
-                y: 0,
-                z
-            })
-        } else {
-            id = createObstacle({
-                width,
-                height,
-                depth: 2,
-                x,
-                y: 0,
-                z
-            })
-        }
-
-        return () => {
-            removeObstacle(id)
-        }
-    }, [type, height, width, x, z])
-
-    if (type === "fancy") {
-        return <Model name="wall1" position={[x, 0, z]} />
-    }
-
-    return (
-        <mesh material={gray} position={[x, height / 2, z]} >
-            <boxBufferGeometry args={[width, height, 2]} />
-        </mesh>
-    )
-}
+import { BlockType } from "../data/block-generator" 
+import { AsteroidWall } from "./blocks/AsteroidWall"
 
 
 export default function World() {

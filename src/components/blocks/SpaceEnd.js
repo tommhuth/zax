@@ -1,4 +1,4 @@
-import { useFrame } from "react-three-fiber"
+import { useFrame } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
 import useStore, { setWarp } from "../../data/store"
 

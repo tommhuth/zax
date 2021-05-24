@@ -1,4 +1,4 @@
-import { useFrame } from "react-three-fiber"
+import { useFrame } from "@react-three/fiber"
 import { Vector3, Matrix4, MeshLambertMaterial } from "three"
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react"
 import useStore, { createBullet, hitPlayer, removeFighter } from "../data/store"
@@ -43,7 +43,7 @@ export default function Fighters() {
     </>
 }
 
-function Fighter({ position, index, setPosition, y = 5, speed = .2, straight, id, stationary = false }) {
+function Fighter({ position, index, setPosition, y = 5, speed = .1, straight, id, stationary = false }) {
     let dead = useRef(false)
     let t = useRef(Math.random() * 2)
     let tid = useRef(Math.random())

@@ -1,4 +1,4 @@
-import { useThree } from "react-three-fiber"
+import { useThree } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
 import useStore from "../data/store"
 

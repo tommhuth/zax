@@ -1,4 +1,4 @@
-import { useFrame } from "react-three-fiber"
+import { useFrame } from "@react-three/fiber"
 import { Quaternion, Vector3, Matrix4 } from "three"
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import useStore, { removeParticle } from "../data/store"

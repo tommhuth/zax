@@ -1,4 +1,4 @@
-import { useFrame } from "react-three-fiber"
+import { useFrame } from "@react-three/fiber"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { createObstacle, removeObstacle } from "../../data/store"
 import random from "@huth/random"

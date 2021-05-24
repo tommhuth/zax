@@ -6,22 +6,20 @@ import { useGeometry } from "../Model"
 import Explosion from "./Explosion"
 
 export default function Turrets() {
-    let material = useMemo(()=>   new MeshLambertMaterial({ color: "#ccc" }), [])
+    let material = useMemo(() => new MeshLambertMaterial({ color: "#ccc" }), [])
     let turrets = useStore(i => i.world.turrets)
     let count = 75
     let ref = useRef()
     let geometry = useGeometry("turret")
+    let matrix = useMemo(() => new Matrix4(), [])
+    let quat = useMemo(() => new Quaternion(), [])
+    let scaling = useMemo(() => new Vector3(), [])
     let setPosition = useCallback((index, position, scale = 1) => {
-        let matrix = new Matrix4()
-        let quat = new Quaternion()
-        let scaling = new Vector3(scale, scale, scale)
-
-        ref.current.setMatrixAt(index, matrix.compose(position, quat, scaling))
+        ref.current.setMatrixAt(index, matrix.compose(position, quat, scaling.setScalar(scale)))
         ref.current.instanceMatrix.needsUpdate = true
-    }, [])
+    }, [quat, matrix, scaling])
 
     return (
-
         <>
             {turrets.map((i) => <Turret setPosition={setPosition} {...i} key={i.id} />)}
             <instancedMesh receiveShadow ref={ref} args={[geometry, material, count]} />
@@ -29,11 +27,23 @@ export default function Turrets() {
     )
 }
 
-function Turret({ setPosition, health, position, id, index, x = 0, y = 0, z = 0, width = 3, height = 6, depth = 3 }) {
+function Turret({
+    setPosition,
+    health,
+    position,
+    id,
+    index,
+    x = 0,
+    y = 0,
+    z = 0,
+    width = 3,
+    height = 8,
+    depth = 3
+}) {
 
     let [dead, setDead] = useState(false)
     let [gone, setGone] = useState(false)
-    let [explode, setExplode] = useState(false)    
+    let [explode, setExplode] = useState(false)
     let [obstacleId, setObstacleId] = useState()
     let obstacle = useStore(i => i.obstacles.find(i => i.id === obstacleId))
     let playerPosition = useRef([0, 0, 0])
@@ -51,7 +61,9 @@ function Turret({ setPosition, health, position, id, index, x = 0, y = 0, z = 0,
             height,
             depth,
             health,
-            x,y,z, 
+            x,
+            y: y - 2,
+            z,
         })
 
         setObstacleId(oid)
@@ -59,7 +71,7 @@ function Turret({ setPosition, health, position, id, index, x = 0, y = 0, z = 0,
         return () => {
             removeObstacle(oid)
         }
-    }, [width, height, depth, id, x, y, z, setPosition,health, index, position])
+    }, [width, height, depth, id, x, y, z, setPosition, health, index, position])
 
     useEffect(() => {
         setPosition(index, position)
