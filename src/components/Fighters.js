@@ -9,13 +9,15 @@ const material = new MeshLambertMaterial({ color: "red" })
 
 export default function Fighters() {
     let count = 40
-    let fighters = useStore(i => i.fighters.list)
+    let fighters = useStore(i => i.fighters.list) 
     let geomtery = useGeometry("fighter1")
     let ref = useRef()
     let matrix = useMemo(() => new Matrix4(), [])
     let setPosition = useCallback((index, position) => {
-        ref.current.setMatrixAt(index, matrix.setPosition(position))
-        ref.current.instanceMatrix.needsUpdate = true
+        if (ref.current) { 
+            ref.current.setMatrixAt(index, matrix.setPosition(position))
+            ref.current.instanceMatrix.needsUpdate = true
+        }
     }, [matrix])
 
     useLayoutEffect(() => {
@@ -71,7 +73,7 @@ function Fighter({ position, index, setPosition, y = 5, speed = .1, straight, id
         fire()
 
         return () => clearTimeout(tid.current)
-    }, [position]) 
+    }, [position])
 
     useFrame(() => {
         position.y = Math.cos(t.current) * .35 + y

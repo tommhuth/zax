@@ -1,12 +1,12 @@
 import { Quaternion, Vector3, Matrix4, MeshLambertMaterial } from "three"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import useStore, { createObstacle, createParticle, removeObstacle, removeTurret } from "../data/store"
+import useStore, { createObstacle, createParticle, removeObstacle, removeTurret, setFuel, setScore } from "../data/store"
 import { useGeometry } from "../Model"
 import Explosion from "../components/Explosion"
 import random from "@huth/random"
 
 export default function Tanks() {
-    let material = useMemo(() => new MeshLambertMaterial({ color: "#ccc" }), [])
+    let material = useMemo(() => new MeshLambertMaterial({ color: "#bf0040", }), [])
     let tanks = useStore(i => i.world.tanks)
     let count = 75
     let ref = useRef()
@@ -71,6 +71,8 @@ function Tank({ setPosition, position, health, id, index, x = 0, y = 0, z = 0, w
             setExplode(true)
             setTimeout(() => setDead(true), 500)
             setTimeout(() => setGone(true), 1100)
+            setFuel(5) 
+            setScore(2500)
         }
     }, [obstacle?.health])
 

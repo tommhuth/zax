@@ -1,13 +1,14 @@
 import { Quaternion, Vector3, Matrix4, MeshLambertMaterial } from "three"
 import { useCallback, useEffect, useRef, useState, useMemo } from "react"
-import useStore, { createBullet, createObstacle, createParticle, removeObstacle, removeTurret } from "../data/store"
+import useStore, { createBullet, createObstacle, createParticle, removeObstacle, removeTurret, setScore } from "../data/store"
 import random from "@huth/random"
 import { useGeometry } from "../Model"
 import Explosion from "./Explosion"
 
 export default function Turrets() {
-    let material = useMemo(() => new MeshLambertMaterial({ color: "#ccc" }), [])
+    let material = useMemo(() => new MeshLambertMaterial({ color: "green" ,  emissive: "green", emissiveIntensity: .1 }), [])
     let turrets = useStore(i => i.world.turrets)
+    let state = useStore(i => i.state)
     let count = 75
     let ref = useRef()
     let geometry = useGeometry("turret")
@@ -21,7 +22,7 @@ export default function Turrets() {
 
     return (
         <>
-            {turrets.map((i) => <Turret setPosition={setPosition} {...i} key={i.id} />)}
+            {turrets.map((i) => <Turret state={state} setPosition={setPosition} {...i} key={i.id} />)}
             <instancedMesh receiveShadow ref={ref} args={[geometry, material, count]} />
         </>
     )
@@ -34,6 +35,7 @@ function Turret({
     id,
     index,
     x = 0,
+    state,
     y = 0,
     z = 0,
     width = 3,
@@ -79,11 +81,11 @@ function Turret({
 
     useEffect(() => {
         let fire = () => {
-            if (playerPosition.current[2] > z - 35 && playerPosition.current[2] < z - 5 && !document.hidden) {
+            if (state === "active" && playerPosition.current[2] > z - 35 && playerPosition.current[2] < z - 5 && !document.hidden) {
                 createBullet(x, y + 5, z - 6, "enemy")
             }
 
-            tid.current = setTimeout(fire, random.boolean() ? 200 : random.integer(500, 1000))
+            tid.current = setTimeout(fire, random.boolean() ? 200 : random.integer(850, 1000))
         }
 
         fire()
@@ -91,11 +93,12 @@ function Turret({
         return () => {
             clearTimeout(tid.current)
         }
-    }, [x, y, z])
+    }, [x, y, z,state])
 
     useEffect(() => {
         if (obstacle?.health === 0) {
             setExplode(true)
+            setScore(1000)
             clearTimeout(tid.current)
             setTimeout(() => setDead(true), 500)
             setTimeout(() => setGone(true), 1100)

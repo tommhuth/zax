@@ -55,7 +55,7 @@ export default function AsteroidMediumBlock({ z, depth, hasFighter = false }) {
         for (let i = 0; i < count; i++) {
             res.push({
                 x: i / count * (Config.PLAYER_LEFT_EDGE + Math.abs(Config.PLAYER_RIGHT_EDGE)) - Config.PLAYER_LEFT_EDGE, // random.integer(-9, 16),
-                z: z + depth - random.integer(0, 15),
+                z: z + depth - i * 5,
                 y: 12,
                 id: random.id()
             })

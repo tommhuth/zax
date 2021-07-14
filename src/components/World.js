@@ -1,6 +1,6 @@
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useMemo, useRef } from "react"
-import useStore, { generateWorld  } from "../data/store" 
+import useStore, { generateWorld } from "../data/store"
 import { PlaneBufferGeometry } from "three"
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils"
 import AsteroidMediumBlock from "./blocks/AsteroidMediumBlock"
@@ -13,13 +13,13 @@ import SpaceMid from "./blocks/SpaceMid"
 import SpaceStart from "./blocks/SpaceStart"
 import AsteroidMediumBlock2 from "./blocks/AsteroidMediumBlock2"
 import SpaceMid2 from "./blocks/SpaceMid2"
-import { BlockType } from "../data/block-generator" 
+import { BlockType } from "../data/block-generator"
 import { AsteroidWall } from "./blocks/AsteroidWall"
 
 
 export default function World() {
-    let { gl } = useThree()
     let blocks = useStore(i => i.world.blocks)
+    let state = useStore(i => i.state)
     let cover = useRef()
     let { viewport } = useThree()
     let playerPosition = useRef([0, 0, 0])
@@ -35,28 +35,30 @@ export default function World() {
             playerPosition.current = position
         }, store => store.player.position)
     }, [])
+ 
 
     useEffect(() => {
         let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
-        let id = setInterval(() => {
-            if (!document.hidden) {
-                generateWorld(diagonal)
+
+        if (state === "active") { 
+            let id = setInterval(() => {
+                if (!document.hidden) {
+                    generateWorld(diagonal)
+                }
+            }, 300)
+
+            generateWorld(diagonal)
+
+            return () => {
+                clearInterval(id)
             }
-        }, 300)
-
-        generateWorld(diagonal)
-
-        return () => {
-            clearInterval(id)
+        } else {
+            generateWorld(diagonal) 
         }
-    }, [viewport])
+    }, [viewport, state])
 
     useFrame(() => {
         cover.current.position.z = playerPosition.current[2]
-    })
-
-    useFrame(() => {
-        document.getElementById("rc").innerText = gl.info.render.calls
     })
 
     return (

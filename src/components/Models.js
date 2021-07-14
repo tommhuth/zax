@@ -9,7 +9,7 @@ const context = React.createContext()
 
 export function ModelsProvider({ children, }) {
     let meteor = useRef()
-    let meteorMaterial = useMemo(() => new MeshLambertMaterial({ color: "#ccc" }), [])
+    let meteorMaterial = useMemo(() => new MeshLambertMaterial({ color: "brown" }), [])
     let meteorGeometry = useGeometry("meteor")
     let [models, setModels] = useState({}) 
 

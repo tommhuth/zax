@@ -17,15 +17,21 @@ export default function Player({ width = 2.5, height = .65, depth = 5 }) {
     let size = useMemo(() => new Vector3(width, height, depth), [width, height, depth])
     let obstacles = useStore(i => i.obstacles)
     let health = useStore(i => i.player.health)
+    let fuel = useStore(i => i.player.fuel)
     let warp = useStore(i => i.player.warp)
+    let state = useStore(i => i.state)
     let acc = useRef(0)
+    let lastBullet = useRef(0)
     let container = useMemo(() => {
         return new Box3().setFromCenterAndSize(new Vector3(), size)
     }, [size])
 
     useEffect(() => {
         let shoot = () => {
-            if (!dead) {
+            let time = new Date()
+
+            if (!dead && time - lastBullet.current > 200) {
+                lastBullet.current = time
                 createBullet(ref.current.position.x, ref.current.position.y, ref.current.position.z + depth / 2 + 1, "player")
             }
         }
@@ -52,7 +58,7 @@ export default function Player({ width = 2.5, height = .65, depth = 5 }) {
     }, [dead, depth])
 
     useFrame(() => {
-        if (!ref.current) {
+        if (!ref.current || state !== "active") {
             return
         }
 
@@ -85,12 +91,15 @@ export default function Player({ width = 2.5, height = .65, depth = 5 }) {
     })
 
     useEffect(() => {
-        setDead(health === 0)
+        let dead = health <= 0 || fuel <= 0
 
-        if (health === 0) {
+        setDead(dead)
+
+        if (dead) {
             setTimeout(() => setHidden(true), 400)
         }
-    }, [health])
+    }, [health, fuel])
+
 
     useFrame(() => {
         if (!ref.current || dead) {
@@ -119,8 +128,15 @@ export default function Player({ width = 2.5, height = .65, depth = 5 }) {
 
     return (
         <>
-            <Model visible={!hidden} receiveShadow={false} castShadow position={[0, 15, -40]} name="player" ref={ref} />
-            <Only if={health === 0}>
+            <Model
+                visible={!hidden}
+                receiveShadow={false}
+                castShadow
+                position={[0, 5, -40]}
+                name="player"
+                ref={ref}
+            />
+            <Only if={dead}>
                 <Explosion
                     x={ref.current?.position.x}
                     y={ref.current?.position.y}

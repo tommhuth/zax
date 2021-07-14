@@ -4,43 +4,50 @@ import create from "zustand"
 import { clamp } from "../utils"
 import { getBlock, BlockType } from "./block-generator"
 
-const store = create(() => ({
-    player: {
-        position: [0, 15, -40],
-        health: 1000,
-        warp: false,
-    },
-    stats: {},
-    bullets: {
-        indexes: new Array(75).fill().map((i, index) => index),
-        list: []
-    },
-    fighters: {
-        indexes: new Array(40).fill().map((i, index) => index),
-        list: []
-    },
-    particles: {
-        indexes: new Array(400).fill().map((i, index) => index),
-        list: []
-    },
-    obstacles: [],
-    world: {
-        stageCount: 0,
-        modeCount: 0,
-        turrets: [],
-        turretIndex: 0,
-        tanks: [],
-        tankIndex: 0,
-        blocks: [
-            {
-                type: BlockType.ASTEROID_START,
-                depth: 27,
-                id: random.id(),
-                z: 0
-            }
-        ]
+function getInitState() {
+    return {
+        player: {
+            position: [0, 15, -40],
+            health: 100,
+            fuel: 25,
+            warp: false,
+        },
+        score: 0,
+        redos: 0,
+        state: "intro", 
+        bullets: {
+            indexes: new Array(75).fill().map((i, index) => index),
+            list: []
+        },
+        fighters: {
+            indexes: new Array(40).fill().map((i, index) => index),
+            list: []
+        },
+        particles: {
+            indexes: new Array(400).fill().map((i, index) => index),
+            list: []
+        },
+        obstacles: [],
+        world: {
+            stageCount: 0,
+            modeCount: 0,
+            turrets: [],
+            turretIndex: 0,
+            tanks: [],
+            tankIndex: 0,
+            blocks: [  
+                {
+                    type: BlockType.ASTEROID_START,
+                    depth: 27,
+                    id: random.id(),
+                    z: 0
+                },
+            ]
+        }
     }
-}))
+}
+
+const store = create(() => getInitState())
 
 function addBlock() {
     let { world } = store.getState()
@@ -67,14 +74,32 @@ function addBlock() {
     return nextBlock
 }
 
-export function updateStats(stats) {
+export function reset() {
+    let redos = store.getState().redos 
+
     store.setState({
-        stats: {
-            ...store.getState().stats,
-            ...stats
+        ...getInitState(),
+        redos:  redos + 1
+    })
+}
+
+export function setFuel(val) {
+    let { fuel } = store.getState().player
+
+    store.setState({
+        player: {
+            ...store.getState().player,
+            fuel: val + fuel
         }
     })
 }
+ 
+export function setState(state) { 
+    store.setState({
+        state
+    })
+}
+ 
 
 export function setWarp(status) {
     store.setState({
@@ -238,7 +263,7 @@ export function createBullet(x, y, z, owner) {
                     z,
                     id: random.id(),
                     index,
-                    speed: .85,
+                    speed: 1.25,
                     position: new Vector3(x, y, z),
                     owner
                 }
@@ -297,12 +322,20 @@ export function removeParticle(id, index) {
 }
 
 
-export function hitPlayer(power = 20) {
+export function hitPlayer(power = 10) {
     store.setState({
         player: {
             ...store.getState().player,
             health: clamp(store.getState().player.health - power, 0, 100),
         }
+    })
+}
+
+export function setScore(value) {
+    let score = store.getState().score 
+
+    store.setState({
+        score:  score + value
     })
 }
 
@@ -316,10 +349,12 @@ export function setPlayerPosition(position) {
 }
 
 export function hitObstacle(id, power) {
+    let score = store.getState().score
     let obstacle = store.getState().obstacles.find(i => i.id === id)
     let health = clamp(obstacle.health - power, 0, Infinity)
 
     store.setState({
+        score: score + 100,
         obstacles: [
             ...store.getState().obstacles.filter(i => i.id !== id),
             {

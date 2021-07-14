@@ -1,15 +1,15 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { useEffect, useState, forwardRef } from "react"
-import { BufferGeometry, Cache, MeshBasicMaterial, MeshLambertMaterial } from "three"
+import { BufferGeometry, Cache, MeshPhongMaterial } from "three"
 
 Cache.enabled = true
 
-let gray = new MeshLambertMaterial({ color: "#ccc" }) 
-let darkgray = new MeshLambertMaterial({ color: "#666" })
-let black = new MeshBasicMaterial({ color: "#000" }) 
-let white = new MeshBasicMaterial({ color: "#fff" }) 
-let blue = new MeshLambertMaterial({ color: "#001170" })
-let darkblue = new MeshLambertMaterial({ color: "#003cff" })
+let gray = new MeshPhongMaterial({ color: "#2d4e9c", shininess: 1 }) 
+let darkgray = new MeshPhongMaterial({ color: "#05204a", shininess: 1 })
+let black = new MeshPhongMaterial({ color: "#000", shininess: 1 }) 
+let white = new MeshPhongMaterial({ color: "#fff", shininess: 1 }) 
+let blue = new MeshPhongMaterial({ color: "rgb(5,5,153)", shininess: 1 })
+let darkblue = new MeshPhongMaterial({ color: "rgb(2,7,68)", shininess: 1 })
 let loader = new GLTFLoader()
 let blank = new BufferGeometry()
 

@@ -38,13 +38,7 @@ export default function Lights() {
         ref.current.shadow.mapSize.set(512, 512)
 
         ref.current.shadow.camera.updateMatrixWorld()
-        ref.current.updateMatrixWorld()
-        
-        /*
-        let g = new CameraHelper(ref.current.shadow.camera)
- 
-        scene.add(g)
-        */
+        ref.current.updateMatrixWorld() 
     }, [viewport])
 
 
@@ -54,16 +48,16 @@ export default function Lights() {
                 castShadow
                 ref={ref}
                 onUpdate={(self) => self.updateMatrixWorld()}
-                intensity={.1}
+                intensity={.5}
                 color={0xffffff}
             />
             <directionalLight
                 ref={ref2}
                 onUpdate={(self) => self.updateMatrixWorld()}
-                intensity={1.9}
-                color={"blue"}
-            />
-            <hemisphereLight intensity={.6} groundColor={"#0000ff"} color={"#77eeff"} />
+                intensity={1.25}
+                color={"white"}
+            /> 
+            <ambientLight color={"#fff"} intensity={.75} />
         </>
     )
 }

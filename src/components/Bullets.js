@@ -102,7 +102,7 @@ function Bullet({ x, y, z, speed, index, position, id, setPosition, owner }) {
             return
         }
 
-        position.z += (speed + (warp ? .1 : 0)) * (owner === "enemy" ? -1 : 1)
+        position.z += (speed + (warp ? .1 : 0)) * (owner === "enemy" ? -.85 : 1)
 
         let edgeLeftBuffer = 30
         let edgeRightBuffer = 45
@@ -111,9 +111,10 @@ function Bullet({ x, y, z, speed, index, position, id, setPosition, owner }) {
 
         if (beyondLeftEdge || beyondRightEdge) {
             removeBullet(id, index)
-        }
-
-        setPosition(index, position)
+            dead.current = true
+        } else { 
+            setPosition(index, position)
+        } 
     })
 
     return null
