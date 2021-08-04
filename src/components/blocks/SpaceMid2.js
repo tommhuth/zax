@@ -7,12 +7,12 @@ export default function SpaceMid2({ z, depth }) {
     let fighters = useMemo(() => {
         let count = random.integer(1, 2)
 
-        return new Array(count).fill().map((i, index) => {
+        return new Array(count).fill().map((i, index) => {  
             return {
                 id: random.id(),
                 x: index / count * (16 + 9) - 9,
                 y: Config.WARP_Y,
-                z: index / count * depth + z
+                z: z + depth - index * 10 
             }
         })
     }, [z, depth])
