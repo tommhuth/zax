@@ -1,3 +1,24 @@
 @import "global.scss";
 @import "variables.scss";
 @import "typography.scss";
+
+canvas {
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+
+#move,
+#shoot {
+    position: fixed;
+    width: 50%;
+    top: 0;
+    bottom: 0;
+    z-index: 10000000; 
+}
+
+#move { 
+    left: 0; 
+}
+#shoot { 
+    right: 0; 
+}

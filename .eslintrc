@@ -2,9 +2,9 @@
     "env": {
         "browser": true,
         "es6": true,
-        "node": true, 
+        "node": true,
         "serviceworker": true
-    },
+    },  
     "settings": {
         "react": {
             "version": "detect"
@@ -13,18 +13,20 @@
     "globals": {
         "workbox": true
     },
-    "parser": "babel-eslint",
+    "parser": "@typescript-eslint/parser",
     "extends": [
-        "plugin:react/recommended",
         "eslint:recommended",
-        "plugin:react-hooks/recommended",
-        "plugin:eslint-plugin-import/recommended"
+        "plugin:react/recommended",
+        "plugin:react-hooks/recommended", 
+        "plugin:compat/recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     "parserOptions": {
         "ecmaVersion": 9,
         "sourceType": "module"
-    },
+    },  
     "rules": {
+        "react-hooks/exhaustive-deps": "off",
         "padding-line-between-statements": [
             "error",
             {
@@ -94,17 +96,7 @@
                 ]
             }
         ],
-        "no-unused-vars": "off",
-		"unused-imports/no-unused-imports": "error",
-		"unused-imports/no-unused-vars": [
-			"warn",
-			{ 
-                "vars": "all", 
-                "varsIgnorePattern": "^_", 
-                "args": "after-used", 
-                "argsIgnorePattern": "^_" 
-            }
-		],
+        "no-unused-vars": "off",  
         "indent": [
             "error",
             4,
@@ -128,13 +120,13 @@
         "react/prop-types": "off",
         "react/jsx-uses-react": "off",
         "react/react-in-jsx-scope": "off",
-        "react/display-name": "off"
+        "react/display-name": "off",
+        "prefer-const": "off",
+        "@typescript-eslint/no-explicit-any" :"off"
     },
     "plugins": [
-        "unused-imports",
-        "babel",
+        "@typescript-eslint", 
         "react",
-        "react-hooks",
-        "eslint-plugin-import"
+        "react-hooks"
     ]
 }

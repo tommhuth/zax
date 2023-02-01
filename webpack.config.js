@@ -1,14 +1,15 @@
 const webpack = require("webpack")
 const path = require("path")
-const uuid = require("uuid")
+const { nanoid } = require("nanoid")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const WebpackPwaManifest = require("webpack-pwa-manifest")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
-const { InjectManifest } = require("workbox-webpack-plugin")
+const { InjectManifest } = require("workbox-webpack-plugin") 
+const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default
 
 module.exports = (env, options) => {
-    const rev = uuid.v4()
+    const revision = nanoid()
     const plugins = [
         new webpack.DefinePlugin({
             "process.env.REGISTER_SERVICEWORKER": JSON.stringify(process.env.REGISTER_SERVICEWORKER),
@@ -20,18 +21,18 @@ module.exports = (env, options) => {
         new HtmlWebpackPlugin({
             template: path.join(__dirname, "assets/views", "index.html"),
             filename: "index.html",
-            rev
+            rev: revision
         }),
         new CopyWebpackPlugin({
-            patterns: [
+            patterns: [ 
                 {
-                    from: path.join(__dirname, "assets", "splashscreens"),
-                    to: "splashscreens/[name]." + rev + ".[ext]"
+                    from: path.join(__dirname, "assets", "fonts"),
+                    to: "fonts/[name].[ext]"
                 },
                 {
                     from: path.join(__dirname, "assets", "models"),
                     to: "models/[name].[ext]"
-                } 
+                },
             ]
         }),
         new WebpackPwaManifest({
@@ -60,19 +61,20 @@ module.exports = (env, options) => {
                     sizes: [120, 180]
                 }
             ]
-        })
-    ] 
+        }),
+        new HTMLInlineCSSWebpackPlugin()
+    ]
 
     if (!options.watch) {
         plugins.push(new InjectManifest({
-            swSrc: "./src/serviceworker.js",
+            swSrc: "./src/serviceworker.ts",
             swDest: "serviceworker.js",
-            exclude: ["serviceworker.js"], 
+            exclude: ["serviceworker.js"],
         }))
     }
 
     return {
-        entry: { app: "./src/app.js" },
+        entry: { app: "./src/root.tsx" },
         output: {
             path: path.resolve(__dirname, "public"),
             filename: "[name].bundle.[contenthash:6].js",
@@ -95,17 +97,17 @@ module.exports = (env, options) => {
                 },
                 { test: /\.json$/, loader: "json" },
                 {
-                    test: /\.js$/,
+                    test: /\.tsx?$/,
+                    use: "ts-loader", 
                     exclude: /node_modules\/(?!(@huth)\/).*/,
-                    loader: "babel-loader"
-                },
+                }, 
                 {
                     test: /\.scss$/,
                     use: [
                         {
                             loader: MiniCssExtractPlugin.loader
                         },
-                        "css-loader", // translates CSS into CommonJS
+                        "css-loader",
                         {
                             loader: "postcss-loader",
                             options: {
@@ -115,13 +117,13 @@ module.exports = (env, options) => {
                                 }
                             }
                         },
-                        "sass-loader" // compiles Sass to CSS, using Node Sass by default
+                        "sass-loader"
                     ]
                 }
             ]
         },
         resolve: {
-            extensions: [".js"]
+            extensions: [".ts", ".js", ".tsx"]
         },
         plugins,
     }

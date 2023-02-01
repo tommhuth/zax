@@ -1,2 +1,4 @@
 node_modules/ 
-public/ 
+public/  
+server.js
+webpack.config.js
