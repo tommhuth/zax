@@ -2,14 +2,15 @@ import { memo, useRef } from "react"
 
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect } from "react"
-import { createBullet, createParticles, Owner, removeTurret, store, Turret, useStore } from "../data/store"
-import { useInstance } from "./InstancedMesh"
-import { clamp, setColorAt, setMatrixAt } from "../utils/utils"
+import { createBullet, createParticles, removeTurret, store, useStore } from "../../data/store"
+import { useInstance } from "../InstancedMesh"
+import { clamp, setColorAt, setMatrixAt } from "../../utils/utils"
 import animate from "@huth/animate"
 import random from "@huth/random" 
 import { Raycaster, Vector3 } from "three"
-import { useForwardMotion } from "../utils/hooks"
+import { useForwardMotion } from "../../utils/hooks"
 import { WORLD_BOTTOM_EDGE, WORLD_TOP_EDGE } from "./World"
+import { Owner, Turret } from "../../data/types"
 
 const _speed = new Vector3()
 
@@ -21,7 +22,7 @@ function Turret({ id, size, position, client, health, fireFrequency }: Turret) {
     let removed = useRef(false)
     let grid = useStore(i => i.world.grid)
     let player = useStore(i => i.player)
-    let { viewport, scene } = useThree()
+    let { viewport } = useThree()
     let [index, instance] = useInstance("box")
     let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
     let remove = () => {
@@ -29,7 +30,7 @@ function Turret({ id, size, position, client, health, fireFrequency }: Turret) {
         removed.current = true
     }
     let shootTimer = useRef(0)
-    let nextShotAt = useRef(fireFrequency)
+    let nextShotAt = useRef(fireFrequency) 
 
     useForwardMotion(position)
 
@@ -65,9 +66,9 @@ function Turret({ id, size, position, client, health, fireFrequency }: Turret) {
         if (health === 0) {
             remove()
             createParticles({
-                position: [position.x, 0, position.z,],
-                speed: [20, 30],
-                variance: [[-10, 10], [0, 0], [-10, 10]],
+                position: [position.x, 0, position.z],
+                speed: [8, 15],
+                variance: [[-10, 10], [0, 5], [-10, 10]],
                 offset: [[-1, 1], [0, 2], [-1, 1]],
                 normal: [0, 1, 0],
                 count: [4, 8],
@@ -98,7 +99,7 @@ function Turret({ id, size, position, client, health, fireFrequency }: Turret) {
                 let offsetRadius = 1.5
                 let offsetx = Math.cos(rotation) * offsetRadius
                 let offsetz = Math.sin(rotation) * offsetRadius
-                let bulletSpeed = 30
+                let bulletSpeed = 18
                 let speed = _speed.set(playerPosition.x, position.y, playerPosition.z)
                     .sub(position)
                     .normalize()

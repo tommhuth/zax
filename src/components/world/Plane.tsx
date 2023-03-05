@@ -2,15 +2,16 @@ import { useRef, memo } from "react"
 
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect } from "react"
-import { createBullet, createParticles, damageTurret, increaseScore, Owner, Plane, removePlane, store, useStore } from "../data/store"
-import { useInstance } from "./InstancedMesh"
-import { clamp, setColorAt, setMatrixAt } from "../utils/utils"
+import { createBullet, createParticles, damageBarrel, damageTurret, increaseScore, removePlane, store, useStore } from "../../data/store"
+import { useInstance } from "../InstancedMesh"
+import { clamp, setColorAt, setMatrixAt } from "../../utils/utils"
 import animate from "@huth/animate"
 import random from "@huth/random"
-import { Tuple3 } from "../types"
-import { useCollisionDetection, useForwardMotion } from "../utils/hooks"
+import { Tuple3 } from "../../types"
+import { useCollisionDetection, useForwardMotion } from "../../utils/hooks"
 import { Raycaster, Vector3 } from "three"
 import { WORLD_BOTTOM_EDGE, WORLD_TOP_EDGE } from "./World"
+import { Owner, Plane } from "../../data/types"
 
 let _origin = new Vector3()
 let _direction = new Vector3(0, -1, 0)
@@ -54,7 +55,10 @@ function Plane({
         },
         actions: {
             turret: (data) => {
-                damageTurret(data.id, 1000)
+                damageTurret(data.id, 100)
+            },
+            barrel: (data) => {
+                damageBarrel(data.id, 100)
             },
         }
     })
@@ -165,10 +169,10 @@ function Plane({
 
     useFrame((state, delta) => {
         if (health === 0 && !grounded.current) {
-            gravety.current += -.015
-            position.y += gravety.current
-            rotation.current[0] += tilt.current
-            rotation.current[2] += tilt.current * .25
+            gravety.current += -.015 * 60 * delta
+            position.y += gravety.current  * 60 * delta
+            rotation.current[0] += tilt.current  * 60 * delta
+            rotation.current[2] += tilt.current * .25  * 60 * delta
             grounded.current = position.y <= (bottomY.current + size[1] / 2)
         }
 

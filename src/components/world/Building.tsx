@@ -1,9 +1,10 @@
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
-import { Building, removeBuilding, useStore } from "../data/store"
-import { useInstance } from "./InstancedMesh"
-import { setColorAt, setMatrixAt } from "../utils/utils"
-import { useForwardMotion } from "../utils/hooks"
+import { removeBuilding, useStore } from "../../data/store"
+import { useInstance } from "../InstancedMesh"
+import { setColorAt, setMatrixAt } from "../../utils/utils"
+import { useForwardMotion } from "../../utils/hooks"
+import { Building } from "../../data/types"
 
 export default function Building({ id, size, position, client }: Building) {
     let removed = useRef(false)

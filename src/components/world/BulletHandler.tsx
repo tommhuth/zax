@@ -1,9 +1,11 @@
 import { useFrame, useThree } from "@react-three/fiber"
+import { memo } from "react"
 import { Object3D, Raycaster, Vector3 } from "three"
-import { Bullet, createParticles, damagePlane, damagePlayer, damageTurret, increaseScore, Owner, removeBullet, store } from "../data/store"
-import { Tuple3 } from "../types"
-import { getCollisions } from "../utils/hooks"
-import { ndelta, setColorAt, setMatrixAt } from "../utils/utils"
+import { createParticles, damageBarrel, damagePlane, damagePlayer, damageTurret, increaseScore, removeBullet, store } from "../../data/store"
+import { Bullet, Owner } from "../../data/types"
+import { Tuple3 } from "../../types"
+import { getCollisions } from "../../utils/hooks"
+import { ndelta, setColorAt, setMatrixAt } from "../../utils/utils"
 
 let _origin = new Vector3()
 let _direction = new Vector3()
@@ -21,7 +23,7 @@ function intersect(object: Object3D, position: Vector3, speed: Tuple3) {
     return intersection
 }
 
-export default function BulletHandler() {
+function BulletHandler() {
     let { viewport } = useThree()
     let worldDiagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
 
@@ -36,8 +38,9 @@ export default function BulletHandler() {
         for (let i = 0; i < bullets.length; i++) {
             let bullet = bullets[i]
             let bulletDiagonal = Math.sqrt((bullet.size[2] * .5) ** 2 + bullet.size[2] ** 2)
-            let collisions = getCollisions({
+            let collisions = getCollisions({ 
                 grid: world.grid,
+                debug: true,
                 position: bullet.position,
                 size: [bullet.size[0], bullet.size[2]],
                 source: {
@@ -121,6 +124,12 @@ export default function BulletHandler() {
                         increaseScore(-5)
                         break
                     }
+                    case "barrel": {
+                        if (bullet.owner === Owner.PLAYER) {
+                            damageBarrel(client.data.id, 100)
+                        }
+                        break
+                    }
                 }
             }
 
@@ -164,8 +173,12 @@ export default function BulletHandler() {
             })
         }
 
-        removeBullet(...removed.map(i => i.id))
+        if (removed.length) {
+            removeBullet(...removed.map(i => i.id))
+        }
     })
 
     return null
 }
+
+export default memo(BulletHandler)

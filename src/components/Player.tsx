@@ -1,12 +1,13 @@
 import { useFrame, useLoader, useThree } from "@react-three/fiber"
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react"
 import { Group, Vector3 } from "three"
-import { createBullet, damagePlane, damagePlayer, damageTurret, Owner, setPlayerObject, setPlayerSpeed, useStore } from "../data/store"
+import { createBullet, damageBarrel, damagePlane, damagePlayer, damageTurret, setPlayerObject, setPlayerSpeed, useStore } from "../data/store"
 import { Tuple3 } from "../types"
-import { WORLD_BOTTOM_EDGE, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./World"
+import { WORLD_BOTTOM_EDGE, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
-import { clamp, roundToNearest } from "../utils/utils"
+import { clamp } from "../utils/utils"
 import { useCollisionDetection } from "../utils/hooks"
+import { Owner } from "../data/types"
 
 let _edgemin = new Vector3(WORLD_LEFT_EDGE, WORLD_BOTTOM_EDGE, 0)
 let _edgemax = new Vector3(WORLD_RIGHT_EDGE, WORLD_TOP_EDGE, 0)
@@ -24,8 +25,8 @@ export default function Player({ size = [1.5, .5, depth], z = 7 }: PlayerProps) 
     let hasFired = useRef(false)
     let grid = useStore(i => i.world.grid)
     let keys = useMemo<Record<string, boolean>>(() => ({}), [])
-    let position = useStore(i => i.player.position) 
-    let activeWeapon = useStore(i => i.player.activeWeapon)
+    let position = useStore(i => i.player.position)
+    let weapon = useStore(i => i.player.weapon)
     let targetPosition = useMemo(() => new Vector3(0, _edgemin.y, 0), [])
     let models = useLoader(GLTFLoader, "/models/space.glb")
     let { viewport } = useThree()
@@ -39,11 +40,11 @@ export default function Player({ size = [1.5, .5, depth], z = 7 }: PlayerProps) 
     }, [grid])
     let pixelSize = (window.innerWidth) / (window.innerWidth * (1 / 7))
     let unitPixel = pixelSize * (viewport.width / window.innerWidth)
- 
+
     useCollisionDetection({
         position,
         size: [size[0], size[2]],
-        interval: 2,
+        interval: 3,
         source: {
             size,
             position,
@@ -58,6 +59,9 @@ export default function Player({ size = [1.5, .5, depth], z = 7 }: PlayerProps) 
                 damagePlayer(100)
                 damageTurret(data.id, 100)
             },
+            barrel: (data) => {
+                damageBarrel(data.id, 100)
+            },
             plane: (data) => {
                 //  setCameraShake(.3)
                 damagePlayer(100)
@@ -67,7 +71,7 @@ export default function Player({ size = [1.5, .5, depth], z = 7 }: PlayerProps) 
     })
 
     useEffect(() => {
-        setPlayerSpeed(unitPixel * 50, unitPixel)
+        setPlayerSpeed(8)
     }, [unitPixel])
 
     useEffect(() => {
@@ -152,42 +156,41 @@ export default function Player({ size = [1.5, .5, depth], z = 7 }: PlayerProps) 
         position.x = 0
     }, [z])
 
-    useFrame(() => {
-        let speedx = .25
+    useFrame((state, delta) => {
+        let speedx = .25 * 60
 
         if (keys.KeyA) {
-            targetPosition.x -= speedx
+            targetPosition.x -= speedx * delta
         } else if (keys.KeyD) {
-            targetPosition.x += speedx
+            targetPosition.x += speedx * delta
         }
 
         targetPosition.clamp(_edgemin, _edgemax)
 
-        if (Date.now() - lastShotAt.current > activeWeapon.fireFrequency && keys.Space) {
+        if (Date.now() - lastShotAt.current > weapon.fireFrequency && keys.Space) {
             createBullet({
                 position: [position.x, position.y, z - 2],
                 owner: Owner.PLAYER,
-                damage: activeWeapon.damage,
-                color: activeWeapon.color,
-                rotation: 0,
-                speed: [0, 0, -activeWeapon.speed],
-                size: activeWeapon.bulletSize
+                damage: weapon.damage,
+                color: weapon.color,
+                rotation: Math.PI,
+                speed: [0, 0, -weapon.speed],
+                size: weapon.bulletSize
             })
             lastShotAt.current = Date.now()
             hasFired.current = true
         }
     })
 
-    useFrame(() => {
+    useFrame((state, delta) => {
         if (ref.current) {
             let y = clamp(targetPosition.y, _edgemin.y, _edgemax.y)
 
-            ref.current.position.x += (targetPosition.x - ref.current.position.x) * .1
-            ref.current.position.y += (y - ref.current.position.y) * .1
+            ref.current.position.x += (targetPosition.x - ref.current.position.x) * (.1 * 60 * delta)
+            ref.current.position.y += (y - ref.current.position.y) * (.1 * 60 * delta)
             ref.current.position.z = z
 
             position.copy(ref.current.position)
-
             client.position = [ref.current.position.x, z]
             grid.updateClient(client)
         }

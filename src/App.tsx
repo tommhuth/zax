@@ -1,17 +1,17 @@
 
 import Camera from "./components/Camera"
-import { Suspense, useEffect, useState } from "react"
+import { Suspense } from "react"
 import { Canvas, useLoader } from "@react-three/fiber"
-import { BasicShadowMap } from "three"
 import { Perf } from "r3f-perf"
 import InstancedMesh from "./components/InstancedMesh"
 import RepeaterMesh from "./components/RepeaterMesh"
 import Player from "./components/Player"
-import World from "./components/World"
-import { Only } from "./utils/utils"
+import World, { WORLD_CENTER_OFFSET } from "./components/world/World"
+import { glsl, Only } from "./utils/utils"
 import Config from "./Config"
 import { useStore } from "./data/store"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { useShader } from "./utils/hooks"
 
 let isSmall = window.matchMedia("(max-height: 400px)").matches || window.matchMedia("(max-width: 600px)").matches
 let frc = isSmall ? 4 : 7
@@ -43,10 +43,10 @@ function Ui() {
     )
 }
 
-export default function Wrapper() {  
+export default function Wrapper() {
     return (
         <div
-            style={{ 
+            style={{
                 left: 0,
                 top: 0,
                 right: 0,
@@ -72,7 +72,7 @@ export default function Wrapper() {
                 orthographic
                 camera={{
                     zoom: isSmall ? 35 : 80,
-                    near: -20,
+                    near: -30,
                     far: 50
                 }}
                 dpr={dpr}
@@ -80,7 +80,12 @@ export default function Wrapper() {
                 <Only if={Config.DEBUG}>
                     <Perf deepAnalyze />
                 </Only>
-                <App /> 
+
+                <mesh position-x={WORLD_CENTER_OFFSET}>
+                    <boxGeometry />
+                    <meshBasicMaterial color="black" />
+                </mesh>
+                <App />
             </Canvas>
         </div>
 
@@ -88,8 +93,10 @@ export default function Wrapper() {
 }
 
 function Models() {
-    let [building1, building2, building3, hangar] = useLoader(GLTFLoader, ["/models/building1.glb", "/models/building2.glb", "/models/building3.glb", "/models/hangar.glb"])
- 
+    let [building1, building2, building3, hangar] = useLoader(GLTFLoader, [
+        "/models/building1.glb", "/models/building2.glb", "/models/building3.glb", "/models/hangar.glb"
+    ])
+
     return (
         <>
             <RepeaterMesh
@@ -117,14 +124,43 @@ function Models() {
 }
 
 
-function App() { 
+function App() {
+    let { onBeforeCompile } = useShader({
+        uniforms: {
+
+        },
+
+        vertex: {
+            head: glsl`
+                varying vec3 vPosition;
+            `,
+            main: glsl`
+                vPosition = position;
+            `,
+        },
+        fragment: {
+            head: glsl`
+                varying vec3 vPosition;
+            `,
+            main: glsl`
+                float opacity = clamp((vPosition.z + .5) / 1., 0., 1.);
+
+                gl_FragColor = vec4(0., 0., 1, opacity);
+            `,
+        }
+    })
+
+    console.log("app")
+
     return (
-        <Suspense fallback={null}> 
+        <Suspense fallback={null}>
             <Camera />
+
             <InstancedMesh name="box" count={250}>
                 <boxGeometry args={[1, 1, 1, 1, 1, 1]} attach="geometry" />
                 <meshLambertMaterial color="white" attach={"material"} />
             </InstancedMesh>
+
             <InstancedMesh name="sphere" count={150}>
                 <sphereGeometry args={[1, 3, 4]} attach="geometry" />
                 <meshLambertMaterial color="white" attach={"material"} />
@@ -132,7 +168,12 @@ function App() {
 
             <InstancedMesh name="line" count={100}>
                 <boxGeometry args={[1, 1, 1, 1, 1, 1]} attach="geometry" />
-                <meshBasicMaterial attach={"material"} />
+                <meshBasicMaterial onBeforeCompile={onBeforeCompile} transparent attach={"material"} />
+            </InstancedMesh>
+
+            <InstancedMesh name="cylinder" count={40}>
+                <cylinderGeometry args={[.5, .5, 1, 10, 1]} attach="geometry" />
+                <meshLambertMaterial color="red" attach={"material"} />
             </InstancedMesh>
 
             <Models />

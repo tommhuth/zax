@@ -1,7 +1,7 @@
 import { useThree } from "@react-three/fiber"
 import { useEffect, useRef, useState } from "react"
 import { Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D } from "three"
-import { RepeaterMesh, requestRepeater, setRepeater, useStore } from "../data/store"
+import { requestRepeater, setRepeater, useStore } from "../data/store"
 
 export function useRepeater(name: string) {
     let [repeater, setRepeater] = useState<Object3D | null>(null)
@@ -9,7 +9,7 @@ export function useRepeater(name: string) {
     let hasData = !!useStore(i => i.repeaters[name])
 
     useEffect(() => {
-        if (!hasRepeater.current && hasData) {
+        if (!hasRepeater.current && hasData) { 
             setRepeater(requestRepeater(name))
             hasRepeater.current = true
         }

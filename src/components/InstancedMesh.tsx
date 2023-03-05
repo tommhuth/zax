@@ -17,6 +17,7 @@ export function useInstance(name: string) {
 
 export default function InstancedMesh({ children, count, name, userData = {} }) {
     let colors = useMemo(() => new Float32Array(count * 3).fill(1), []) 
+ 
 
     return (
         <instancedMesh
