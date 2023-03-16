@@ -53,7 +53,7 @@ export default function RepeaterMesh({ name, count, object }: { object: Object3D
             }
         })
 
-        let reps = new Array(count).fill(null).map(i => object.clone())
+        let reps = new Array(count).fill(null).map(() => object.clone())
 
         reps.forEach(i => {
             i.visible = false

@@ -1,5 +1,5 @@
 import { useFrame, useLoader, useThree } from "@react-three/fiber"
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { Group, Vector3 } from "three"
 import { createBullet, damageBarrel, damagePlane, damagePlayer, damageTurret, setPlayerObject, setPlayerSpeed, useStore } from "../data/store"
 import { Tuple3 } from "../types"
@@ -17,21 +17,22 @@ let depth = 2
 interface PlayerProps {
     size?: Tuple3
     z?: number
+    y?: number
 }
 
-export default function Player({ size = [1.5, .5, depth], z = 7 }: PlayerProps) {
+export default function Player({ size = [1.5, .5, depth], z = 4, y = 1.5 }: PlayerProps) {
     let ref = useRef<Group | null>(null)
     let lastShotAt = useRef(0)
     let hasFired = useRef(false)
     let grid = useStore(i => i.world.grid)
     let keys = useMemo<Record<string, boolean>>(() => ({}), [])
-    let position = useStore(i => i.player.position)
     let weapon = useStore(i => i.player.weapon)
-    let targetPosition = useMemo(() => new Vector3(0, _edgemin.y, 0), [])
+    let targetPosition = useMemo(() => new Vector3(0, _edgemin.y, z), [])
     let models = useLoader(GLTFLoader, "/models/space.glb")
     let { viewport } = useThree()
+    let position = useMemo(() => new Vector3(0, y, z), [])
     let client = useMemo(() => {
-        return grid.newClient([0, z], [size[0], size[2]], {
+        return grid.newClient([0, 0, z], size, {
             type: "player",
             id: "player",
             size,
@@ -43,7 +44,7 @@ export default function Player({ size = [1.5, .5, depth], z = 7 }: PlayerProps) 
 
     useCollisionDetection({
         position,
-        size: [size[0], size[2]],
+        size,
         interval: 3,
         source: {
             size,
@@ -148,13 +149,7 @@ export default function Player({ size = [1.5, .5, depth], z = 7 }: PlayerProps) 
             shootDiv.removeEventListener("touchend", onTouchEndShoot)
             shootDiv.removeEventListener("touchcancel", onTouchEndShoot)
         }
-    }, [])
-
-    useLayoutEffect(() => {
-        position.z = z
-        position.y = 1
-        position.x = 0
-    }, [z])
+    }, []) 
 
     useFrame((state, delta) => {
         let speedx = .25 * 60
@@ -169,7 +164,7 @@ export default function Player({ size = [1.5, .5, depth], z = 7 }: PlayerProps) 
 
         if (Date.now() - lastShotAt.current > weapon.fireFrequency && keys.Space) {
             createBullet({
-                position: [position.x, position.y, z - 2],
+                position: [position.x, position.y, position.z - 2],
                 owner: Owner.PLAYER,
                 damage: weapon.damage,
                 color: weapon.color,
@@ -188,10 +183,10 @@ export default function Player({ size = [1.5, .5, depth], z = 7 }: PlayerProps) 
 
             ref.current.position.x += (targetPosition.x - ref.current.position.x) * (.1 * 60 * delta)
             ref.current.position.y += (y - ref.current.position.y) * (.1 * 60 * delta)
-            ref.current.position.z = z
+            ref.current.position.z -= 6 * delta 
 
             position.copy(ref.current.position)
-            client.position = [ref.current.position.x, z]
+            client.position = position.toArray()
             grid.updateClient(client)
         }
     })

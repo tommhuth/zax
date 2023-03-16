@@ -148,9 +148,7 @@ function App() {
                 gl_FragColor = vec4(0., 0., 1, opacity);
             `,
         }
-    })
-
-    console.log("app")
+    }) 
 
     return (
         <Suspense fallback={null}>
@@ -204,11 +202,11 @@ function App() {
             <Player />
 
             <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={-8}>
-                <planeGeometry args={[10, 100]} />
+                <planeGeometry args={[10, 10000, 1, 1]} />
                 <meshBasicMaterial color="black" />
             </mesh>
             <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={22}>
-                <planeGeometry args={[10, 100]} />
+                <planeGeometry args={[10, 10000, 1, 1]} />
                 <meshBasicMaterial color="black" />
             </mesh>
         </Suspense>

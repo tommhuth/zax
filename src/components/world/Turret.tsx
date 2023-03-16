@@ -4,11 +4,10 @@ import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect } from "react"
 import { createBullet, createParticles, removeTurret, store, useStore } from "../../data/store"
 import { useInstance } from "../InstancedMesh"
-import { clamp, setColorAt, setMatrixAt } from "../../utils/utils"
+import { clamp, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import animate from "@huth/animate"
-import random from "@huth/random" 
+import random from "@huth/random"
 import { Raycaster, Vector3 } from "three"
-import { useForwardMotion } from "../../utils/hooks"
 import { WORLD_BOTTOM_EDGE, WORLD_TOP_EDGE } from "./World"
 import { Owner, Turret } from "../../data/types"
 
@@ -18,33 +17,24 @@ let _origin = new Vector3()
 let _direction = new Vector3()
 let _raycaster = new Raycaster(_origin, _direction, 0)
 
-function Turret({ id, size, position, client, health, fireFrequency }: Turret) {
+function Turret({ id, size, position, health, fireFrequency, aabb }: Turret) {
     let removed = useRef(false)
-    let grid = useStore(i => i.world.grid)
-    let player = useStore(i => i.player)
     let { viewport } = useThree()
     let [index, instance] = useInstance("box")
     let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
+    let shootTimer = useRef(0)
+    let nextShotAt = useRef(fireFrequency)
     let remove = () => {
         removeTurret(id)
         removed.current = true
     }
-    let shootTimer = useRef(0)
-    let nextShotAt = useRef(fireFrequency) 
-
-    useForwardMotion(position)
 
     useEffect(() => {
         if (typeof index === "number" && instance) {
             setColorAt(instance, index, "blue")
 
             return () => {
-                setMatrixAt({
-                    instance,
-                    index: index as number,
-                    position: [0, 0, -1000],
-                    scale: [0, 0, 0]
-                })
+                setMatrixNullAt(instance, index as number)
             }
         }
     }, [index, instance])
@@ -79,21 +69,21 @@ function Turret({ id, size, position, client, health, fireFrequency }: Turret) {
     }, [health])
 
     useFrame((state, delta) => {
-        let shouldShoot = position.z < viewport.width
-        let playerObject = store.getState().player.object
+        let { player: { object: playerObject }, world } = store.getState()
+        let canShoot = world.frustum.containsPoint(position)
 
-        if (shootTimer.current > nextShotAt.current && shouldShoot && playerObject) {
-            let distanceFromPlayer = 1 - clamp(Math.abs(position.z - player.position.z) / (diagonal / 2), 0, 1) 
-            let heightPenalty = clamp((player.position.y - WORLD_BOTTOM_EDGE) / (WORLD_TOP_EDGE - WORLD_BOTTOM_EDGE), 0, 1) 
-            let playerPosition = store.getState().player.position
- 
+        if (shootTimer.current > nextShotAt.current && canShoot && playerObject) {
+            let playerPosition = playerObject.position
+            let distanceFromPlayer = 1 - clamp(Math.abs(playerPosition.z - playerPosition.z) / (diagonal / 2), 0, 1)
+            let heightPenalty = clamp((playerPosition.y - WORLD_BOTTOM_EDGE) / (WORLD_TOP_EDGE - WORLD_BOTTOM_EDGE), 0, 1)
+
             _raycaster.set(position, _direction.copy(playerPosition).sub(position).normalize())
             _raycaster.near = 0
             _raycaster.far = 25
 
             let [firstIntersection] = _raycaster.intersectObject(playerObject, true)
             let hasLineOfSightToPlayer = firstIntersection?.object.userData?.type === "player"
- 
+
             if (hasLineOfSightToPlayer || random.boolean(.1)) {
                 let rotation = Math.atan2(playerPosition.z - position.z, playerPosition.x - position.x)
                 let offsetRadius = 1.5
@@ -109,7 +99,7 @@ function Turret({ id, size, position, client, health, fireFrequency }: Turret) {
                     position: [
                         position.x + offsetx,
                         position.y + size[1] * .75 * .5,
-                        position.z + offsetz 
+                        position.z + offsetz
                     ],
                     color: "white",
                     damage: 5,
@@ -122,11 +112,13 @@ function Turret({ id, size, position, client, health, fireFrequency }: Turret) {
             shootTimer.current = 0
             nextShotAt.current = fireFrequency * random.float(.75, 1) - fireFrequency * distanceFromPlayer * .5 + heightPenalty * fireFrequency * 2
         }
- 
+
         shootTimer.current += delta * 1000
     })
 
     useFrame(() => {
+        let world = useStore.getState().world
+
         if (instance && typeof index === "number" && !removed.current) {
             setMatrixAt({
                 instance,
@@ -135,11 +127,8 @@ function Turret({ id, size, position, client, health, fireFrequency }: Turret) {
                 scale: size,
             })
 
-            if (position.z > diagonal * .75) {
+            if (!world.frustum.intersectsBox(aabb)) { 
                 remove()
-            } else {
-                client.position = [position.x, position.z]
-                grid.updateClient(client)
             }
         }
     })

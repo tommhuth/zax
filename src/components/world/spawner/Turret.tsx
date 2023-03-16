@@ -12,7 +12,7 @@ export default function Turret({
     position = [0, 0, 0]
 }: TurretProps) {
     useEffect(() => {
-        let id
+        let id: string
 
         startTransition(() => {
             id = createTurret(fireFrequency, position)

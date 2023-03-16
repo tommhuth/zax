@@ -9,7 +9,7 @@ import Building from "./Building"
 import Barrel from "./Barrel"
 import ParticleHandler from "./ParticleHandler"
 import BulletHandler from "./BulletHandler"
-import { WorldPart, WorldPartDefault, WorldPartBuildingsGap, WorldPartType, WorldPartBuildingsLow } from "../../data/types"
+import { WorldPartDefault, WorldPartBuildingsGap, WorldPartType, WorldPartBuildingsLow } from "../../data/types"
 import BuildingsGap from "./parts/BuildingsGap"
 import BuildingsLow from "./parts/BuildingsLow"
 
@@ -25,10 +25,14 @@ export default function World() {
     let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
 
     useFrame(() => {
-        let parts = store.getState().world.parts
-        let forwardWorldPart = parts.at(-1) as WorldPart
+        let { world: { parts }, player: { object: player } } = store.getState()
+        let forwardWorldPart = parts[parts.length - 1]
 
-        if (forwardWorldPart.position.z > -diagonal * .75) {
+        if (forwardWorldPart) {
+            if (player && forwardWorldPart.position.z > player.position.z - diagonal) {
+                startTransition(createWorldPart)
+            }
+        } else {
             startTransition(createWorldPart)
         }
     })

@@ -1,5 +1,5 @@
 import { startTransition, useEffect } from "react"
-import { createBarrel, createPlane, removeBarrel } from "../../../data/store"
+import {  createPlane, removeBarrel } from "../../../data/store"
 import { Tuple3 } from "../../../types"
 
 interface PlaneProps {

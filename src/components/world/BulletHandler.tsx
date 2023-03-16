@@ -1,11 +1,11 @@
-import { useFrame, useThree } from "@react-three/fiber"
+import { useFrame } from "@react-three/fiber"
 import { memo } from "react"
 import { Object3D, Raycaster, Vector3 } from "three"
 import { createParticles, damageBarrel, damagePlane, damagePlayer, damageTurret, increaseScore, removeBullet, store } from "../../data/store"
 import { Bullet, Owner } from "../../data/types"
 import { Tuple3 } from "../../types"
 import { getCollisions } from "../../utils/hooks"
-import { ndelta, setColorAt, setMatrixAt } from "../../utils/utils"
+import { ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 
 let _origin = new Vector3()
 let _direction = new Vector3()
@@ -23,26 +23,24 @@ function intersect(object: Object3D, position: Vector3, speed: Tuple3) {
     return intersection
 }
 
-function BulletHandler() {
-    let { viewport } = useThree()
-    let worldDiagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
 
+function BulletHandler() {
     useFrame((state, delta) => {
         let { bullets, instances, world, player } = store.getState()
         let removed: Bullet[] = []
 
-        if (!instances.line) {
+
+        if (!instances.line || !player.object) {
             return
         }
 
         for (let i = 0; i < bullets.length; i++) {
             let bullet = bullets[i]
             let bulletDiagonal = Math.sqrt((bullet.size[2] * .5) ** 2 + bullet.size[2] ** 2)
-            let collisions = getCollisions({ 
+            let collisions = getCollisions({
                 grid: world.grid,
-                debug: true,
                 position: bullet.position,
-                size: [bullet.size[0], bullet.size[2]],
+                size: bullet.size,
                 source: {
                     position: bullet.position,
                     rotation: bullet.rotation,
@@ -50,10 +48,6 @@ function BulletHandler() {
                     obb: bullet.obb,
                 }
             })
-
-            if (collisions.length) {
-                removed.push(bullet)
-            }
 
             for (let i = 0; i < collisions.length; i++) {
                 let client = collisions[i]
@@ -69,7 +63,7 @@ function BulletHandler() {
                                 speed: [7, 8],
                                 variance: [[-2, 2], [-2, 2], [-2, 2]],
                                 normal: intersection.face.normal.toArray(),
-                                count: [1, 3],
+                                count: [1, 2],
                                 radius: [.1, .2],
                                 color: "gray",
                             })
@@ -133,10 +127,8 @@ function BulletHandler() {
                 }
             }
 
-            // movement 
             bullet.position.x += bullet.speed[0] * ndelta(delta)
             bullet.position.z += bullet.speed[2] * ndelta(delta)
-            bullet.position.z += player.speed * ndelta(delta)
 
             setMatrixAt({
                 instance: instances.line.mesh,
@@ -146,13 +138,8 @@ function BulletHandler() {
                 scale: bullet.size,
             })
 
-            if (
-                bullet.position.z > worldDiagonal * .75 ||
-                bullet.position.z < -worldDiagonal ||
-                bullet.position.x > worldDiagonal / 2 ||
-                bullet.position.x < -worldDiagonal / 2
-            ) {
-                removed.push(bullet)
+            if (!world.frustum.containsPoint(bullet.position) || collisions.length) {
+                removed.push(bullet) 
             }
 
             if (!bullet.mounted) {
@@ -164,13 +151,7 @@ function BulletHandler() {
         for (let i = 0; i < removed.length; i++) {
             let bullet = removed[i]
 
-            setMatrixAt({
-                instance: instances.line.mesh,
-                index: bullet.index,
-                position: [-1000, 0, -1000],
-                rotation: [0, bullet.rotation, 0],
-                scale: [0, 0, 0]
-            })
+            setMatrixNullAt(instances.line.mesh, bullet.index)
         }
 
         if (removed.length) {

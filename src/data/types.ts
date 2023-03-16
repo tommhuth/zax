@@ -2,7 +2,7 @@ import { Box3, InstancedMesh, Object3D, Vector3 } from "three"
 import { OBB } from "three/examples/jsm/math/OBB"
 import { Tuple2, Tuple3 } from "../types"
 import Counter from "./Counter"
-import { Client } from "./SpatialHashGrid"
+import { Client } from "./SpatialHashGrid3D"
 
 export interface Instance {
     mesh: InstancedMesh;
@@ -75,8 +75,8 @@ export interface SpawnedBuilding {
 export interface SpawnedPlane {
     position: Tuple3
     id: string
-    speed: number
-    fireFrequency: number
+    speed?: number
+    fireFrequency?: number
 }
 
 export interface SpawnedTurret {

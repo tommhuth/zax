@@ -1,8 +1,8 @@
-import { useFrame, useThree } from "@react-three/fiber"
-import React, { useEffect } from "react"
-import { Vector3 } from "three"
-import { removeWorldPart } from "../../data/store"
-import { useForwardMotion } from "../../utils/hooks"
+import { useFrame } from "@react-three/fiber"
+import React, { startTransition, useEffect, useRef } from "react"
+import { Box3, Vector3 } from "three"
+import { removeWorldPart, useStore } from "../../data/store"
+import { Tuple2 } from "../../types"
 import { setColorAt, setMatrixAt } from "../../utils/utils"
 import { useInstance } from "../InstancedMesh"
 
@@ -14,22 +14,22 @@ interface WorldPartWrapperProps {
     position: Vector3
     id: string
     children?: React.ReactNode
-    depth: number
+    size: Tuple2
     assets?: (Asset | null)[]
 }
+
+let _box = new Box3()
+let _center = new Vector3()
+let _size = new Vector3()
 
 export default function WorldPartWrapper({
     position,
     children,
-    depth,
+    size: [width, depth],
     id,
-    assets = []
 }: WorldPartWrapperProps) {
-    let { viewport } = useThree()
-    let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
     let [index, instance] = useInstance("box")
-
-    useForwardMotion(position)
+    let dead = useRef(false)
 
     useEffect(() => {
         if (typeof index === "number" && instance) {
@@ -49,14 +49,25 @@ export default function WorldPartWrapper({
     })
 
     useFrame(() => {
-        if (position.z - depth > diagonal * .75) {
-            removeWorldPart(id)
+        if (dead.current) {
+            return
+        }
 
-            assets.filter((i): i is Asset => !!i).forEach(i => i.release())
+        let { player, world } = useStore.getState()
+        let height = 6
+
+        _center.set(position.x, position.y + height / 2, position.z + depth / 2)
+        _box.setFromCenterAndSize(_center, _size.set(width, height, depth))
+
+        if (!world.frustum.intersectsBox(_box) && player.object && position.z > player.object.position.z) {
+            dead.current = true
+            startTransition(() => removeWorldPart(id))
         }
     })
 
     return (
-        <>{children}</>
+        <>
+            {children}
+        </>
     )
 }

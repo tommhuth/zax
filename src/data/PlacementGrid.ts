@@ -1,7 +1,7 @@
 import random from "@huth/random"
 import { Tuple2, Tuple3 } from "../types"
 
-interface GridElement<T> {
+interface PlacementGridElement<T> {
     id: string
     object: T
     size: Tuple2
@@ -9,8 +9,8 @@ interface GridElement<T> {
     bounds: [Tuple2, Tuple2]
 }
 
-export default class Grid<T> {
-    private elements: Record<string, GridElement<T>> = {}
+export default class PlacementGrid<T> {
+    private elements: Record<string, PlacementGridElement<T>> = {}
     private size = [0, 0]
     private grid: (null | string)[][] = [[]]
     private origin: Tuple3

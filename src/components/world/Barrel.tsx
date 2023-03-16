@@ -1,29 +1,26 @@
-import { useFrame, useThree } from "@react-three/fiber"
+import { useFrame } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
+import { Vector3 } from "three"
 import { createParticles, removeBarrel, useStore } from "../../data/store"
 import { Barrel } from "../../data/types"
-import { useForwardMotion } from "../../utils/hooks"
-import { setMatrixAt } from "../../utils/utils"
+import { setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import { useInstance } from "../InstancedMesh"
+
+let _size = new Vector3()
 
 export default function Barrel({
     position,
-    client,
+    aabb,
     size = [.25, 2, .25],
     id,
     health,
 }: Barrel) {
     let removed = useRef(false)
-    let grid = useStore(i => i.world.grid)
-    let { viewport } = useThree()
     let [index, instance] = useInstance("cylinder")
-    let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
     let remove = () => {
         removeBarrel(id)
         removed.current = true
     }
-
-    useForwardMotion(position)
 
     useEffect(() => {
         if (health === 0) {
@@ -44,17 +41,14 @@ export default function Barrel({
     useEffect(() => {
         if (typeof index === "number" && instance) {
             return () => {
-                setMatrixAt({
-                    instance,
-                    index: index as number,
-                    position: [0, 0, -1000],
-                    scale: [0, 0, 0]
-                })
+                setMatrixNullAt(instance, index as number)
             }
         }
     }, [index, instance])
 
     useFrame(() => {
+        let { world, player } = useStore.getState()
+
         if (instance && typeof index === "number" && !removed.current) {
             setMatrixAt({
                 instance,
@@ -63,11 +57,10 @@ export default function Barrel({
                 scale: size,
             })
 
-            if (position.z > diagonal * .75) {
+            aabb.setFromCenterAndSize(position, _size.set(...size))
+
+            if (!world.frustum.intersectsBox(aabb) && player.object && position.z > player.object.position.z) {
                 remove()
-            } else {
-                client.position = [position.x, position.z]
-                grid.updateClient(client)
             }
         }
     })

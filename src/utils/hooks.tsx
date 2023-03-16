@@ -1,11 +1,11 @@
 import { useFrame } from "@react-three/fiber"
-import React, { Ref, useLayoutEffect, useMemo, useRef } from "react"
-import { Box3, IUniform, Matrix4, Object3D, Quaternion, Shader, Vector3 } from "three"
-import { OBB } from "three/examples/jsm/math/OBB"
-import SpatialHashGrid, { Client, ClientData } from "../data/SpatialHashGrid"
+import { useMemo, useRef } from "react"
+import { Box3, IUniform, Matrix4, Quaternion, Shader, Vector3 } from "three"
+import { OBB } from "three/examples/jsm/math/OBB" 
+import { SpatialHashGrid3D, Client } from "../data/SpatialHashGrid3D"
 import { useStore } from "../data/store"
-import { Tuple2, Tuple3 } from "../types"
-import { glsl, ndelta, roundToNearest } from "./utils"
+import { Tuple3 } from "../types"
+import { glsl } from "./utils"
 
 interface ShaderPart {
     head?: string
@@ -66,34 +66,7 @@ export function useShader({
         }
     }
 }
-
-export function useForwardMotion(
-    object?: Vector3 | React.MutableRefObject<Object3D | null>,
-    ownSpeed: React.RefObject<number> = { current: 0 },
-    base?: Tuple3
-) {
-    useLayoutEffect(() => {
-        if (!base) {
-            return
-        }
-
-        if (object instanceof Vector3) {
-            object.set(...base)
-        } else if (object && object.current) {
-            object.current.position.set(...base)
-        }
-    }, [])
-
-    useFrame((state, delta) => {
-        let player = useStore.getState().player
-
-        if (object instanceof Vector3) {
-           // object.z += (player.speed + (ownSpeed.current || 0)) * ndelta(delta)
-        } else if (object && object.current) {
-           // object.current.position.z += (player.speed + (ownSpeed.current || 0)) * ndelta(delta)
-        }
-    })
-}
+ 
 interface CollisionObject {
     position: Vector3
     size: Tuple3
@@ -104,11 +77,11 @@ interface CollisionObject {
 
 interface UseCollisionDetectionParams {
     position: Vector3
-    size: Tuple2
+    size: Tuple3
     interval?: number
     source: CollisionObject
     predicate?: () => boolean
-    actions: Record<string, (data: ClientData) => void>
+    actions: Record<string, (data: any) => void>
 }
 
 
@@ -125,11 +98,10 @@ export function getCollisions({
     grid,
     position,
     size,
-    source,
-    debug,
-}: Omit<UseCollisionDetectionParams, "actions" | "predicate" | "interval"> & { grid: SpatialHashGrid }) {
-    let near = grid.findNear([position.x, position.z], size)
-    let result: Client[] = []  
+    source, 
+}: Omit<UseCollisionDetectionParams, "actions" | "predicate" | "interval"> & { grid: SpatialHashGrid3D }) {
+    let near = grid.findNear(position.toArray(), size)
+    let result: Client[] = []
 
     for (let i = 0; i < near.length; i++) {
         let client = near[i]
@@ -171,7 +143,7 @@ export function useCollisionDetection({
     size,
     source,
     actions,
-    predicate = () => true, 
+    predicate = () => true,
 }: UseCollisionDetectionParams) {
     let grid = useStore(i => i.world.grid)
     let tick = useRef(0)
@@ -184,13 +156,13 @@ export function useCollisionDetection({
                 position,
                 size,
                 source
-            }) 
+            })
 
             for (let i = 0; i < collisions.length; i++) {
                 let client = collisions[i]
                 let action = actions[client.data.type]
 
-                if (!types.includes(client.data.type)) { 
+                if (!types.includes(client.data.type)) {
                     continue
                 }
 

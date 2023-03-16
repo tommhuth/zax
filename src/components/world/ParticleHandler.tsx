@@ -1,8 +1,7 @@
 import { useFrame, useThree } from "@react-three/fiber"
 import { memo } from "react"
-import { Vector3 } from "three"
 import { removeParticle, store } from "../../data/store"
-import { Particle, WorldPart } from "../../data/types"
+import { Particle } from "../../data/types"
 import { setColorAt, setMatrixAt } from "../../utils/utils"
 
 function ParticleHandler() {
@@ -10,7 +9,7 @@ function ParticleHandler() {
     let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
 
     useFrame((state, delta) => {
-        let { particles, player } = store.getState()
+        let { particles } = store.getState()
         let dead: Particle[] = []
 
         for (let i = 0; i < particles.length; i++) {
@@ -34,7 +33,7 @@ function ParticleHandler() {
 
             position.x += velocity.x * delta
             position.y = Math.max(floorY + radius, position.y + velocity.y * delta)
-            position.z += (velocity.z + player.speed) * delta
+            position.z += velocity.z  * delta
 
             if (position.y <= floorY + radius) {
                 velocity.y *= -restitution
@@ -63,18 +62,7 @@ function ParticleHandler() {
         }
 
         if (dead.length) {
-            removeParticle(dead.map(i => i.id))
-
-            for (let i = 0; i < dead.length; i++) {
-                let particle = dead[i]
-
-                setMatrixAt({
-                    instance: particle.instance.mesh,
-                    index: particle.index,
-                    position: [0, 0, -1000],
-                    scale: [0, 0, 0],
-                })
-            }
+            removeParticle(dead.map(i => i.id)) 
         }
     })
 

@@ -1,10 +1,6 @@
 import React, { createContext } from "react"
 import { Color, ColorRepresentation, Euler, InstancedMesh, Matrix4, Quaternion, Vector3 } from "three"
-import { Tuple3, Tuple4 } from "../types" 
-
-export function roundToNearest(value: number, interval: number) {
-    return Math.round(value / interval) * interval
-}
+import { Tuple3, Tuple4 } from "../types"
  
 export function ndelta(delta: number) {
     let nDelta = clamp(delta, 1 / 120, 1 / 30)
@@ -86,6 +82,16 @@ export function setMatrixAt({
         _scale.set(...scale)
     ))
     instance.instanceMatrix.needsUpdate = true
+}
+
+export function setMatrixNullAt(instance:InstancedMesh, index: number) {
+    setMatrixAt({
+        instance,
+        index,
+        position: [-100_000, 0, -100_000],
+        scale: [0, 0, 0],
+        rotation: [0, 0, 0]
+    })
 }
 
 const _color = new Color()

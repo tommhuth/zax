@@ -1,25 +1,25 @@
 import { WorldPartDefault } from "../../../data/types"
-import WorldPartWrapper from "../WorldPartWrapper" 
+import WorldPartWrapper from "../WorldPartWrapper"
 import Turret from "../spawner/Turret"
 import EdgeBuilding from "../decoration/EdgeBuilding"
 import Barrel from "../spawner/Barrel"
-import Plane from "../spawner/Plane" 
+import Plane from "../spawner/Plane"
 
 export default function Default({
     id,
-    barrels, 
+    barrels,
     position,
     turrets,
-    planes, 
-    size: [, depth]
+    planes,
+    size,
 }: WorldPartDefault) {
     return (
         <WorldPartWrapper
-            depth={depth}
+            size={size}
             position={position}
             id={id}
         >
-            <EdgeBuilding z={position.z + depth / 2} />
+            <EdgeBuilding z={position.z + size[1] / 2} />
 
             {turrets.map(i => {
                 return (
@@ -33,7 +33,7 @@ export default function Default({
                 return (
                     <Barrel
                         key={i.id}
-                        position={i.position} 
+                        position={i.position}
                     />
                 )
             })}
@@ -44,7 +44,7 @@ export default function Default({
                         {...i}
                     />
                 )
-            })} 
+            })}
         </WorldPartWrapper>
     )
 }

@@ -1,18 +1,19 @@
-import { Box3, InstancedMesh, Matrix3, Object3D, Vector3 } from "three"
+import { Box3, Frustum, InstancedMesh, Matrix3, Object3D, Vector3 } from "three"
 import create from "zustand"
-import random from "@huth/random"
-import SpatialHashGrid from "./SpatialHashGrid"
+import random from "@huth/random" 
 import { Tuple2, Tuple3 } from "../types"
-import { OBB } from "three/examples/jsm/math/OBB" 
+import { OBB } from "three/examples/jsm/math/OBB"
 import Counter from "./Counter"
 import { Barrel, Building, Bullet, Instance, Particle, Plane, RepeaterMesh, Turret, WorldPart } from "./types"
 import { getNextWorldPart, makeDefault } from "./generators"
+import { SpatialHashGrid3D } from "./SpatialHashGrid3D"
 
 
 interface Store {
     world: {
         parts: WorldPart[]
-        grid: SpatialHashGrid
+        frustum: Frustum
+        grid: SpatialHashGrid3D
     }
     buildings: Building[]
     instances: Record<string, Instance>
@@ -26,8 +27,7 @@ interface Store {
         speed: number
         cameraShake: number
         health: number
-        score: number
-        position: Vector3
+        score: number 
         weapon: {
             name: string,
             fireFrequency: number,
@@ -35,7 +35,7 @@ interface Store {
             speed: number
             damage: number
             bulletSize: Tuple3
-        } 
+        }
         object: Object3D | null
     }
 }
@@ -43,8 +43,9 @@ interface Store {
 
 const store = create<Store>(() => ({
     world: {
-        grid: new SpatialHashGrid([[-20, -30], [20, 30]], [5, 5]),
-        parts: [ 
+        grid: new SpatialHashGrid3D([4, 3, 4]),
+        frustum: new Frustum(),
+        parts: [
             makeDefault({ position: new Vector3(0, 0, -5), size: [10, 20] }),
         ]
     },
@@ -63,11 +64,11 @@ const store = create<Store>(() => ({
         score: 0,
         object: null,
         position: new Vector3(),
-        weapon:{
+        weapon: {
             name: "Default gun",
-            fireFrequency: 150,
+            fireFrequency: 100,
             damage: 35,
-            color: "yellow", 
+            color: "yellow",
             speed: 40,
             bulletSize: [.125, .125, 1.25]
         },
@@ -75,7 +76,7 @@ const store = create<Store>(() => ({
     }
 }))
 const useStore = store
-  
+
 export function createWorldPart() {
     let world = store.getState().world
     let lastPart = world.parts[world.parts.length - 1]
@@ -107,7 +108,7 @@ export function setPlayerObject(object: Object3D) {
             object
         }
     })
-} 
+}
 
 export function increaseScore(amount: number) {
     store.setState({
@@ -117,7 +118,7 @@ export function increaseScore(amount: number) {
         }
     })
 }
- 
+
 export function damagePlayer(damage: number) {
     let player = store.getState().player
 
@@ -182,8 +183,8 @@ export function createTurret(
     let aabb = new Box3().setFromCenterAndSize(position, new Vector3(...size))
     let { world, turrets } = store.getState()
     let client = world.grid.newClient(
-        [position[0], position[2]],
-        [size[0], size[2]],
+        position.toArray(),
+        [...size],
         { type: "turret", id, size, position }
     )
 
@@ -207,7 +208,7 @@ export function createTurret(
 
 export function createPlane(
     [x, y, z] = [0, 0, -10],
-    speed = 1,
+    speed = 5,
     fireFrequency = 850,
 ) {
     let id = random.id()
@@ -216,8 +217,8 @@ export function createPlane(
     let aabb = new Box3().setFromCenterAndSize(position, new Vector3(...size))
     let { world, planes } = store.getState()
     let client = world.grid.newClient(
-        [position[0], position[2]],
-        [size[0], size[2]],
+        position.toArray(),
+        [...size],
         { type: "plane", id, size, position }
     )
 
@@ -247,8 +248,8 @@ export function createBuilding(
     let box = new Box3().setFromCenterAndSize(position.clone(), new Vector3(...size))
     let { world, buildings } = store.getState()
     let client = world.grid.newClient(
-        [position[0], position[2]],
-        [size[0], size[2]],
+        [position.x, position.y + size[1] / 2, position.z],
+        [...size],
         { type: "building", id, size, position }
     )
 
@@ -268,21 +269,28 @@ export function createBuilding(
 
     return id
 }
- 
+
+interface CreateBarrelParams {
+    position: Tuple3
+    size?: Tuple3
+    health?: number
+    rotation?: number
+}
+
 export function createBarrel({
     position: [x = 0, y = 0, z = 0] = [0, 0, 0],
     rotation = 0,
     size = [1.25, 1.75, 1.25],
     health = 25,
-}) {
+}: CreateBarrelParams) {
     let id = random.id()
     let position = new Vector3(x, y + size[1] / 2, z)
     let obb = new OBB(new Vector3(x, y, z), new Vector3(...size.map(i => i / 2)), new Matrix3().rotate(rotation))
     let aabb = new Box3().setFromCenterAndSize(new Vector3(z, y, z), new Vector3(...size))
     let { instances, world } = store.getState()
     let client = world.grid.newClient(
-        [position[0], position[2]],
-        [size[0], size[2]],
+        position.toArray(),
+        [...size],
         { type: "barrel", id, size, position }
     )
 
@@ -419,7 +427,7 @@ export function createParticles({
             radius: radius[0] + (radius[1] - radius[0]) * (index / (list.length - 1)),
             color,
             lifetime: 0,
-            maxLifetime: random.integer(80, 120),
+            maxLifetime: 80,
         }
     })
 
@@ -500,7 +508,7 @@ export function removeTurret(id: string) {
     if (turret) {
         store.setState({
             turrets: turrets.filter(i => i.id !== id)
-        }) 
+        })
         world.grid.remove(turret.client)
     }
 }

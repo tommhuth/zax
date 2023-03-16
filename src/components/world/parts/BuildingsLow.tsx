@@ -1,7 +1,6 @@
 import { WorldPartBuildingsLow } from "../../../data/types"
 import WorldPartWrapper from "../WorldPartWrapper" 
-import Turret from "../spawner/Turret"
-import EdgeBuilding from "../decoration/EdgeBuilding"
+import Turret from "../spawner/Turret" 
 import Barrel from "../spawner/Barrel"
 import Plane from "../spawner/Plane"
 import Building from "../spawner/Building"
@@ -12,12 +11,12 @@ export default function BuildingsLow({
     position,
     turrets,
     planes, 
-    buildings,
-    size: [, depth]
+    buildings, 
+    size,
 }: WorldPartBuildingsLow) {
     return (
         <WorldPartWrapper
-            depth={depth}
+            size={size}
             position={position}
             id={id}
         > 
