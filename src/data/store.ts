@@ -125,7 +125,7 @@ export function damagePlayer(damage: number) {
     store.setState({
         player: {
             ...player,
-            health: Math.max(player.health - damage, -Infinity),
+            health: Math.max(player.health - damage, 0),
         }
     })
 }

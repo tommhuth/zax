@@ -1,16 +1,16 @@
-import { useFrame, useLoader, useThree } from "@react-three/fiber"
+import { useFrame, useLoader } from "@react-three/fiber"
 import { useEffect, useMemo, useRef } from "react"
-import { Group, Vector3 } from "three"
-import { createBullet, damageBarrel, damagePlane, damagePlayer, damageTurret, setPlayerObject, setPlayerSpeed, useStore } from "../data/store"
+import { Group, Mesh, Vector3 } from "three"
+import { createBullet, damageBarrel, damagePlane, damagePlayer, damageTurret, setPlayerObject, useStore } from "../data/store"
 import { Tuple3 } from "../types"
-import { WORLD_BOTTOM_EDGE, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
+import { WORLD_BOTTOM_EDGE, WORLD_CENTER, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { clamp } from "../utils/utils"
 import { useCollisionDetection } from "../utils/hooks"
 import { Owner } from "../data/types"
 
-let _edgemin = new Vector3(WORLD_LEFT_EDGE, WORLD_BOTTOM_EDGE, 0)
-let _edgemax = new Vector3(WORLD_RIGHT_EDGE, WORLD_TOP_EDGE, 0)
+let _edgemin = new Vector3(WORLD_LEFT_EDGE, WORLD_BOTTOM_EDGE, -100)
+let _edgemax = new Vector3(WORLD_RIGHT_EDGE, WORLD_TOP_EDGE, 100)
 
 let depth = 2
 
@@ -20,17 +20,20 @@ interface PlayerProps {
     y?: number
 }
 
-export default function Player({ size = [1.5, .5, depth], z = 4, y = 1.5 }: PlayerProps) {
-    let ref = useRef<Group | null>(null)
-    let lastShotAt = useRef(0)
-    let hasFired = useRef(false)
+export default function Player({
+    size = [1.5, .5, depth],
+    z = WORLD_CENTER,
+    y = 1.5
+}: PlayerProps) {
+    let playerGroupRef = useRef<Group | null>(null)
+    let hitboxRef = useRef<Mesh>(null)
+    let lastShotAt = useRef(0) 
     let grid = useStore(i => i.world.grid)
     let keys = useMemo<Record<string, boolean>>(() => ({}), [])
     let weapon = useStore(i => i.player.weapon)
-    let targetPosition = useMemo(() => new Vector3(0, _edgemin.y, z), [])
+    let targetPosition = useMemo(() => new Vector3(WORLD_CENTER, _edgemin.y, z), [])
     let models = useLoader(GLTFLoader, "/models/space.glb")
-    let { viewport } = useThree()
-    let position = useMemo(() => new Vector3(0, y, z), [])
+    let position = useMemo(() => new Vector3(WORLD_CENTER, y, z), [])
     let client = useMemo(() => {
         return grid.newClient([0, 0, z], size, {
             type: "player",
@@ -39,8 +42,7 @@ export default function Player({ size = [1.5, .5, depth], z = 4, y = 1.5 }: Play
             position,
         })
     }, [grid])
-    let pixelSize = (window.innerWidth) / (window.innerWidth * (1 / 7))
-    let unitPixel = pixelSize * (viewport.width / window.innerWidth)
+    let startPosition = useMemo(() => new Vector3(), [])
 
     useCollisionDetection({
         position,
@@ -72,49 +74,12 @@ export default function Player({ size = [1.5, .5, depth], z = 4, y = 1.5 }: Play
     })
 
     useEffect(() => {
-        setPlayerSpeed(8)
-    }, [unitPixel])
-
-    useEffect(() => {
-        let startX: number | null = null
-        let startY: number | null = null
         let shootDiv = document.getElementById("shoot") as HTMLElement
-        let moveDiv = document.getElementById("move") as HTMLElement
         let onKeyDown = (e: KeyboardEvent) => {
             keys[e.code] = true
-
-            if (e.code === "KeyW") {
-                targetPosition.y = clamp(targetPosition.y + 1, _edgemin.y, _edgemax.y)
-            } else if (e.code === "KeyS") {
-                targetPosition.y = clamp(targetPosition.y - 1, _edgemin.y, _edgemax.y)
-            }
         }
         let onKeyUp = (e: KeyboardEvent) => {
-            delete keys[e.code]
-            hasFired.current = false
-        }
-        // move 
-        let onTouchStartMove = (e: TouchEvent) => {
-            startX = e.changedTouches[0].clientX
-            startY = e.changedTouches[0].clientY
-
-        }
-        let onTouchMoveMove = (e: TouchEvent) => {
-            if (startX && startY) {
-                let dx = startX - e.changedTouches[0].clientX
-                let dy = startY - e.changedTouches[0].clientY
-
-                startX = e.changedTouches[0].clientX
-                startY = e.changedTouches[0].clientY
-
-                targetPosition.x += -dx * .1
-                targetPosition.y += dy * .1
-                targetPosition.clamp(_edgemin, _edgemax)
-            }
-        }
-        let onTouchEndMove = () => {
-            startX = null
-            startY = null
+            delete keys[e.code] 
         }
         // shoot 
         let onTouchStartShoot = () => {
@@ -127,11 +92,6 @@ export default function Player({ size = [1.5, .5, depth], z = 4, y = 1.5 }: Play
         window.addEventListener("keydown", onKeyDown)
         window.addEventListener("keyup", onKeyUp)
 
-        moveDiv.addEventListener("touchstart", onTouchStartMove)
-        moveDiv.addEventListener("touchmove", onTouchMoveMove)
-        moveDiv.addEventListener("touchend", onTouchEndMove)
-        moveDiv.addEventListener("touchcancel", onTouchEndMove)
-
         shootDiv.addEventListener("touchstart", onTouchStartShoot)
         shootDiv.addEventListener("touchend", onTouchEndShoot)
         shootDiv.addEventListener("touchcancel", onTouchEndShoot)
@@ -140,28 +100,33 @@ export default function Player({ size = [1.5, .5, depth], z = 4, y = 1.5 }: Play
             window.removeEventListener("keydown", onKeyDown)
             window.removeEventListener("keyup", onKeyUp)
 
-            moveDiv.removeEventListener("touchstart", onTouchStartMove)
-            moveDiv.removeEventListener("touchmove", onTouchMoveMove)
-            moveDiv.removeEventListener("touchend", onTouchEndMove)
-            moveDiv.removeEventListener("touchcancel", onTouchEndMove)
-
             shootDiv.removeEventListener("touchstart", onTouchStartShoot)
             shootDiv.removeEventListener("touchend", onTouchEndShoot)
             shootDiv.removeEventListener("touchcancel", onTouchEndShoot)
         }
-    }, []) 
+    }, [])
 
+    // input
     useFrame((state, delta) => {
-        let speedx = .25 * 60
+        let speedx = 15
+        let speedy = 13
 
-        if (keys.KeyA) {
-            targetPosition.x -= speedx * delta
-        } else if (keys.KeyD) {
-            targetPosition.x += speedx * delta
+        if (Object.entries(keys).length) {
+            if (keys.KeyA) {
+                targetPosition.x -= speedx * delta 
+            } else if (keys.KeyD) {
+                targetPosition.x += speedx * delta
+            }
+
+            if (keys.KeyW) {
+                targetPosition.y += speedy * delta
+            } else if (keys.KeyS) {
+                targetPosition.y -= speedy * delta
+            }
+
+            targetPosition.clamp(_edgemin, _edgemax)
         }
-
-        targetPosition.clamp(_edgemin, _edgemax)
-
+ 
         if (Date.now() - lastShotAt.current > weapon.fireFrequency && keys.Space) {
             createBullet({
                 position: [position.x, position.y, position.z - 2],
@@ -172,20 +137,23 @@ export default function Player({ size = [1.5, .5, depth], z = 4, y = 1.5 }: Play
                 speed: [0, 0, -weapon.speed],
                 size: weapon.bulletSize
             })
-            lastShotAt.current = Date.now()
-            hasFired.current = true
+            lastShotAt.current = Date.now() 
         }
     })
 
+    // movement
     useFrame((state, delta) => {
-        if (ref.current) {
+        if (playerGroupRef.current && hitboxRef.current) {
+            let playerGroup = playerGroupRef.current
             let y = clamp(targetPosition.y, _edgemin.y, _edgemax.y)
 
-            ref.current.position.x += (targetPosition.x - ref.current.position.x) * (.1 * 60 * delta)
-            ref.current.position.y += (y - ref.current.position.y) * (.1 * 60 * delta)
-            ref.current.position.z -= 6 * delta 
+            playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.08 * 60 * delta)
+            playerGroup.position.y += (y - playerGroup.position.y) * (.065 * 60 * delta)
+            playerGroup.position.z -= 6 * delta
 
-            position.copy(ref.current.position)
+            startPosition.z -= 6 * delta  
+            hitboxRef.current.position.z = playerGroup.position.z 
+            position.copy(playerGroup.position)
             client.position = position.toArray()
             grid.updateClient(client)
         }
@@ -195,7 +163,7 @@ export default function Player({ size = [1.5, .5, depth], z = 4, y = 1.5 }: Play
         <>
             <group
                 ref={(object: Group) => {
-                    ref.current = object
+                    playerGroupRef.current = object
                     setPlayerObject(object)
                 }}
                 scale={.75}
@@ -212,7 +180,30 @@ export default function Player({ size = [1.5, .5, depth], z = 4, y = 1.5 }: Play
                     <boxGeometry args={[...size, 1, 1, 1]} />
                     <meshBasicMaterial color="red" wireframe />
                 </mesh>
+
             </group>
+            <mesh
+                ref={hitboxRef}
+                position={[0, .1, 0]}
+                rotation-x={-Math.PI / 2}
+                onPointerMove={(e) => {
+                    if (e.pointerType === "touch") {
+                        targetPosition.y += (startPosition.z - e.point.z) * 1
+                        targetPosition.x += (e.point.x - startPosition.x) * 1.5
+
+                        targetPosition.clamp(_edgemin, _edgemax)
+                        startPosition.copy(e.point)
+                    }
+                }}
+                onPointerDown={(e) => {
+                    if (e.pointerType === "touch") {
+                        startPosition.set(e.point.x, 0, e.point.z)
+                    }
+                }}
+            >
+                <planeGeometry args={[20, 20, 1, 1]} />
+                <meshBasicMaterial visible={false} />
+            </mesh>
         </>
     )
 }

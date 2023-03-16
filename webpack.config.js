@@ -61,8 +61,7 @@ module.exports = (env, options) => {
                     sizes: [120, 180]
                 }
             ]
-        }),
-        new HTMLInlineCSSWebpackPlugin()
+        }), 
     ]
 
     if (!options.watch) {

@@ -1,6 +1,6 @@
 import random from "@huth/random"
 import { Vector3 } from "three"
-import { WORLD_TOP_EDGE } from "../components/world/World"
+import { WORLD_CENTER, WORLD_TOP_EDGE } from "../components/world/World"
 import { Tuple2, Tuple3 } from "../types"
 import makeCycler from "./cycler"
 import PlacementGrid from "./PlacementGrid"
@@ -25,7 +25,7 @@ export function makeBuildingsGap(previous: BaseWorldPart): WorldPartBuildingsGap
             return {
                 id: random.id(),
                 position: [
-                    index * 3 - list.length * 3 * .5 + 3 * .5,
+                    WORLD_CENTER + index * 3 - list.length * 3 * .5 + 3 * .5,
                     WORLD_TOP_EDGE,
                     startZ - index * 4 - random.integer(-2, -4)
                 ]
@@ -71,7 +71,7 @@ export function makeBuildingsGap(previous: BaseWorldPart): WorldPartBuildingsGap
 export function makeDefault(previous: BaseWorldPart): WorldPartDefault {
     let depth = 20
     let startZ = previous.position.z - depth
-    let grid = new PlacementGrid<null>([3, 4], [0, 0, startZ], depth)
+    let grid = new PlacementGrid<null>([3, 4], [WORLD_CENTER, 0, startZ], depth)
 
     return {
         turrets: new Array(2).fill(null).map(() => {
@@ -94,7 +94,7 @@ export function makeDefault(previous: BaseWorldPart): WorldPartDefault {
             return {
                 id: random.id(),
                 position: [
-                    index * 3 - list.length * 3 * .5 + 3 * .5,
+                    WORLD_CENTER + index * 3 - list.length * 3 * .5 + 3 * .5,
                     WORLD_TOP_EDGE,
                     startZ - index * 4 - random.integer(-2, -4)
                 ]
@@ -111,7 +111,7 @@ export function makeDefault(previous: BaseWorldPart): WorldPartDefault {
 export function makeBuildingsLow(previous: BaseWorldPart): WorldPartBuildingsLow {
     let depth = 20
     let startZ = previous.position.z - depth
-    let grid = new PlacementGrid<null>([3, 4], [0, 0, startZ], depth)
+    let grid = new PlacementGrid<null>([3, 4], [WORLD_CENTER, 0, startZ], depth)
 
     return {
         turrets: new Array(1).fill(null).map(() => {

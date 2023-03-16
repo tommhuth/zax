@@ -25,7 +25,7 @@ export default class PlacementGrid<T> {
         ]
     }
 
-    constructor(size: Tuple2, origin: Tuple3, depth: number, cellSize = 3, gap = 1) {
+    constructor(size: Tuple2, origin: Tuple3, depth: number, cellSize = 3, gap = .25) {
         this.size = size
         this.origin = origin
         this.gap = gap

@@ -16,8 +16,7 @@ export default function Camera({ startPosition = [10, 15, 10] }: { startPosition
             Math.PI / 3, // 60 degrees from positive Y-axis and 30 degrees to XZ-plane
             Math.PI / 4  // 45 degrees, between positive X and Z axes, thus on XZ-plane
         )
-        camera.lookAt(0, 0, 0)
-        camera.position.x -= 2.5
+        camera.lookAt(0, 0, 0) 
         basePosition.copy(camera.position)
     }, [camera, ...startPosition])
 
@@ -28,7 +27,7 @@ export default function Camera({ startPosition = [10, 15, 10] }: { startPosition
         world.frustum.setFromProjectionMatrix(_matrix)
 
         if (player.object) {
-            camera.position.z = basePosition.z + player.object.position.z - 5
+            camera.position.z = basePosition.z + player.object.position.z - 8
         }
     })
 

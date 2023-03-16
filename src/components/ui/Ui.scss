@@ -1,0 +1,22 @@
+.ui {
+    --offsetx: 8vw;
+    --offsety: 6vw;
+    position: fixed;
+    left: var(--offsetx);
+    right: var(--offsetx);
+    bottom: var(--offsety);
+    display: flex;
+    gap: 1.5em;
+    color: white;
+    z-index: 100;
+    pointer-events: none;
+    font-size: 1.5em;
+
+    @media (max-width: 800px), (max-height: 500px) {
+        font-size: 1.25em;
+        flex-direction: row-reverse;
+        --offsetx: 1.75em;
+        --offsety: 1.5em;
+    }
+}   
+ 
