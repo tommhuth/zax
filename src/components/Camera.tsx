@@ -17,6 +17,7 @@ export default function Camera({ startPosition = [10, 15, 10] }: { startPosition
             Math.PI / 4  // 45 degrees, between positive X and Z axes, thus on XZ-plane
         )
         camera.lookAt(0, 0, 0) 
+        camera.position.x -= 2
         basePosition.copy(camera.position)
     }, [camera, ...startPosition])
 
