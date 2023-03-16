@@ -15,6 +15,7 @@ const _speed = new Vector3()
 
 let _origin = new Vector3()
 let _direction = new Vector3()
+let _size = new Vector3()
 let _raycaster = new Raycaster(_origin, _direction, 0)
 
 function Turret({ id, size, position, health, fireFrequency, aabb }: Turret) {
@@ -117,9 +118,9 @@ function Turret({ id, size, position, health, fireFrequency, aabb }: Turret) {
     })
 
     useFrame(() => {
-        let world = useStore.getState().world
+        let { world, player } = useStore.getState()
 
-        if (instance && typeof index === "number" && !removed.current) {
+        if (!removed.current && instance && typeof index === "number" && !removed.current) {
             setMatrixAt({
                 instance,
                 index,
@@ -127,7 +128,9 @@ function Turret({ id, size, position, health, fireFrequency, aabb }: Turret) {
                 scale: size,
             })
 
-            if (!world.frustum.intersectsBox(aabb)) { 
+            aabb.setFromCenterAndSize(position, _size.set(...size))
+
+            if (!world.frustum.intersectsBox(aabb) && player.object && position.z > player.object.position.z) {
                 remove()
             }
         }
