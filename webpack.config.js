@@ -36,11 +36,11 @@ module.exports = (env, options) => {
             ]
         }),
         new WebpackPwaManifest({
-            name: "React boilplate",
-            short_name: "React boilplate",
+            name: "Zaxxon",
+            short_name: "Zaxxon",
             background_color: "#FFF",
             theme_color: "#000",
-            orientation: "portrait",
+            orientation: "landscape",
             start_url: "/",
             display: "fullscreen",
             inject: true,
