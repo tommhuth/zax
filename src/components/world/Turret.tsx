@@ -4,7 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect } from "react"
 import { createBullet, createParticles, removeTurret, store, useStore } from "../../data/store"
 import { useInstance } from "../InstancedMesh"
-import { clamp, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
+import { clamp, ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import animate from "@huth/animate"
 import random from "@huth/random"
 import { Raycaster, Vector3 } from "three"
@@ -114,7 +114,7 @@ function Turret({ id, size, position, health, fireFrequency, aabb }: Turret) {
             nextShotAt.current = fireFrequency * random.float(.75, 1) - fireFrequency * distanceFromPlayer * .5 + heightPenalty * fireFrequency * 2
         }
 
-        shootTimer.current += delta * 1000
+        shootTimer.current += ndelta(delta) * 1000
     })
 
     useFrame(() => {

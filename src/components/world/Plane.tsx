@@ -4,7 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect } from "react"
 import { createBullet, createParticles, damageBarrel, damageTurret, increaseScore, removePlane, store, useStore } from "../../data/store"
 import { useInstance } from "../InstancedMesh"
-import { clamp, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
+import { clamp, ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import animate from "@huth/animate"
 import random from "@huth/random"
 import { Tuple3 } from "../../types"
@@ -147,14 +147,14 @@ function Plane({
             nextShotAt.current = fireFrequency * random.float(.75, 1) - fireFrequency * distanceFromPlayer * .5
         }
 
-        shootTimer.current += delta * 1000
+        shootTimer.current += ndelta(delta) * 1000
     })
 
     useFrame((state, delta) => {
         let { world, player } = useStore.getState()
 
         if (instance && typeof index === "number" && !removed.current) {
-            position.z += actualSpeed.current * delta
+            position.z += actualSpeed.current * ndelta(delta)
 
             aabb.setFromCenterAndSize(position, _size.set(...size))
 
@@ -177,10 +177,12 @@ function Plane({
 
     useFrame((state, delta) => {
         if (health === 0 && !grounded.current) {
-            gravety.current += -.015 * 60 * delta
-            position.y += gravety.current * 60 * delta
-            rotation.current[0] += tilt.current * 60 * delta
-            rotation.current[2] += tilt.current * .25 * 60 * delta
+            let nd = ndelta(delta)
+
+            gravety.current += -.015 * 60 * nd
+            position.y += gravety.current * 60 * nd
+            rotation.current[0] += tilt.current * 60 * nd
+            rotation.current[2] += tilt.current * .25 * 60 * nd
             grounded.current = position.y <= (bottomY.current + size[1] / 2)
             actualSpeed.current *= .95
         }

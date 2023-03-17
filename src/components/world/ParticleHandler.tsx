@@ -2,7 +2,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import { memo } from "react"
 import { removeParticle, store } from "../../data/store"
 import { Particle } from "../../data/types"
-import { setColorAt, setMatrixAt } from "../../utils/utils"
+import { ndelta, setColorAt, setMatrixAt } from "../../utils/utils"
 
 function ParticleHandler() {
     let { viewport } = useThree()
@@ -11,6 +11,7 @@ function ParticleHandler() {
     useFrame((state, delta) => {
         let { particles } = store.getState()
         let dead: Particle[] = []
+        let nd = ndelta(delta)
 
         for (let i = 0; i < particles.length; i++) {
             let particle = particles[i]
@@ -31,9 +32,9 @@ function ParticleHandler() {
                 particles[i].mounted = true
             }
 
-            position.x += velocity.x * delta
-            position.y = Math.max(floorY + radius, position.y + velocity.y * delta)
-            position.z += velocity.z  * delta
+            position.x += velocity.x * nd
+            position.y = Math.max(floorY + radius, position.y + velocity.y * nd)
+            position.z += velocity.z  * nd
 
             if (position.y <= floorY + radius) {
                 velocity.y *= -restitution
@@ -42,9 +43,9 @@ function ParticleHandler() {
             velocity.x *= friction
             velocity.z *= friction
 
-            velocity.x += acceleration.x * delta
-            velocity.y += acceleration.y * delta
-            velocity.z += acceleration.z * delta
+            velocity.x += acceleration.x * nd
+            velocity.y += acceleration.y * nd
+            velocity.z += acceleration.z * nd
 
             setMatrixAt({
                 instance: instance.mesh,

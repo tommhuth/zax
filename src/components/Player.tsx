@@ -5,7 +5,7 @@ import { createBullet, damageBarrel, damagePlane, damagePlayer, damageTurret, se
 import { Tuple3 } from "../types"
 import { WORLD_BOTTOM_EDGE, WORLD_CENTER, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
-import { clamp } from "../utils/utils"
+import { clamp, ndelta } from "../utils/utils"
 import { useCollisionDetection } from "../utils/hooks"
 import { Owner } from "../data/types"
 
@@ -110,18 +110,19 @@ export default function Player({
     useFrame((state, delta) => {
         let speedx = 15
         let speedy = 13
+        let nd = ndelta(delta)
 
         if (Object.entries(keys).length) {
             if (keys.KeyA) {
-                targetPosition.x -= speedx * delta 
+                targetPosition.x -= speedx * nd 
             } else if (keys.KeyD) {
-                targetPosition.x += speedx * delta
+                targetPosition.x += speedx * nd
             }
 
             if (keys.KeyW) {
-                targetPosition.y += speedy * delta
+                targetPosition.y += speedy * nd
             } else if (keys.KeyS) {
-                targetPosition.y -= speedy * delta
+                targetPosition.y -= speedy * nd
             }
 
             targetPosition.clamp(_edgemin, _edgemax)
@@ -144,15 +145,16 @@ export default function Player({
     // movement
     useFrame((state, delta) => {
         if (playerGroupRef.current && hitboxRef.current) {
+            let nd = ndelta(delta)
             let playerGroup = playerGroupRef.current
             let speed = useStore.getState().player.speed
             let y = clamp(targetPosition.y, _edgemin.y, _edgemax.y)
 
-            playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.08 * 60 * delta)
-            playerGroup.position.y += (y - playerGroup.position.y) * (.065 * 60 * delta)
-            playerGroup.position.z -= speed * delta
+            playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.08 * 60 * nd)
+            playerGroup.position.y += (y - playerGroup.position.y) * (.065 * 60 * nd)
+            playerGroup.position.z -= speed * nd
 
-            startPosition.z -= speed * delta  
+            startPosition.z -= speed * nd  
             hitboxRef.current.position.z = playerGroup.position.z 
             position.copy(playerGroup.position)
             client.position = position.toArray()
