@@ -135,8 +135,7 @@ export default function Player({
                 damage: weapon.damage,
                 color: weapon.color,
                 rotation: Math.PI,
-                speed: [0, 0, -weapon.speed],
-                size: weapon.bulletSize
+                speed: [0, 0, -weapon.speed], 
             })
             lastShotAt.current = Date.now() 
         }

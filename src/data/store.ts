@@ -28,8 +28,7 @@ interface Store {
         cameraShake: number
         health: number
         score: number 
-        weapon: {
-            name: string,
+        weapon: { 
             fireFrequency: number,
             color: string,
             speed: number
@@ -64,9 +63,8 @@ const store = create<Store>(() => ({
         score: 0,
         object: null,
         position: new Vector3(),
-        weapon: {
-            name: "Default gun",
-            fireFrequency: 100,
+        weapon: { 
+            fireFrequency: 200,
             damage: 35,
             color: "yellow",
             speed: 40,
@@ -347,7 +345,7 @@ export function createBullet({
     position = [0, 0, 0],
     rotation,
     owner,
-    size = [.125, .125, 1.25],
+    size = [.15, .1, 1.5],
     speed = [0, 0, 0],
     damage,
     color,

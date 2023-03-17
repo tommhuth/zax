@@ -8,7 +8,6 @@ import { WorldPart, WorldPartDefault, WorldPartBuildingsLow, WorldPartBuildingsG
 
 export type BaseWorldPart = { size: Tuple2, position: Vector3 }
 
-
 export function makeBuildingsGap(previous: BaseWorldPart): WorldPartBuildingsGap {
     let depth = 10
     let width = 10
@@ -32,7 +31,7 @@ export function makeBuildingsGap(previous: BaseWorldPart): WorldPartBuildingsGap
             }
         }),
         buildings: [
-            ...new Array(2).fill(null).map((i, index) => {
+            ...new Array(random.integer(0, 1)).fill(null).map((i, index) => {
                 let height = random.pick(4.5, 6)
                 let width = 15
                 let buildingPosition = [
@@ -71,30 +70,30 @@ export function makeBuildingsGap(previous: BaseWorldPart): WorldPartBuildingsGap
 export function makeDefault(previous: BaseWorldPart): WorldPartDefault {
     let depth = 20
     let startZ = previous.position.z - depth
-    let grid = new PlacementGrid<null>([3, 4], [WORLD_CENTER, 0, startZ], depth)
+    let grid = new PlacementGrid({ size: [3, 4], origin: [WORLD_CENTER, 0, startZ], depth })
 
     return {
-        turrets: new Array(2).fill(null).map(() => {
-            let [position] = grid.add([1, 1], null)
+        turrets: new Array(random.integer(0, 2)).fill(null).map(() => {
+            let [position] = grid.add([1, 1])
 
             return {
                 id: random.id(),
                 position,
             }
         }),
-        barrels: new Array(2).fill(null).map(() => {
-            let [position] = grid.add([1, 1], null)
+        barrels: new Array(random.integer(1, 3)).fill(null).map(() => {
+            let [position] = grid.add([1, 1])
 
             return {
                 id: random.id(),
                 position,
             }
         }),
-        planes: new Array(3).fill(null).map((i, index, list) => {
+        planes: new Array(random.integer(0, 3)).fill(null).map((i, index, list) => {
             return {
                 id: random.id(),
                 position: [
-                    WORLD_CENTER + index * 3 - list.length * 3 * .5 + 3 * .5,
+                    WORLD_CENTER + 2 + index * 3 - list.length * 3 * .5 + 3 * .5,
                     WORLD_TOP_EDGE,
                     startZ - index * 4 - random.integer(-2, -4)
                 ]
@@ -108,31 +107,34 @@ export function makeDefault(previous: BaseWorldPart): WorldPartDefault {
     }
 }
 
+const buildingSize = makeCycler<Tuple2>([[1, 2], [1, 1], [2, 2]])
+const buildingHeight = makeCycler([2, 4, 3, 2, 5])
+
 export function makeBuildingsLow(previous: BaseWorldPart): WorldPartBuildingsLow {
     let depth = 20
     let startZ = previous.position.z - depth
-    let grid = new PlacementGrid<null>([3, 4], [WORLD_CENTER, 0, startZ], depth)
+    let grid = new PlacementGrid({ size: [3, 4], origin: [WORLD_CENTER, 0, startZ], depth })
 
     return {
-        turrets: new Array(1).fill(null).map(() => {
-            let [position] = grid.add([1, 1], null)
+        turrets: new Array(random.integer(0, 2)).fill(null).map(() => {
+            let [position] = grid.add([1, 1])
 
             return {
                 id: random.id(),
                 position,
             }
         }),
-        buildings: [[1, 2], [1, 1], [2, 1]].map(i => {
-            let [position, size] = grid.add(i as Tuple2, null)
+        buildings: new Array(random.integer(2, 3)).fill(null).map(() => {
+            let [position, size] = grid.add(buildingSize.next())
 
             return {
                 id: random.id(),
                 position,
-                size: [size[0], 4, size[1]]
+                size: [size[0], buildingHeight.next(), size[1]]
             }
         }),
-        barrels: new Array(1).fill(null).map(() => {
-            let [position] = grid.add([1, 1], null)
+        barrels: new Array(random.integer(1, 2)).fill(null).map(() => {
+            let [position] = grid.add([1, 1])
 
             return {
                 id: random.id(),

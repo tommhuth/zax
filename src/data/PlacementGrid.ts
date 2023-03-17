@@ -1,18 +1,17 @@
 import random from "@huth/random"
 import { Tuple2, Tuple3 } from "../types"
 
-interface PlacementGridElement<T> {
-    id: string
-    object: T
+interface PlacementGridParams {
     size: Tuple2
-    position: Tuple2
-    bounds: [Tuple2, Tuple2]
+    origin: Tuple3
+    depth: number
+    cellSize?: number
+    gap?: number
 }
 
-export default class PlacementGrid<T> {
-    private elements: Record<string, PlacementGridElement<T>> = {}
+export default class PlacementGrid {
     private size = [0, 0]
-    private grid: (null | string)[][] = [[]]
+    private grid: boolean[][] = [[]]
     private origin: Tuple3
     private gap: number
     private cellSize: number
@@ -25,7 +24,13 @@ export default class PlacementGrid<T> {
         ]
     }
 
-    constructor(size: Tuple2, origin: Tuple3, depth: number, cellSize = 3, gap = .25) {
+    constructor({
+        size,
+        origin,
+        depth,
+        cellSize = 2,
+        gap = .5
+    }: PlacementGridParams) {
         this.size = size
         this.origin = origin
         this.gap = gap
@@ -36,7 +41,7 @@ export default class PlacementGrid<T> {
             this.grid[x] = []
 
             for (let y = 0; y < size[1]; y++) {
-                this.grid[x][y] = null
+                this.grid[x][y] = false
             }
         }
     }
@@ -48,22 +53,13 @@ export default class PlacementGrid<T> {
         return [min as Tuple2, max as Tuple2]
     }
 
-    private insert(position: Tuple2, size: Tuple2, object: T) {
+    private insert(position: Tuple2, size: Tuple2) {
         if (this.canFitAt(position, size)) {
             let [min, max] = this.getBounds(position, size)
-            let element = {
-                position: [...min] as Tuple2,
-                object,
-                id: random.id(),
-                size,
-                bounds: [min, max] as [Tuple2, Tuple2]
-            }
-
-            this.elements[element.id] = element
 
             for (let x = min[0]; x < max[0]; x++) {
                 for (let y = min[1]; y < max[1]; y++) {
-                    this.grid[x][y] = element.id
+                    this.grid[x][y] = true
                 }
             }
 
@@ -78,7 +74,6 @@ export default class PlacementGrid<T> {
     }
 
     print() {
-        console.log("GRID:")
         let res: any[] = []
 
         for (let y = 0; y < this.size[1]; y++) {
@@ -127,18 +122,18 @@ export default class PlacementGrid<T> {
         return this.getAllPotentialPositions(size).length > 0
     }
 
-    add(position: Tuple2, size: Tuple2, object: any): ReturnType<typeof this.insert>
-    add(size: Tuple2, object: any): ReturnType<typeof this.insert>
+    add(position: Tuple2, size: Tuple2): ReturnType<typeof this.insert>
+    add(size: Tuple2): ReturnType<typeof this.insert>
     add(...args): ReturnType<typeof this.insert> {
-        if (args.length === 3) {
-            let [position, size, object] = args as [position: Tuple2, size: Tuple2, object: T]
+        if (args.length === 2) {
+            let [position, size] = args as [position: Tuple2, size: Tuple2]
 
-            return this.insert(position, size, object)
+            return this.insert(position, size)
         } else {
-            let [size, object] = args as [size: Tuple2, object: T]
+            let [size] = args as [size: Tuple2]
             let position = random.pick(...this.getAllPotentialPositions(size))
 
-            return this.insert(position, size, object)
+            return this.insert(position, size)
         }
     }
 

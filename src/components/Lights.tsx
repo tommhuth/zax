@@ -12,20 +12,21 @@ export default function Lights() {
     useEffect(() => {
         if (!lightRef.current) {
             return
-        } 
+        }
 
         scene.add(lightRef.current.target)
     }, [scene])
 
-    useFrame(() => {
+    useFrame((state, delta) => {
         let player = useStore.getState().player.object
 
-        if (lightRef.current && player && ticks.current === 30) {
+        if (lightRef.current && player && ticks.current > 3000) {
             lightRef.current.position.z = player.position.z
             lightRef.current.target.position.z = player.position.z
             ticks.current = 0
+            console.log(1)
         } else {
-            ticks.current++
+            ticks.current += delta * 1000
         }
     })
 
@@ -47,7 +48,7 @@ export default function Lights() {
                 shadow-camera-far={15}
                 shadow-camera-left={-8} // x
                 shadow-camera-right={8}
-                shadow-camera-top={diagonal} // z
+                shadow-camera-top={diagonal * 1.5} // z
                 shadow-camera-bottom={-diagonal * .5}
                 shadow-mapSize={[256, 256]}
                 shadow-bias={-0.001}
