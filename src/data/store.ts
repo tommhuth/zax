@@ -58,7 +58,7 @@ const store = create<Store>(() => ({
     bullets: [],
     particles: [],
     player: {
-        speed: 0,
+        speed: 6,
         cameraShake: 0,
         health: 100,
         score: 0,
@@ -427,7 +427,7 @@ export function createParticles({
             radius: radius[0] + (radius[1] - radius[0]) * (index / (list.length - 1)),
             color,
             lifetime: 0,
-            maxLifetime: 80,
+            maxLifetime: 90,
         }
     })
 

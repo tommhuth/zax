@@ -145,13 +145,14 @@ export default function Player({
     useFrame((state, delta) => {
         if (playerGroupRef.current && hitboxRef.current) {
             let playerGroup = playerGroupRef.current
+            let speed = useStore.getState().player.speed
             let y = clamp(targetPosition.y, _edgemin.y, _edgemax.y)
 
             playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.08 * 60 * delta)
             playerGroup.position.y += (y - playerGroup.position.y) * (.065 * 60 * delta)
-            playerGroup.position.z -= 6 * delta
+            playerGroup.position.z -= speed * delta
 
-            startPosition.z -= 6 * delta  
+            startPosition.z -= speed * delta  
             hitboxRef.current.position.z = playerGroup.position.z 
             position.copy(playerGroup.position)
             client.position = position.toArray()

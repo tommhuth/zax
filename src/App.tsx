@@ -12,6 +12,7 @@ import { useShader } from "./utils/hooks"
 import Ui from "./components/ui/Ui"
 import Models from "./components/Models"
 import Lights from "./components/Lights"
+import { BasicShadowMap } from "three"
 
 let isSmall = window.matchMedia("(max-height: 400px)").matches || window.matchMedia("(max-width: 800px)").matches
 let frc = isSmall ? 4 : 7
@@ -42,11 +43,11 @@ export default function Wrapper() {
                     width: "100%",
                 }}
                 shadows={{
-                    // type: BasicShadowMap,
+                    type: BasicShadowMap,
                 }}
                 orthographic
                 camera={{
-                    zoom: isSmall ? 40 : 80,
+                    zoom: isSmall ? 40 : 70,
                     near: -30,
                     far: 50
                 }}
@@ -126,7 +127,7 @@ function App() {
             <World />
             <Player />
 
-            <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={-8}>
+            <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={-6}>
                 <planeGeometry args={[10, 10000, 1, 1]} />
                 <meshBasicMaterial color="black" />
             </mesh>

@@ -15,7 +15,7 @@ import BuildingsLow from "./parts/BuildingsLow"
 
 export const WORLD_CENTER = 1
 export const WORLD_LEFT_EDGE = -2
-export const WORLD_RIGHT_EDGE = 4
+export const WORLD_RIGHT_EDGE = 5
 export const WORLD_TOP_EDGE = 5
 export const WORLD_BOTTOM_EDGE = 1.5
 

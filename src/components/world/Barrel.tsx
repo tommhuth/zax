@@ -32,7 +32,7 @@ export default function Barrel({
                 offset: [[-1, 1], [0, 1], [-1, 1]],
                 normal: [0, 1, 0],
                 count: [4, 8],
-                radius: [.1, .35],
+                radius: [.1, .4],
                 color: "red",
             })
         }
