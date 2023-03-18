@@ -4,7 +4,7 @@
     position: fixed;
     left: var(--offsetx);
     right: var(--offsetx);
-    bottom: #{"max(var(--offsety), env(safe-area-inset-left))"};
+    bottom: calc(max(var(--offsety), env(safe-area-inset-left)));
     display: flex;
     gap: 1.5em;
     color: white;
@@ -23,7 +23,7 @@
 .height {
     display: flex;
     position: fixed;
-    left: #{"clamp(max(env(safe-area-inset-left), 1em), 5vw, 5em)"};
+    left: calc(env(safe-area-inset-left, 0px) + clamp(1em, 5vw, 5em));
     flex-wrap: wrap;
     top: 50%;
     color: white;
