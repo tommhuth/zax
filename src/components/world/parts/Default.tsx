@@ -4,10 +4,12 @@ import Turret from "../spawner/Turret"
 import EdgeBuilding from "../decoration/EdgeBuilding"
 import Barrel from "../spawner/Barrel"
 import Plane from "../spawner/Plane"
+import Building from "../spawner/Building"
 
 export default function Default({
     id,
     barrels,
+    buildings,
     position,
     turrets,
     planes,
@@ -26,6 +28,14 @@ export default function Default({
                     <Turret
                         key={i.id}
                         position={i.position}
+                    />
+                )
+            })}
+            {buildings.map(i => {
+                return (
+                    <Building
+                        key={i.id}
+                        {...i}
                     />
                 )
             })}

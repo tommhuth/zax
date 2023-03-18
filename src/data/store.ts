@@ -1,6 +1,6 @@
 import { Box3, Frustum, InstancedMesh, Matrix3, Object3D, Vector3 } from "three"
 import create from "zustand"
-import random from "@huth/random" 
+import random from "@huth/random"
 import { Tuple2, Tuple3 } from "../types"
 import { OBB } from "three/examples/jsm/math/OBB"
 import Counter from "./Counter"
@@ -8,6 +8,10 @@ import { Barrel, Building, Bullet, Instance, Particle, Plane, RepeaterMesh, Turr
 import { getNextWorldPart, makeDefault } from "./generators"
 import { SpatialHashGrid3D } from "./SpatialHashGrid3D"
 
+export let isSmallScreen = window.matchMedia("(max-height: 400px)").matches || window.matchMedia("(max-width: 800px)").matches
+let frc = isSmallScreen ? 4 : 7
+
+export const dpr = 1 / frc
 
 interface Store {
     world: {
@@ -27,8 +31,8 @@ interface Store {
         speed: number
         cameraShake: number
         health: number
-        score: number 
-        weapon: { 
+        score: number
+        weapon: {
             fireFrequency: number,
             color: string,
             speed: number
@@ -45,7 +49,7 @@ const store = create<Store>(() => ({
         grid: new SpatialHashGrid3D([4, 3, 4]),
         frustum: new Frustum(),
         parts: [
-            makeDefault({ position: new Vector3(0, 0, -5), size: [10, 20] }),
+            makeDefault({ position: new Vector3(0, 0, 0), size: [10, 20] }),
         ]
     },
     instances: {},
@@ -63,7 +67,7 @@ const store = create<Store>(() => ({
         score: 0,
         object: null,
         position: new Vector3(),
-        weapon: { 
+        weapon: {
             fireFrequency: 200,
             damage: 35,
             color: "yellow",
@@ -463,12 +467,18 @@ export function removeBullet(...ids: string[]) {
 
 export function damageTurret(id: string, damage: number) {
     let turret = store.getState().turrets.find(i => i.id === id) as Turret
+    let health = Math.max(turret.health - damage, 0)
+    let score = store.getState().player.score
 
     if (!turret) {
         return
     }
 
     store.setState({
+        player: {
+            ...store.getState().player,
+            score: score + (health === 0 ? 1000 : 100)
+        },
         turrets: [
             ...store.getState().turrets.filter(i => i.id !== id),
             {
@@ -482,17 +492,23 @@ export function damageTurret(id: string, damage: number) {
 
 export function damagePlane(id: string, damage: number) {
     let plane = store.getState().planes.find(i => i.id === id) as Plane
+    let health = Math.max(plane.health - damage, 0)
+    let score = store.getState().player.score
 
     if (!plane) {
         return
     }
 
     store.setState({
+        player: {
+            ...store.getState().player,
+            score: score + (health === 0 ? 1000 : 100)
+        },
         planes: [
             ...store.getState().planes.filter(i => i.id !== id),
             {
                 ...plane,
-                health: Math.max(plane.health - damage, 0)
+                health,
             }
         ]
     })

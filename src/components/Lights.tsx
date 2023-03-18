@@ -23,8 +23,7 @@ export default function Lights() {
         if (lightRef.current && player && ticks.current > 3000) {
             lightRef.current.position.z = player.position.z
             lightRef.current.target.position.z = player.position.z
-            ticks.current = 0
-            console.log(1)
+            ticks.current = 0 
         } else {
             ticks.current += delta * 1000
         }

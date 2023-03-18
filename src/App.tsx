@@ -5,7 +5,7 @@ import { Canvas } from "@react-three/fiber"
 import { Perf } from "r3f-perf"
 import InstancedMesh from "./components/InstancedMesh"
 import Player from "./components/Player"
-import World, { WORLD_CENTER } from "./components/world/World"
+import World, { WORLD_CENTER_X } from "./components/world/World"
 import { glsl, Only } from "./utils/utils"
 import Config from "./Config"
 import { useShader } from "./utils/hooks"
@@ -13,11 +13,7 @@ import Ui from "./components/ui/Ui"
 import Models from "./components/Models"
 import Lights from "./components/Lights"
 import { BasicShadowMap } from "three"
-
-let isSmall = window.matchMedia("(max-height: 400px)").matches || window.matchMedia("(max-width: 800px)").matches
-let frc = isSmall ? 4 : 7
-
-export const dpr = 1 / frc
+import { dpr, isSmallScreen } from "./data/store"
 
 export default function Wrapper() {
     return (
@@ -47,7 +43,7 @@ export default function Wrapper() {
                 }}
                 orthographic
                 camera={{
-                    zoom: isSmall ? 40 : 70,
+                    zoom: isSmallScreen ? 40 : 70,
                     near: -30,
                     far: 50
                 }}
@@ -57,7 +53,7 @@ export default function Wrapper() {
                     <Perf deepAnalyze />
                 </Only>
 
-                <mesh position-x={WORLD_CENTER}>
+                <mesh position-x={WORLD_CENTER_X}>
                     <boxGeometry />
                     <meshBasicMaterial color="black" />
                 </mesh>

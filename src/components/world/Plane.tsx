@@ -128,7 +128,7 @@ function Plane({
         let shootDisabled = position.z > playerPosition.z || !world.frustum.containsPoint(position)
         let canShoot = position.y > playerPosition.y - 3 && health > 0
 
-        if (!shootDisabled && canShoot && shootTimer.current > nextShotAt.current + heightPenalty * fireFrequency * 2) {
+        if (!shootDisabled && canShoot && shootTimer.current > nextShotAt.current + heightPenalty * fireFrequency * 4) {
             let bulletSpeed = 20
 
             createBullet({

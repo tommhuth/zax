@@ -73,8 +73,7 @@ function BulletHandler() {
                     }
                     case "plane": {
                         if (bullet.owner === Owner.PLAYER) {
-                            damagePlane(client.data.id, bullet.damage)
-                            increaseScore(40)
+                            damagePlane(client.data.id, bullet.damage) 
 
                             let intersection = intersect(instances.box.mesh, bullet.position, bullet.speed)
 
@@ -94,8 +93,7 @@ function BulletHandler() {
                     }
                     case "turret": {
                         if (bullet.owner === Owner.PLAYER) {
-                            damageTurret(client.data.id, bullet.damage)
-                            increaseScore(100)
+                            damageTurret(client.data.id, bullet.damage) 
 
                             let intersection = intersect(instances.box.mesh, bullet.position, bullet.speed)
 
@@ -115,12 +113,13 @@ function BulletHandler() {
                     }
                     case "player": {
                         damagePlayer(bullet.damage)
-                        increaseScore(-5)
+                        increaseScore(-10)
                         break
                     }
                     case "barrel": {
                         if (bullet.owner === Owner.PLAYER) {
                             damageBarrel(client.data.id, 100)
+                            increaseScore(1000)
                         }
                         break
                     }

@@ -1,13 +1,13 @@
-import { useFrame, useLoader } from "@react-three/fiber"
+import { useFrame, useLoader, useThree } from "@react-three/fiber"
 import { useEffect, useMemo, useRef } from "react"
 import { Group, Mesh, Vector3 } from "three"
-import { createBullet, damageBarrel, damagePlane, damagePlayer, damageTurret, setPlayerObject, useStore } from "../data/store"
+import { createBullet, damageBarrel, damagePlane, damagePlayer, damageTurret, dpr, setPlayerObject, useStore } from "../data/store"
 import { Tuple3 } from "../types"
-import { WORLD_BOTTOM_EDGE, WORLD_CENTER, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
+import { WORLD_BOTTOM_EDGE, WORLD_CENTER_X, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { clamp, ndelta } from "../utils/utils"
 import { useCollisionDetection } from "../utils/hooks"
-import { Owner } from "../data/types"
+import { Owner } from "../data/types" 
 
 let _edgemin = new Vector3(WORLD_LEFT_EDGE, WORLD_BOTTOM_EDGE, -100)
 let _edgemax = new Vector3(WORLD_RIGHT_EDGE, WORLD_TOP_EDGE, 100)
@@ -22,7 +22,7 @@ interface PlayerProps {
 
 export default function Player({
     size = [1.5, .5, depth],
-    z = WORLD_CENTER,
+    z = WORLD_CENTER_X,
     y = 1.5
 }: PlayerProps) {
     let playerGroupRef = useRef<Group | null>(null)
@@ -31,9 +31,9 @@ export default function Player({
     let grid = useStore(i => i.world.grid)
     let keys = useMemo<Record<string, boolean>>(() => ({}), [])
     let weapon = useStore(i => i.player.weapon)
-    let targetPosition = useMemo(() => new Vector3(WORLD_CENTER, _edgemin.y, z), [])
+    let targetPosition = useMemo(() => new Vector3(WORLD_CENTER_X, _edgemin.y, z), [])
     let models = useLoader(GLTFLoader, "/models/space.glb")
-    let position = useMemo(() => new Vector3(WORLD_CENTER, y, z), [])
+    let position = useMemo(() => new Vector3(WORLD_CENTER_X, y, z), [])
     let client = useMemo(() => {
         return grid.newClient([0, 0, z], size, {
             type: "player",
@@ -43,6 +43,9 @@ export default function Player({
         })
     }, [grid])
     let startPosition = useMemo(() => new Vector3(), [])
+    let {viewport} = useThree()
+    let pixelSize = (window.innerWidth) / (window.innerWidth * dpr)
+    let unitPixel = pixelSize * (viewport.width / window.innerWidth) 
 
     useCollisionDetection({
         position,
@@ -108,7 +111,7 @@ export default function Player({
 
     // input
     useFrame((state, delta) => {
-        let speedx = 15
+        let speedx = 12
         let speedy = 10
         let nd = ndelta(delta)
 
@@ -146,7 +149,7 @@ export default function Player({
         if (playerGroupRef.current && hitboxRef.current) {
             let nd = ndelta(delta)
             let playerGroup = playerGroupRef.current
-            let speed = useStore.getState().player.speed
+            let speed  = useStore.getState().player.speed
             let y = clamp(targetPosition.y, _edgemin.y, _edgemax.y)
 
             playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.08 * 60 * nd)
