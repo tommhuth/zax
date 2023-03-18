@@ -109,7 +109,7 @@ export default function Player({
     // input
     useFrame((state, delta) => {
         let speedx = 15
-        let speedy = 13
+        let speedy = 10
         let nd = ndelta(delta)
 
         if (Object.entries(keys).length) {

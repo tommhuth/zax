@@ -57,7 +57,7 @@ const store = create<Store>(() => ({
     bullets: [],
     particles: [],
     player: {
-        speed: 6,
+        speed: 8,
         cameraShake: 0,
         health: 100,
         score: 0,
