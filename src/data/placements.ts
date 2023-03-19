@@ -1,6 +1,7 @@
 import random from "@huth/random"
 import { WORLD_CENTER_X, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE } from "../components/world/World"
 import { Tuple3 } from "../types"
+import makeCycler from "./cycler"
 
 interface PlaceableObject {
     position: Tuple3
@@ -110,8 +111,10 @@ function toWorldSpace<T extends PlaceableObject>(object: T, origin: Tuple3, dire
     }
 }
 
+let placementCycler = makeCycler(placements)
+
 export function getRandomPlacement(origin: Tuple3 = [0, 0, 0]) {
-    let placement = random.pick(...placements)
+    let placement = placementCycler.next()
     let direction = random.pick(-1, 1) 
 
     return {
