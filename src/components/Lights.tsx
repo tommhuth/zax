@@ -20,7 +20,7 @@ export default function Lights() {
     useFrame((state, delta) => {
         let player = useStore.getState().player.object
 
-        if (lightRef.current && player && ticks.current > 3000) {
+        if (lightRef.current && player && ticks.current > 1500) {
             lightRef.current.position.z = player.position.z
             lightRef.current.target.position.z = player.position.z
             ticks.current = 0 
