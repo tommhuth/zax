@@ -1,13 +1,13 @@
 import { useFrame, useLoader, useThree } from "@react-three/fiber"
 import { useEffect, useMemo, useRef } from "react"
 import { Group, Mesh, Vector3 } from "three"
-import { createBullet, damageBarrel, damagePlane, damagePlayer, damageTurret, dpr, setPlayerObject, useStore } from "../data/store"
+import { bulletSize, createBullet, damageBarrel, damagePlane, damagePlayer, damageTurret, dpr, setPlayerObject, useStore } from "../data/store"
 import { Tuple3 } from "../types"
 import { WORLD_BOTTOM_EDGE, WORLD_CENTER_X, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { clamp, ndelta } from "../utils/utils"
 import { useCollisionDetection } from "../utils/hooks"
-import { Owner } from "../data/types" 
+import { Owner } from "../data/types"
 
 let _edgemin = new Vector3(WORLD_LEFT_EDGE, WORLD_BOTTOM_EDGE, -100)
 let _edgemax = new Vector3(WORLD_RIGHT_EDGE, WORLD_TOP_EDGE, 100)
@@ -27,7 +27,7 @@ export default function Player({
 }: PlayerProps) {
     let playerGroupRef = useRef<Group | null>(null)
     let hitboxRef = useRef<Mesh>(null)
-    let lastShotAt = useRef(0) 
+    let lastShotAt = useRef(0)
     let grid = useStore(i => i.world.grid)
     let keys = useMemo<Record<string, boolean>>(() => ({}), [])
     let weapon = useStore(i => i.player.weapon)
@@ -43,9 +43,9 @@ export default function Player({
         })
     }, [grid])
     let startPosition = useMemo(() => new Vector3(), [])
-    let {viewport} = useThree()
+    let { viewport } = useThree()
     let pixelSize = (window.innerWidth) / (window.innerWidth * dpr)
-    let unitPixel = pixelSize * (viewport.width / window.innerWidth) 
+    let unitPixel = pixelSize * (viewport.width / window.innerWidth)
 
     useCollisionDetection({
         position,
@@ -82,7 +82,7 @@ export default function Player({
             keys[e.code] = true
         }
         let onKeyUp = (e: KeyboardEvent) => {
-            delete keys[e.code] 
+            delete keys[e.code]
         }
         // shoot 
         let onTouchStartShoot = () => {
@@ -117,7 +117,7 @@ export default function Player({
 
         if (Object.entries(keys).length) {
             if (keys.KeyA) {
-                targetPosition.x -= speedx * nd 
+                targetPosition.x -= speedx * nd
             } else if (keys.KeyD) {
                 targetPosition.x += speedx * nd
             }
@@ -130,17 +130,17 @@ export default function Player({
 
             targetPosition.clamp(_edgemin, _edgemax)
         }
- 
+
         if (Date.now() - lastShotAt.current > weapon.fireFrequency && keys.Space) {
             createBullet({
-                position: [position.x, position.y, position.z - 2],
+                position: [position.x, position.y, position.z - (depth / 2 + bulletSize[2] / 2) * 1.25],
                 owner: Owner.PLAYER,
                 damage: weapon.damage,
                 color: weapon.color,
                 rotation: Math.PI,
-                speed: [0, 0, -weapon.speed], 
+                speed: [0, 0, -weapon.speed],
             })
-            lastShotAt.current = Date.now() 
+            lastShotAt.current = Date.now()
         }
     })
 
@@ -149,15 +149,15 @@ export default function Player({
         if (playerGroupRef.current && hitboxRef.current) {
             let nd = ndelta(delta)
             let playerGroup = playerGroupRef.current
-            let speed  = useStore.getState().player.speed
+            let speed = useStore.getState().player.speed
             let y = clamp(targetPosition.y, _edgemin.y, _edgemax.y)
 
             playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.08 * 60 * nd)
             playerGroup.position.y += (y - playerGroup.position.y) * (.065 * 60 * nd)
             playerGroup.position.z -= speed * nd
 
-            startPosition.z -= speed * nd  
-            hitboxRef.current.position.z = playerGroup.position.z 
+            startPosition.z -= speed * nd
+            hitboxRef.current.position.z = playerGroup.position.z
             position.copy(playerGroup.position)
             client.position = position.toArray()
             grid.updateClient(client)

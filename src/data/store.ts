@@ -13,6 +13,8 @@ let frc = isSmallScreen ? 4 : 7
 
 export const dpr = 1 / frc
 
+export const bulletSize: Tuple3 = [.2, .2, 1.5]
+
 interface Store {
     world: {
         parts: WorldPart[]
@@ -349,7 +351,7 @@ export function createBullet({
     position = [0, 0, 0],
     rotation,
     owner,
-    size = [.15, .1, 1.5],
+    size = bulletSize,
     speed = [0, 0, 0],
     damage,
     color,
@@ -370,7 +372,7 @@ export function createBullet({
                 index: instances.line.index.next(),
                 aabb,
                 color,
-                size: [size[0] * 1.5, size[1] * 1.5, size[2]],
+                size: [size[0], size[1], size[2]],
                 speed: speed as Tuple3,
                 owner,
                 rotation,
