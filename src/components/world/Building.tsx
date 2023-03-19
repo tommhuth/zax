@@ -8,13 +8,11 @@ export default function Building({ size, position }: Building) {
 
     useEffect(() => {
         if (typeof index === "number" && instance) {
-            let pos = position.toArray()
-
             setColorAt(instance, index, "gray")
             setMatrixAt({
                 instance,
                 index,
-                position: [pos[0], pos[1] + size[1] / 2, pos[2]],
+                position: [position.x, position.y, position.z],
                 scale: size,
             })
 

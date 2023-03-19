@@ -2,7 +2,7 @@ import random from "@huth/random"
 import { Vector3 } from "three"
 import { WORLD_CENTER_X, WORLD_TOP_EDGE } from "../components/world/World"
 import { Tuple2, Tuple3 } from "../types"
-import makeCycler from "./cycler" 
+import makeCycler from "./cycler"
 import { getRandomPlacement } from "./placements"
 import { WorldPart, WorldPartDefault, WorldPartBuildingsLow, WorldPartBuildingsGap, WorldPartType } from "./types"
 
@@ -34,7 +34,7 @@ export function makeBuildingsGap(previous: BaseWorldPart): WorldPartBuildingsGap
             ...new Array(random.integer(0, 1)).fill(null).map((i, index) => {
                 let height = random.pick(4.5, 6)
                 let width = 15
-                let buildingPosition = [
+                let buildingPosition: Tuple3 = [
                     (width / 2 + 4) * (index === 1 ? 1 : -1),
                     0,
                     startZ + depth / 2 + random.pick(-2, 2)
@@ -42,7 +42,7 @@ export function makeBuildingsGap(previous: BaseWorldPart): WorldPartBuildingsGap
 
                 return {
                     id: random.id(),
-                    position: buildingPosition as Tuple3,
+                    position: buildingPosition,
                     size: [
                         width,
                         height,
@@ -54,7 +54,7 @@ export function makeBuildingsGap(previous: BaseWorldPart): WorldPartBuildingsGap
                 id: random.id(),
                 position: [
                     (width / 2 + 4) * random.pick(-1, 1),
-                    thirdHeight / 2,
+                    0,
                     startZ + width * .5
                 ],
                 size: [

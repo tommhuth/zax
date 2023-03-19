@@ -210,7 +210,7 @@ export function createTurret(
 
 export function createPlane(
     [x, y, z] = [0, 0, -10],
-    speed = 5,
+    speed = random.float(4,5),
     fireFrequency = 850,
 ) {
     let id = random.id()
@@ -243,11 +243,11 @@ export function createPlane(
 
 export function createBuilding(
     size: Tuple3 = [1, 1, 1],
-    [x = 0, y = 0, z = -10] = [],
+    [x = 0, y = 0, z = 0] = [],
 ) {
     let id = random.id()
-    let position = new Vector3(x, y, z)
-    let box = new Box3().setFromCenterAndSize(position.clone(), new Vector3(...size))
+    let position = new Vector3(x, y  + size[1] / 2, z)
+    let box = new Box3().setFromCenterAndSize(new Vector3(x, y + size[1] / 2, z), new Vector3(...size))
     let { world, buildings } = store.getState()
     let client = world.grid.newClient(
         [position.x, position.y + size[1] / 2, position.z],
