@@ -1,7 +1,7 @@
-import { useFrame } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
 import { useStore } from "../../data/store"
 import { WORLD_BOTTOM_EDGE, WORLD_TOP_EDGE } from "../world/World"
+import RotateMe from "./RotateMe"
 
 import "./Ui.scss"
 
@@ -45,6 +45,8 @@ export default function Ui() {
 
     return (
         <>
+            <RotateMe />
+            
             <div className="height">
                 <div
                     className="height__current"

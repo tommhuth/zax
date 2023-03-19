@@ -11,7 +11,7 @@ let _size = new Vector3()
 export default function Barrel({
     position,
     aabb,
-    size = [.25, 2, .25],
+    size = [1, 2, 1],
     id,
     health,
 }: Barrel) {

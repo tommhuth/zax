@@ -282,7 +282,7 @@ interface CreateBarrelParams {
 export function createBarrel({
     position: [x = 0, y = 0, z = 0] = [0, 0, 0],
     rotation = 0,
-    size = [1.25, 1.75, 1.25],
+    size = [2, 1.75,2],
     health = 25,
 }: CreateBarrelParams) {
     let id = random.id()
