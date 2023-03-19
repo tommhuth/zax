@@ -98,6 +98,7 @@ export interface WorldPartBuildingsGap extends WorldPart {
 export interface WorldPartDefault extends WorldPart {
     turrets: SpawnedTurret[]
     barrels: SpawnedBarrel[]
+    buildings: SpawnedBuilding[]
     planes: SpawnedPlane[]
     type: WorldPartType.DEFAULT
 }
