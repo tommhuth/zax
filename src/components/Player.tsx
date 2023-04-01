@@ -28,6 +28,7 @@ export default function Player({
     let playerGroupRef = useRef<Group | null>(null)
     let hitboxRef = useRef<Mesh>(null)
     let lastShotAt = useRef(0)
+    let zStart = useRef(0)
     let grid = useStore(i => i.world.grid)
     let keys = useMemo<Record<string, boolean>>(() => ({}), [])
     let weapon = useStore(i => i.player.weapon)
@@ -56,17 +57,17 @@ export default function Player({
             position,
         },
         actions: {
-            building: () => { 
+            building: () => {
                 damagePlayer(100)
             },
-            turret: (data) => { 
+            turret: (data) => {
                 damagePlayer(100)
                 damageTurret(data.id, 100)
             },
             barrel: (data) => {
                 damageBarrel(data.id, 100)
             },
-            plane: (data) => { 
+            plane: (data) => {
                 damagePlayer(100)
                 damagePlane(data.id, 100)
             }
@@ -149,14 +150,14 @@ export default function Player({
         if (playerGroupRef.current && hitboxRef.current) {
             let nd = ndelta(delta)
             let playerGroup = playerGroupRef.current
-            let speed = useStore.getState().player.speed
             let y = clamp(targetPosition.y, _edgemin.y, _edgemax.y)
 
             playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.08 * 60 * nd)
             playerGroup.position.y += (y - playerGroup.position.y) * (.065 * 60 * nd)
             playerGroup.position.z -= unitPixel * 60 * nd
 
-            startPosition.z -= speed * nd
+            startPosition.z -= unitPixel * 60 * nd
+            zStart.current -= unitPixel * 60 * nd
             hitboxRef.current.position.z = playerGroup.position.z
             position.copy(playerGroup.position)
             client.position = position.toArray()
@@ -193,9 +194,13 @@ export default function Player({
                 rotation-x={-Math.PI / 2}
                 onPointerMove={(e) => {
                     if (e.pointerType === "touch") {
-                        targetPosition.y += (startPosition.z - e.point.z) * 1
-                        targetPosition.x += (e.point.x - startPosition.x) * 1.5
+                        let depthThreshold = 1.75 
 
+                        if (Math.abs(zStart.current - e.point.z) > depthThreshold) {
+                            targetPosition.y += (startPosition.z - e.point.z)
+                        }
+
+                        targetPosition.x += (e.point.x - startPosition.x) * 1.5
                         targetPosition.clamp(_edgemin, _edgemax)
                         startPosition.copy(e.point)
                     }
@@ -203,6 +208,7 @@ export default function Player({
                 onPointerDown={(e) => {
                     if (e.pointerType === "touch") {
                         startPosition.set(e.point.x, 0, e.point.z)
+                        zStart.current = e.point.z
                     }
                 }}
             >
