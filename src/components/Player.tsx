@@ -56,20 +56,17 @@ export default function Player({
             position,
         },
         actions: {
-            building: () => {
-                //setCameraShake(.3)
+            building: () => { 
                 damagePlayer(100)
             },
-            turret: (data) => {
-                //setCameraShake(.3)
+            turret: (data) => { 
                 damagePlayer(100)
                 damageTurret(data.id, 100)
             },
             barrel: (data) => {
                 damageBarrel(data.id, 100)
             },
-            plane: (data) => {
-                //  setCameraShake(.3)
+            plane: (data) => { 
                 damagePlayer(100)
                 damagePlane(data.id, 100)
             }
@@ -130,7 +127,10 @@ export default function Player({
 
             targetPosition.clamp(_edgemin, _edgemax)
         }
+    })
 
+    // shoot
+    useFrame(() => {
         if (Date.now() - lastShotAt.current > weapon.fireFrequency && keys.Space) {
             createBullet({
                 position: [position.x, position.y, position.z - (depth / 2 + bulletSize[2] / 2) * 1.25],
@@ -154,7 +154,7 @@ export default function Player({
 
             playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.08 * 60 * nd)
             playerGroup.position.y += (y - playerGroup.position.y) * (.065 * 60 * nd)
-            playerGroup.position.z -= speed * nd
+            playerGroup.position.z -= unitPixel * 60 * nd
 
             startPosition.z -= speed * nd
             hitboxRef.current.position.z = playerGroup.position.z
