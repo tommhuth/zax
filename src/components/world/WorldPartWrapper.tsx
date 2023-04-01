@@ -5,6 +5,7 @@ import { removeWorldPart, useStore } from "../../data/store"
 import { Tuple2 } from "../../types"
 import { setColorAt, setMatrixAt } from "../../utils/utils"
 import { useInstance } from "../InstancedMesh"
+import random from "@huth/random"
 
 interface Asset {
     release: () => void
@@ -30,6 +31,7 @@ export default function WorldPartWrapper({
 }: WorldPartWrapperProps) {
     let [index, instance] = useInstance("box")
     let dead = useRef(false)
+    let i = useRef(random.integer(0, 100)) 
 
     useEffect(() => {
         if (typeof index === "number" && instance) {
@@ -49,7 +51,9 @@ export default function WorldPartWrapper({
     })
 
     useFrame(() => {
-        if (dead.current) {
+        i.current++
+
+        if (dead.current || i.current % 6 > 0) {
             return
         }
 
@@ -63,6 +67,7 @@ export default function WorldPartWrapper({
             dead.current = true
             startTransition(() => removeWorldPart(id))
         }
+
     })
 
     return (
