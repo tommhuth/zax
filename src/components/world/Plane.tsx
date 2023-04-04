@@ -162,7 +162,7 @@ function Plane({
                 instance,
                 index,
                 position: position.toArray(),
-                scale: size,
+                scale: [size[0], .5, size[2]],
                 rotation: rotation.current
             })
 

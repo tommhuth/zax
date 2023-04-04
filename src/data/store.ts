@@ -212,17 +212,17 @@ export function createTurret(
 
 export function createPlane(
     [x, y, z] = [0, 0, -10],
-    speed = random.float(4,5),
+    speed = random.float(4, 5),
     fireFrequency = 850,
 ) {
     let id = random.id()
-    let size = [1, .5, 2] as Tuple3
+    let size = [1, 1.5, 2] as Tuple3
     let position = new Vector3(x, y, z)
     let aabb = new Box3().setFromCenterAndSize(position, new Vector3(...size))
     let { world, planes } = store.getState()
     let client = world.grid.newClient(
         position.toArray(),
-        [...size],
+        [size[0], size[1], size[2]],
         { type: "plane", id, size, position }
     )
 
@@ -248,7 +248,7 @@ export function createBuilding(
     [x = 0, y = 0, z = 0] = [],
 ) {
     let id = random.id()
-    let position = new Vector3(x, y  + size[1] / 2, z)
+    let position = new Vector3(x, y + size[1] / 2, z)
     let box = new Box3().setFromCenterAndSize(new Vector3(x, y + size[1] / 2, z), new Vector3(...size))
     let { world, buildings } = store.getState()
     let client = world.grid.newClient(
@@ -284,7 +284,7 @@ interface CreateBarrelParams {
 export function createBarrel({
     position: [x = 0, y = 0, z = 0] = [0, 0, 0],
     rotation = 0,
-    size = [2, 1.75,2],
+    size = [2, 1.75, 2],
     health = 25,
 }: CreateBarrelParams) {
     let id = random.id()

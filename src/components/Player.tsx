@@ -22,13 +22,14 @@ interface PlayerProps {
 
 export default function Player({
     size = [1.5, .5, depth],
-    z = WORLD_CENTER_X,
+    z = 0,
     y = 1.5
 }: PlayerProps) {
     let playerGroupRef = useRef<Group | null>(null)
     let hitboxRef = useRef<Mesh>(null)
     let lastShotAt = useRef(0)
     let zStart = useRef(0)
+    let dyes = useRef(false)
     let grid = useStore(i => i.world.grid)
     let keys = useMemo<Record<string, boolean>>(() => ({}), [])
     let weapon = useStore(i => i.player.weapon)
@@ -152,8 +153,8 @@ export default function Player({
             let playerGroup = playerGroupRef.current
             let y = clamp(targetPosition.y, _edgemin.y, _edgemax.y)
 
-            playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.08 * 60 * nd)
-            playerGroup.position.y += (y - playerGroup.position.y) * (.065 * 60 * nd)
+            playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.09 * 60 * nd)
+            playerGroup.position.y += (y - playerGroup.position.y) * (.08 * 60 * nd)
             playerGroup.position.z -= unitPixel * 60 * nd
 
             startPosition.z -= unitPixel * 60 * nd
@@ -192,11 +193,18 @@ export default function Player({
                 ref={hitboxRef}
                 position={[0, .1, 0]}
                 rotation-x={-Math.PI / 2}
+                onPointerUp={() => {
+                    dyes.current = false
+                }}
                 onPointerMove={(e) => {
                     if (e.pointerType === "touch") {
-                        let depthThreshold = 1.75 
+                        let depthThreshold = 1 
 
-                        if (Math.abs(zStart.current - e.point.z) > depthThreshold) {
+                        if (!dyes.current && Math.abs(zStart.current - e.point.z) > depthThreshold ) {
+                            dyes.current = true
+                        }
+
+                        if (dyes.current) {
                             targetPosition.y += (startPosition.z - e.point.z)
                         }
 
