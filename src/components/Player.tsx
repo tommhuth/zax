@@ -198,7 +198,7 @@ export default function Player({
                 }}
                 onPointerMove={(e) => {
                     if (e.pointerType === "touch") {
-                        let depthThreshold = 1 
+                        let depthThreshold = 2
 
                         if (!dyes.current && Math.abs(zStart.current - e.point.z) > depthThreshold ) {
                             dyes.current = true
