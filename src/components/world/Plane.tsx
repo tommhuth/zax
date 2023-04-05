@@ -2,7 +2,7 @@ import { useRef, memo } from "react"
 
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect } from "react"
-import { createBullet, createParticles, damageBarrel, damageTurret, increaseScore, removePlane, store, useStore } from "../../data/store"
+import { createBullet, createExplosion, createParticles, damageBarrel, damageTurret, increaseScore, removePlane, store, useStore } from "../../data/store"
 import { useInstance } from "../InstancedMesh"
 import { clamp, ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import animate from "@huth/animate"
@@ -91,6 +91,7 @@ function Plane({
     useEffect(() => {
         if (health === 0) {
             increaseScore(500)
+            createExplosion([position.x, position.y, position.z])
             createParticles({
                 position: position.toArray(),
                 speed: [12, 16],

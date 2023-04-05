@@ -100,12 +100,12 @@ function App() {
 
             <InstancedMesh name="box" count={250}>
                 <boxGeometry args={[1, 1, 1, 1, 1, 1]} attach="geometry" />
-                <meshLambertMaterial color="white" attach={"material"} />
+                <meshPhongMaterial color="white" attach={"material"} />
             </InstancedMesh>
 
             <InstancedMesh name="sphere" count={150}>
                 <sphereGeometry args={[1, 3, 4]} attach="geometry" />
-                <meshLambertMaterial color="white" attach={"material"} />
+                <meshPhongMaterial color="white" attach={"material"} />
             </InstancedMesh>
 
             <InstancedMesh name="line" count={100}>
@@ -115,7 +115,7 @@ function App() {
 
             <InstancedMesh name="cylinder" count={40}>
                 <cylinderGeometry args={[.5, .5, 1, 10, 1]} attach="geometry" />
-                <meshLambertMaterial color="red" attach={"material"} />
+                <meshPhongMaterial color="red" attach={"material"} />
             </InstancedMesh>
 
             <Models />

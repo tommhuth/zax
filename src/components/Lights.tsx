@@ -1,12 +1,15 @@
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
-import { DirectionalLight } from "three"
+import { DirectionalLight, PointLight } from "three"
 import { useStore } from "../data/store"
 
 export default function Lights() {
     let lightRef = useRef<DirectionalLight>(null)
+    let playerLightRef = useRef<PointLight>(null)
+    let explosionLightRef = useRef<PointLight>(null)
     let { scene, viewport } = useThree()
     let ticks = useRef(0)
+    let explosion = useStore(i => i.explosions)
     let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
 
     useEffect(() => {
@@ -16,6 +19,12 @@ export default function Lights() {
 
         scene.add(lightRef.current.target)
     }, [scene])
+
+    useEffect(()=> {
+        if (explosionLightRef.current) {
+            explosionLightRef.current.intensity = 22 
+        }
+    }, [explosion])
 
     useFrame((state, delta) => {
         let player = useStore.getState().player.object
@@ -27,6 +36,16 @@ export default function Lights() {
         } else {
             ticks.current += delta * 1000
         }
+
+        if (playerLightRef.current && player) {
+            playerLightRef.current.position.z = player.position.z + 1
+            playerLightRef.current.position.y = player.position.y
+            playerLightRef.current.position.x = player.position.x 
+        }
+
+        if (explosionLightRef.current) {
+            explosionLightRef.current.intensity *= .9  
+        } 
     })
 
     return (
@@ -51,6 +70,18 @@ export default function Lights() {
                 shadow-camera-bottom={-diagonal * .5}
                 shadow-mapSize={[256, 256]}
                 shadow-bias={-0.001}
+            />
+            <pointLight 
+                color={"blue"}
+                intensity={5}
+                ref={playerLightRef}
+                distance={4}
+            />
+            <pointLight 
+                color={"red"} 
+                ref={explosionLightRef}
+                position={explosion}
+                distance={6}
             />
             <ambientLight intensity={.25} color="lightblue" />
         </>

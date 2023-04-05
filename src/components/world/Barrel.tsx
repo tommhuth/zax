@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
 import { Vector3 } from "three"
-import { createParticles, removeBarrel, useStore } from "../../data/store"
+import { createExplosion, createParticles, removeBarrel, useStore } from "../../data/store"
 import { Barrel } from "../../data/types"
 import { setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import { useInstance } from "../InstancedMesh"
@@ -25,6 +25,7 @@ export default function Barrel({
     useEffect(() => {
         if (health === 0) {
             remove()
+            createExplosion([position.x, 2, position.z])
             createParticles({
                 position: [position.x, 1, position.z],
                 speed: [10, 20],

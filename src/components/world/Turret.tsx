@@ -2,7 +2,7 @@ import { memo, useRef } from "react"
 
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect } from "react"
-import { createBullet, createParticles, removeTurret, store, useStore } from "../../data/store"
+import { createBullet, createExplosion, createParticles, removeTurret, store, useStore } from "../../data/store"
 import { useInstance } from "../InstancedMesh"
 import { clamp, ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import animate from "@huth/animate"
@@ -56,6 +56,7 @@ function Turret({ id, size, position, health, fireFrequency, aabb }: Turret) {
     useEffect(() => {
         if (health === 0) {
             remove()
+            createExplosion([position.x, position.y + 1, position.z ])
             createParticles({
                 position: [position.x, 0, position.z],
                 speed: [8, 15],

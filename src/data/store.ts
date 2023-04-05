@@ -29,6 +29,7 @@ interface Store {
     barrels: Barrel[]
     planes: Plane[]
     particles: Particle[]
+    explosions: Tuple3,
     player: {
         speed: number
         cameraShake: number
@@ -46,6 +47,12 @@ interface Store {
 }
 
 
+export function createExplosion(position: Tuple3) {
+    store.setState({
+        explosions: position
+    })
+}
+
 const store = create<Store>(() => ({
     world: {
         grid: new SpatialHashGrid3D([4, 3, 4]),
@@ -57,6 +64,7 @@ const store = create<Store>(() => ({
     instances: {},
     repeaters: {},
     buildings: [],
+    explosions: [0, 0, 0],
     planes: [],
     turrets: [],
     barrels: [],
