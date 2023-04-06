@@ -15,6 +15,23 @@ export const dpr = 1 / frc
 
 export const bulletSize: Tuple3 = [.2, .2, 1.5]
 
+interface Fireball {
+    isPrimary?: boolean
+    position: Tuple3
+    index: number
+    startRadius: number
+    maxRadius: number
+    lifetime: number
+    time: number
+    id: string
+}
+
+interface Explosion {
+    position: Tuple3
+    id: string
+    fireballs: Fireball[]
+}
+
 interface Store {
     world: {
         parts: WorldPart[]
@@ -29,7 +46,7 @@ interface Store {
     barrels: Barrel[]
     planes: Plane[]
     particles: Particle[]
-    explosions: Tuple3,
+    explosions: Explosion[],
     player: {
         speed: number
         cameraShake: number
@@ -46,10 +63,55 @@ interface Store {
     }
 }
 
+let c = new Counter(100)
 
-export function createExplosion(position: Tuple3) {
+export function removeExplosion(id: string) {
     store.setState({
-        explosions: position
+        explosions: store.getState().explosions.filter(i => i.id !== id)
+    })
+}
+
+export function createExplosion(position: Tuple3, count = 12, radius = .75) {
+    let baseLifetime = random.integer(90, 120)
+
+    radius += random.float(-.1, .1)
+
+    store.setState({
+        explosions: [
+            {
+                position,
+                id: random.id(),
+                fireballs: [
+                    {
+                        id: random.id(),
+                        index: c.next(),
+                        position,
+                        startRadius: radius * .33,
+                        maxRadius: radius,
+                        time: 0,
+                        lifetime: baseLifetime
+                    },
+                    ...new Array(count).fill(null).map((i, index, list) => {
+                        let startRadius = (index / list.length) * (radius * 1.5 - radius * .25) + radius * .25
+
+                        return {
+                            index: c.next(),
+                            position: [
+                                random.pick(-radius, radius) + position[0],
+                                random.float(0, radius * 3) + position[1],
+                                random.pick(-radius, radius) + position[2]
+                            ] as Tuple3,
+                            startRadius,
+                            id: random.id(),
+                            maxRadius: startRadius * 2.5,
+                            time: random.integer(-10, 0),
+                            lifetime: random.integer(baseLifetime * .25, baseLifetime * .65)
+                        }
+                    })
+                ],
+            },
+            ...store.getState().explosions,
+        ]
     })
 }
 
@@ -64,7 +126,7 @@ const store = create<Store>(() => ({
     instances: {},
     repeaters: {},
     buildings: [],
-    explosions: [0, 0, 0],
+    explosions: [],
     planes: [],
     turrets: [],
     barrels: [],

@@ -2,6 +2,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
 import { DirectionalLight, PointLight } from "three"
 import { useStore } from "../data/store"
+import random from "@huth/random"
 
 export default function Lights() {
     let lightRef = useRef<DirectionalLight>(null)
@@ -9,7 +10,7 @@ export default function Lights() {
     let explosionLightRef = useRef<PointLight>(null)
     let { scene, viewport } = useThree()
     let ticks = useRef(0)
-    let explosion = useStore(i => i.explosions)
+    let explosion = useStore(i => i.explosions[0])
     let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
 
     useEffect(() => {
@@ -20,9 +21,14 @@ export default function Lights() {
         scene.add(lightRef.current.target)
     }, [scene])
 
-    useEffect(()=> {
-        if (explosionLightRef.current) {
-            explosionLightRef.current.intensity = 22 
+    useEffect(() => {
+        if (explosionLightRef.current && explosion) {
+            explosionLightRef.current.intensity = 20
+            explosionLightRef.current.position.set(
+                explosion.position[0],
+                explosion.position[1] + 2,
+                explosion.position[2],
+            )
         }
     }, [explosion])
 
@@ -32,7 +38,7 @@ export default function Lights() {
         if (lightRef.current && player && ticks.current > 1500) {
             lightRef.current.position.z = player.position.z
             lightRef.current.target.position.z = player.position.z
-            ticks.current = 0 
+            ticks.current = 0
         } else {
             ticks.current += delta * 1000
         }
@@ -40,12 +46,14 @@ export default function Lights() {
         if (playerLightRef.current && player) {
             playerLightRef.current.position.z = player.position.z + 1
             playerLightRef.current.position.y = player.position.y
-            playerLightRef.current.position.x = player.position.x 
+            playerLightRef.current.position.x = player.position.x
+
+            playerLightRef.current.intensity = random.float(10, 12)
         }
 
         if (explosionLightRef.current) {
-            explosionLightRef.current.intensity *= .9  
-        } 
+            explosionLightRef.current.intensity *= .9
+        }
     })
 
     return (
@@ -71,17 +79,15 @@ export default function Lights() {
                 shadow-mapSize={[256, 256]}
                 shadow-bias={-0.001}
             />
-            <pointLight 
+            <pointLight
                 color={"blue"}
-                intensity={5}
                 ref={playerLightRef}
                 distance={4}
             />
-            <pointLight 
-                color={"red"} 
+            <pointLight
+                color={"red"}
                 ref={explosionLightRef}
-                position={explosion}
-                distance={6}
+                distance={8}
             />
             <ambientLight intensity={.25} color="lightblue" />
         </>

@@ -91,7 +91,7 @@ function Plane({
     useEffect(() => {
         if (health === 0) {
             increaseScore(500)
-            createExplosion([position.x, position.y, position.z])
+            createExplosion([position.x, position.y - 1, position.z], 10, .6)
             createParticles({
                 position: position.toArray(),
                 speed: [12, 16],

@@ -25,7 +25,7 @@ export default function Barrel({
     useEffect(() => {
         if (health === 0) {
             remove()
-            createExplosion([position.x, 2, position.z])
+            createExplosion([position.x, 0, position.z])
             createParticles({
                 position: [position.x, 1, position.z],
                 speed: [10, 20],

@@ -56,7 +56,7 @@ function Turret({ id, size, position, health, fireFrequency, aabb }: Turret) {
     useEffect(() => {
         if (health === 0) {
             remove()
-            createExplosion([position.x, position.y + 1, position.z ])
+            createExplosion([position.x, 0, position.z], 10, .65)
             createParticles({
                 position: [position.x, 0, position.z],
                 speed: [8, 15],
