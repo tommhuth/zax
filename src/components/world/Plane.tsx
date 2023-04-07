@@ -9,13 +9,10 @@ import animate from "@huth/animate"
 import random from "@huth/random"
 import { Tuple3 } from "../../types"
 import { useCollisionDetection } from "../../utils/hooks"
-import { Raycaster, Vector3 } from "three"
+import { Vector3 } from "three"
 import { WORLD_BOTTOM_EDGE, WORLD_TOP_EDGE } from "./World"
 import { Owner, Plane } from "../../data/types"
 
-let _origin = new Vector3()
-let _direction = new Vector3(0, -1, 0)
-let _raycaster = new Raycaster(_origin, _direction, 0, 10)
 let _size = new Vector3()
 
 function Plane({
@@ -30,11 +27,10 @@ function Plane({
 }: Plane) {
     let removed = useRef(false)
     let grounded = useRef(false)
-    let bottomY = useRef(0)
+    let bottomY = 0
     let gravety = useRef(0)
     let actualSpeed = useRef(speed)
     let grid = useStore(i => i.world.grid)
-    let { scene } = useThree()
     let rotation = useRef([0, 0, 0] as Tuple3)
     let tilt = useRef(random.float(0.001, 0.05))
     let [index, instance] = useInstance("box")
@@ -91,7 +87,7 @@ function Plane({
     useEffect(() => {
         if (health === 0) {
             increaseScore(500)
-            createExplosion([position.x, position.y - 1, position.z], 10, .6)
+            createExplosion([position.x, position.y - 1, position.z], 10, .5)
             createParticles({
                 position: position.toArray(),
                 speed: [12, 16],
@@ -102,16 +98,6 @@ function Plane({
                 radius: [.1, .45],
                 color: "yellow",
             })
-
-            _origin.copy(position)
-            _origin.y -= size[1] / 2
-            _raycaster.set(_origin, _direction)
-
-            let [intersection] = _raycaster.intersectObjects(scene.children, false) || []
-
-            if (intersection) {
-                bottomY.current = intersection.point.y
-            }
         }
     }, [health])
 
@@ -145,7 +131,7 @@ function Plane({
                 owner: Owner.ENEMY
             })
             shootTimer.current = 0
-            nextShotAt.current = fireFrequency * random.float(.75, 1) - fireFrequency * distanceFromPlayer * .5
+            nextShotAt.current = fireFrequency - fireFrequency * distanceFromPlayer * .5
         }
 
         shootTimer.current += ndelta(delta) * 1000
@@ -184,13 +170,17 @@ function Plane({
             position.y += gravety.current * 60 * nd
             rotation.current[0] += tilt.current * 60 * nd
             rotation.current[2] += tilt.current * .25 * 60 * nd
-            grounded.current = position.y <= (bottomY.current + size[1] / 2)
+            grounded.current = position.y <= (bottomY + .5 / 2)
             actualSpeed.current *= .95
+
+            if (grounded.current) { 
+                createExplosion([position.x, -.5, position.z], 8, .4) 
+            }
         }
 
         if (grounded.current) {
             actualSpeed.current *= .85
-            position.y = (bottomY.current + size[1] / 2)
+            position.y = (bottomY + .5 / 2)
         }
     })
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react" 
+import { useEffect, useMemo, useState } from "react"
 import { setInstance, store, useStore } from "../data/store"
 import { setMatrixAt } from "../utils/utils"
 
@@ -15,22 +15,28 @@ export function useInstance(name: string) {
     return [index, instance?.mesh] as const
 }
 
-export default function InstancedMesh({ children, count, name, userData = {} }) {
-    let colors = useMemo(() => new Float32Array(count * 3).fill(1), []) 
- 
+export default function InstancedMesh({
+    children,
+    receiveShadow = true,
+    castShadow = true,
+    count,
+    name,
+    userData = {}
+}) {
+    let colors = useMemo(() => new Float32Array(count * 3).fill(1), [])
 
     return (
         <instancedMesh
             args={[undefined, undefined, count]}
-            castShadow
-            userData={{...userData, type: name }}
-            receiveShadow
+            castShadow={castShadow}
+            userData={{ ...userData, type: name }}
+            receiveShadow={receiveShadow}
             ref={(mesh) => {
                 if (mesh && mesh !== store.getState().instances[name]?.mesh) {
                     setInstance(name, mesh, count)
 
                     for (let i = 0; i < count; i++) {
-                        setMatrixAt({ instance: mesh, index: i, scale: [0,0,0] })
+                        setMatrixAt({ instance: mesh, index: i, scale: [0, 0, 0] })
                     }
                 }
             }}

@@ -1,10 +1,11 @@
 
 import { useEffect, useMemo, useRef } from "react"
-import { BufferAttribute, InstancedMesh } from "three"
-import { clamp, glsl, setMatrixAt } from "../../utils/utils"
+import { BufferAttribute } from "three"
+import { clamp, glsl, ndelta, setMatrixAt } from "../../utils/utils"
 import { useShader } from "../../utils/hooks"
 import { removeExplosion, useStore } from "../../data/store"
 import { useFrame } from "@react-three/fiber"
+import InstancedMesh from "../InstancedMesh"
 
 function easeInOutCubic(x: number): number {
     return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
@@ -39,8 +40,7 @@ function easeInBack(x: number): number {
     return c3 * x * x * x - c1 * x * x
 }
 
-export default function ExplosionsHandler() {
-    let ref = useRef<InstancedMesh>(null)
+export default function ExplosionsHandler() { 
     let latestExplosion = useStore(i => i.explosions[0])
     let centerAttributes = useMemo(() => {
         return new Float32Array(new Array(100 * 3).fill(0))
@@ -48,6 +48,7 @@ export default function ExplosionsHandler() {
     let lifetimeAttributes = useMemo(() => {
         return new Float32Array(new Array(100).fill(0))
     }, [])
+    let instance = useStore(i => i.instances.fireball?.mesh)
 
     let { onBeforeCompile } = useShader({
         uniforms: {
@@ -71,7 +72,7 @@ export default function ExplosionsHandler() {
             `,
             main: glsl`
                 vec4 globalPosition = instanceMatrix * vec4(transformed, 1.);  
-
+ 
                 vDistance = easeInOutQuint(clamp(length(globalPosition.xyz - aCenter) / 6., 0., 1.));
                 vLifetime = aLifetime;
             `
@@ -91,11 +92,11 @@ export default function ExplosionsHandler() {
     })
 
     useEffect(() => {
-        if (!ref.current || !latestExplosion) {
+        if (!instance || !latestExplosion) {
             return
         }
 
-        let attribute = ref.current.geometry.attributes.aCenter as BufferAttribute
+        let attribute = instance.geometry.attributes.aCenter as BufferAttribute
 
         for (let fireball of latestExplosion.fireballs) {
             attribute.setXYZ(fireball.index, ...latestExplosion.position)
@@ -103,15 +104,15 @@ export default function ExplosionsHandler() {
         }
     }, [latestExplosion])
 
-    useFrame(() => {
-        if (!ref.current) {
+    useFrame((state, delta) => {
+        if (!instance) {
             return
         }
 
         let explosions = useStore.getState().explosions
 
         for (let explosion of explosions) {
-            if (explosion.fireballs[0].time >= explosion.fireballs[0].lifetime) {
+            if (explosion.fireballs[0].time > explosion.fireballs[0].lifetime) {
                 removeExplosion(explosion.id)
                 continue
             }
@@ -124,13 +125,13 @@ export default function ExplosionsHandler() {
                     scale = 0
                 }
 
-                let attribute = ref.current.geometry.attributes.aLifetime as BufferAttribute
+                let attribute = instance.geometry.attributes.aLifetime as BufferAttribute
 
                 attribute.set([t], sphere.index)
                 attribute.needsUpdate = true
 
                 setMatrixAt({
-                    instance: ref.current,
+                    instance: instance,
                     index: sphere.index,
                     position: [
                         sphere.position[0],
@@ -140,13 +141,13 @@ export default function ExplosionsHandler() {
                     scale: [scale, scale, scale]
                 })
 
-                sphere.time++
+                sphere.time += ndelta(delta) * 1000
             }
         }
     })
 
     return (
-        <instancedMesh castShadow args={[undefined, undefined, 100]} ref={ref}>
+        <InstancedMesh castShadow receiveShadow={false} count={100} name="fireball">
             <sphereGeometry args={[1, 16, 16, 16]} >
                 <instancedBufferAttribute
                     needsUpdate={true}
@@ -160,6 +161,6 @@ export default function ExplosionsHandler() {
                 />
             </sphereGeometry>
             <meshBasicMaterial onBeforeCompile={onBeforeCompile} color={"white"} />
-        </instancedMesh>
+        </InstancedMesh>
     )
 }

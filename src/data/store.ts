@@ -61,9 +61,7 @@ interface Store {
         }
         object: Object3D | null
     }
-}
-
-let c = new Counter(100)
+} 
 
 export function removeExplosion(id: string) {
     store.setState({
@@ -72,7 +70,8 @@ export function removeExplosion(id: string) {
 }
 
 export function createExplosion(position: Tuple3, count = 12, radius = .75) {
-    let baseLifetime = random.integer(90, 120)
+    let baseLifetime = random.integer(1600, 1800)
+    let instance = useStore.getState().instances.fireball
 
     radius += random.float(-.1, .1)
 
@@ -84,9 +83,9 @@ export function createExplosion(position: Tuple3, count = 12, radius = .75) {
                 fireballs: [
                     {
                         id: random.id(),
-                        index: c.next(),
+                        index: instance.index.next(),
                         position,
-                        startRadius: radius * .33,
+                        startRadius: radius * .25,
                         maxRadius: radius,
                         time: 0,
                         lifetime: baseLifetime
@@ -95,7 +94,7 @@ export function createExplosion(position: Tuple3, count = 12, radius = .75) {
                         let startRadius = (index / list.length) * (radius * 1.5 - radius * .25) + radius * .25
 
                         return {
-                            index: c.next(),
+                            index: instance.index.next(),
                             position: [
                                 random.pick(-radius, radius) + position[0],
                                 random.float(0, radius * 3) + position[1],
@@ -104,7 +103,7 @@ export function createExplosion(position: Tuple3, count = 12, radius = .75) {
                             startRadius,
                             id: random.id(),
                             maxRadius: startRadius * 2.5,
-                            time: random.integer(-10, 0),
+                            time: random.integer(-200, 0),
                             lifetime: random.integer(baseLifetime * .25, baseLifetime * .65)
                         }
                     })
@@ -248,7 +247,7 @@ export function setInstance(name: string, mesh: InstancedMesh, maxCount: number)
 }
 
 export function createTurret(
-    fireFrequency = random.integer(1300, 2000),
+    fireFrequency = random.integer(1500, 2200),
     [x = 0, y = 0, z = -10] = [],
 ) {
     let id = random.id()
