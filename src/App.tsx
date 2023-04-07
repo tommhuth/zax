@@ -1,19 +1,20 @@
 
 import Camera from "./components/Camera"
-import { Suspense, useRef } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
+import { Suspense } from "react"
+import { Canvas } from "@react-three/fiber"
 import { Perf } from "r3f-perf"
 import InstancedMesh from "./components/InstancedMesh"
 import Player from "./components/Player"
 import World, { WORLD_CENTER_X } from "./components/world/World"
-import { clamp, glsl, Only, setMatrixAt } from "./utils/utils"
+import { glsl, Only } from "./utils/utils"
 import Config from "./Config"
 import { useShader } from "./utils/hooks"
 import Ui from "./components/ui/Ui"
 import Models from "./components/Models"
 import Lights from "./components/Lights"
-import { BasicShadowMap, InstancedMesh as ThreeInstacedMesh } from "three"
-import { dpr, isSmallScreen, removeExplosion, useStore } from "./data/store" 
+import { BasicShadowMap } from "three"
+import { dpr, isSmallScreen } from "./data/store"
+import ExplosionsHandler from "./components/world/ExplosionsHandler"
 
 export default function Wrapper() {
     return (
@@ -66,83 +67,6 @@ export default function Wrapper() {
     )
 }
 
-function easeInOutCubic(x: number): number {
-    return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-}
-
-function easeOutBack(x: number): number {
-    const c1 = 1.70158
-    const c3 = c1 + 1
-
-    return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2)
-}
-
-function easeOutQuart(x: number): number {
-    return 1 - Math.pow(1 - x, 4)
-}
-
-function blend(values = [75, 100, 0], t = 0, threshold = .5) {
-    let left = t >= threshold ? 1 : 0
-    let right = left + 1
-
-    if (t <= threshold) {
-        return (1 - t / (1 - threshold)) * values[left] + t / (1 - threshold) * values[right]
-    }
-
-    return (1 - (t - threshold) / (1 - threshold)) * values[left] + (t - threshold) / (1 - threshold) * values[right]
-}
-
-function easeInBack(x: number): number {
-    const c1 = 1.70158
-    const c3 = c1 + 1
-
-    return c3 * x * x * x - c1 * x * x
-} 
-
-function Explosions() {
-    let ref = useRef<ThreeInstacedMesh>(null)
-
-    useFrame(() => {
-        let explosions = useStore.getState().explosions  
-
-        for (let explosion of explosions) {
-            if (explosion.fireballs[0].time >= explosion.fireballs[0].lifetime ) {
-                removeExplosion(explosion.id)
-                continue
-            }
-
-            for (let sphere of explosion.fireballs) {
-                let t = easeOutQuart(clamp(sphere.time / sphere.lifetime, 0, 1))
-                let s = blend([sphere.startRadius, sphere.maxRadius, 0], t)
-
-                if (sphere.time < 0) {
-                    s = 0
-                } 
-
-                setMatrixAt({
-                    instance: ref.current as ThreeInstacedMesh,
-                    index: sphere.index,
-                    position: [
-                        sphere.position[0],
-                        sphere.position[1] + (clamp(sphere.time / sphere.lifetime, 0, 1)) * 2,
-                        sphere.position[2],
-                    ],
-                    scale: [s, s, s]
-                })
-
-
-                sphere.time++
-            }
-        }
-    })
-
-    return (
-        <instancedMesh castShadow receiveShadow args={[undefined, undefined, 100]} ref={ref}>
-            <sphereGeometry args={[1, 16, 16, 16]} />
-            <meshLambertMaterial color={"white"} />
-        </instancedMesh>
-    )
-}
 
 function App() {
     let { onBeforeCompile } = useShader({
@@ -169,7 +93,6 @@ function App() {
             `,
         }
     })
-
 
     return (
         <>
@@ -199,7 +122,7 @@ function App() {
             <Lights />
             <World />
             <Player />
-            <Explosions />
+            <ExplosionsHandler />
 
             <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={-6}>
                 <planeGeometry args={[10, 10000, 1, 1]} />

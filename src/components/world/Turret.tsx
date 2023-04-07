@@ -26,7 +26,7 @@ function Turret({ id, size, position, health, fireFrequency, aabb }: Turret) {
     let shootTimer = useRef(0)
     let nextShotAt = useRef(fireFrequency)
     let remove = () => {
-        removeTurret(id)
+        setTimeout(() => removeTurret(id), 350)
         removed.current = true
     }
 

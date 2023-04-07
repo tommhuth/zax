@@ -18,7 +18,7 @@ export default function Barrel({
     let removed = useRef(false)
     let [index, instance] = useInstance("cylinder")
     let remove = () => {
-        removeBarrel(id)
+        setTimeout(() => removeBarrel(id), 300) 
         removed.current = true
     }
 

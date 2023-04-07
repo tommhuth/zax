@@ -23,13 +23,13 @@ export default function Lights() {
 
     useEffect(() => {
         if (explosionLightRef.current && explosion) {
-            explosionLightRef.current.intensity = 20
+            explosionLightRef.current.intensity = 30
             explosionLightRef.current.position.set(
                 explosion.position[0],
                 explosion.position[1] + 2,
                 explosion.position[2],
             )
-        }
+        } 
     }, [explosion])
 
     useFrame((state, delta) => {
