@@ -61,7 +61,7 @@ interface Store {
         }
         object: Object3D | null
     }
-} 
+}
 
 export function removeExplosion(id: string) {
     store.setState({
@@ -69,11 +69,25 @@ export function removeExplosion(id: string) {
     })
 }
 
-export function createExplosion(position: Tuple3, count = 12, radius = .75) {
+interface CreateExplosionParams {
+    position: Tuple3
+    count?: number
+    radius?: number
+    fireballPath?: [start: Tuple3, direction: Tuple3]
+    fireballCount?: number
+}
+
+export function createExplosion({
+    position,
+    count = 12,
+    radius = .75,
+    fireballPath: [fireballStart, freballDirection] = [[0, 0, 0], [0, 0, 0]],
+    fireballCount = 0,
+}: CreateExplosionParams) {
     let baseLifetime = random.integer(1600, 1800)
     let instance = useStore.getState().instances.fireball
 
-    radius += random.float(-.1, .1)
+    radius *= random.float(1, 1.15)
 
     store.setState({
         explosions: [
@@ -90,6 +104,23 @@ export function createExplosion(position: Tuple3, count = 12, radius = .75) {
                         time: 0,
                         lifetime: baseLifetime
                     },
+                    ...new Array(fireballCount).fill(null).map((i, index) => {
+                        let tn = index / (fireballCount - 1)
+
+                        return {
+                            index: instance.index.next(),
+                            id: random.id(),
+                            position: [
+                                fireballStart[0] + tn * freballDirection[0] + random.float(-.25, .25),
+                                fireballStart[1] + tn * freballDirection[1],
+                                fireballStart[2] + tn * freballDirection[2] + random.float(-.25, .25),
+                            ] as Tuple3,
+                            startRadius: radius * 1.5,  
+                            maxRadius: radius * 3, 
+                            time: index * -random.integer(75, 100),
+                            lifetime: 750 + random.integer(0, 200)
+                        }
+                    }),
                     ...new Array(count).fill(null).map((i, index, list) => {
                         let startRadius = (index / list.length) * (radius * 1.5 - radius * .25) + radius * .25
 

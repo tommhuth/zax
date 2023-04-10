@@ -18,14 +18,20 @@ export default function Barrel({
     let removed = useRef(false)
     let [index, instance] = useInstance("cylinder")
     let remove = () => {
-        setTimeout(() => removeBarrel(id), 300) 
+        setTimeout(() => removeBarrel(id), 300)
         removed.current = true
     }
 
     useEffect(() => {
         if (health === 0) {
             remove()
-            createExplosion([position.x, 0, position.z])
+            createExplosion({
+                position: [position.x, 0, position.z],
+                count: 10,
+                radius: .65,
+                fireballPath: [[position.x, 1, position.z], [0, 4, 0]],
+                fireballCount: 6,
+            })
             createParticles({
                 position: [position.x, 1, position.z],
                 speed: [10, 20],

@@ -1,22 +1,10 @@
-
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo } from "react"
 import { BufferAttribute } from "three"
 import { clamp, glsl, ndelta, setMatrixAt } from "../../utils/utils"
 import { useShader } from "../../utils/hooks"
 import { removeExplosion, useStore } from "../../data/store"
 import { useFrame } from "@react-three/fiber"
 import InstancedMesh from "../InstancedMesh"
-
-function easeInOutCubic(x: number): number {
-    return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
-}
-
-function easeOutBack(x: number): number {
-    const c1 = 1.70158
-    const c3 = c1 + 1
-
-    return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2)
-}
 
 function easeOutQuart(x: number): number {
     return 1 - Math.pow(1 - x, 4)
@@ -33,13 +21,6 @@ function blend(values = [75, 100, 0], t = 0, threshold = .5) {
     return (1 - (t - threshold) / (1 - threshold)) * values[left] + (t - threshold) / (1 - threshold) * values[right]
 }
 
-function easeInBack(x: number): number {
-    const c1 = 1.70158
-    const c3 = c1 + 1
-
-    return c3 * x * x * x - c1 * x * x
-}
-
 export default function ExplosionsHandler() { 
     let latestExplosion = useStore(i => i.explosions[0])
     let centerAttributes = useMemo(() => {
@@ -49,11 +30,7 @@ export default function ExplosionsHandler() {
         return new Float32Array(new Array(100).fill(0))
     }, [])
     let instance = useStore(i => i.instances.fireball?.mesh)
-
-    let { onBeforeCompile } = useShader({
-        uniforms: {
-            uTime: { value: 0 },
-        },
+    let { onBeforeCompile } = useShader({ 
         vertex: {
             head: glsl` 
                 attribute vec3 aCenter;   
@@ -72,8 +49,9 @@ export default function ExplosionsHandler() {
             `,
             main: glsl`
                 vec4 globalPosition = instanceMatrix * vec4(transformed, 1.);  
+                float radius = 7.;
  
-                vDistance = easeInOutQuint(clamp(length(globalPosition.xyz - aCenter) / 6., 0., 1.));
+                vDistance = easeInOutQuint(clamp(length(globalPosition.xyz - aCenter) / radius, 0., 1.));
                 vLifetime = aLifetime;
             `
         },
@@ -148,7 +126,7 @@ export default function ExplosionsHandler() {
 
     return (
         <InstancedMesh castShadow receiveShadow={false} count={100} name="fireball">
-            <sphereGeometry args={[1, 16, 16, 16]} >
+            <sphereGeometry args={[1, 12, 12]} >
                 <instancedBufferAttribute
                     needsUpdate={true}
                     attach="attributes-aCenter"

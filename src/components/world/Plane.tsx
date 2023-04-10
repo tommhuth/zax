@@ -1,6 +1,5 @@
 import { useRef, memo } from "react"
-
-import { useFrame, useThree } from "@react-three/fiber"
+import { useFrame } from "@react-three/fiber"
 import { useEffect } from "react"
 import { createBullet, createExplosion, createParticles, damageBarrel, damageTurret, increaseScore, removePlane, store, useStore } from "../../data/store"
 import { useInstance } from "../InstancedMesh"
@@ -28,7 +27,7 @@ function Plane({
     let removed = useRef(false)
     let grounded = useRef(false)
     let bottomY = 0
-    let gravety = useRef(0)
+    let gravity = useRef(0)
     let actualSpeed = useRef(speed)
     let grid = useStore(i => i.world.grid)
     let rotation = useRef([0, 0, 0] as Tuple3)
@@ -87,7 +86,11 @@ function Plane({
     useEffect(() => {
         if (health === 0) {
             increaseScore(500)
-            createExplosion([position.x, position.y - 1, position.z], 10, .5)
+            createExplosion({
+                position: [position.x, position.y - 1, position.z], 
+                count: 10, 
+                radius: .4
+            })
             createParticles({
                 position: position.toArray(),
                 speed: [12, 16],
@@ -100,7 +103,6 @@ function Plane({
             })
         }
     }, [health])
-
 
     useFrame((state, delta) => {
         let playerPosition = store.getState().player.object?.position
@@ -166,20 +168,26 @@ function Plane({
         if (health === 0 && !grounded.current) {
             let nd = ndelta(delta)
 
-            gravety.current += -.015 * 60 * nd
-            position.y += gravety.current * 60 * nd
+            gravity.current += -.015 * 60 * nd
+            position.y += gravity.current * 60 * nd
             rotation.current[0] += tilt.current * 60 * nd
             rotation.current[2] += tilt.current * .25 * 60 * nd
             grounded.current = position.y <= (bottomY + .5 / 2)
-            actualSpeed.current *= .95
+            actualSpeed.current *= .99
 
             if (grounded.current) { 
-                createExplosion([position.x, -.5, position.z], 8, .4) 
+                createExplosion({
+                    position: [position.x, -.5, position.z], 
+                    count: 8,  
+                    radius: .3,
+                    fireballCount: 5,
+                    fireballPath: [[position.x, 0, position.z], [0, 0, 2]]
+                }) 
             }
         }
 
         if (grounded.current) {
-            actualSpeed.current *= .85
+            actualSpeed.current *= .9
             position.y = (bottomY + .5 / 2)
         }
     })

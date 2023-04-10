@@ -52,7 +52,7 @@ export default function Lights() {
         }
 
         if (explosionLightRef.current) {
-            explosionLightRef.current.intensity *= .9
+            explosionLightRef.current.intensity *= .94
         }
     })
 
