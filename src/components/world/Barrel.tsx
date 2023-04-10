@@ -5,6 +5,7 @@ import { createExplosion, createParticles, removeBarrel, useStore } from "../../
 import { Barrel } from "../../data/types"
 import { setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import { useInstance } from "../InstancedMesh"
+import random from "@huth/random"
 
 let _size = new Vector3()
 
@@ -30,7 +31,7 @@ export default function Barrel({
                 count: 10,
                 radius: .65,
                 fireballPath: [[position.x, 1, position.z], [0, 4, 0]],
-                fireballCount: 6,
+                fireballCount: random.pick(0, 5),
             })
             createParticles({
                 position: [position.x, 1, position.z],

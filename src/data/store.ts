@@ -115,8 +115,8 @@ export function createExplosion({
                                 fireballStart[1] + tn * freballDirection[1],
                                 fireballStart[2] + tn * freballDirection[2] + random.float(-.25, .25),
                             ] as Tuple3,
-                            startRadius: radius * 1.5,  
-                            maxRadius: radius * 3, 
+                            startRadius: radius * 1.5,
+                            maxRadius: radius * 3.5,
                             time: index * -random.integer(75, 100),
                             lifetime: 750 + random.integer(0, 200)
                         }
