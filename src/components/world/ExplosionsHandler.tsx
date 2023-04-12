@@ -59,10 +59,18 @@ export default function ExplosionsHandler() {
             head: glsl`  
                 varying float vDistance; 
                 varying float vLifetime;
+
+                float easeOutQuart(float x) {
+                    return 1. - pow(1. - x, 4.);
+                }
             `,
             main: glsl`   
-                vec3 c1 = mix(vec3(1., 0.9, 0.), vec3(1., 0.4, .0), vDistance);
-                vec3 c2 = mix(c1, vec3(1., 0.1, 0.), vLifetime);
+                vec3 brightRed = vec3(.85, 0.0, 0.25); 
+                vec3 brightYellow = vec3(1., 0.9, 0.);
+                vec3 orange =  vec3(1., 0.4, .0);
+
+                vec3 c1 = mix(brightYellow, orange, vDistance);
+                vec3 c2 = mix(c1, brightRed, easeOutQuart(clamp(vLifetime - .5, 0., 0.5) / .5));
 
                 gl_FragColor = vec4(c2, 1.);
             `
