@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber"
 import { memo } from "react"
 import { Object3D, Raycaster, Vector3 } from "three"
-import { createParticles, damageBarrel, damagePlane, damagePlayer, damageTurret, increaseScore, removeBullet, store } from "../../data/store"
+import { createParticles, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, increaseScore, removeBullet, store } from "../../data/store"
 import { Bullet, Owner } from "../../data/types"
 import { Tuple3 } from "../../types"
 import { getCollisions } from "../../utils/hooks"
@@ -86,6 +86,26 @@ function BulletHandler() {
                                     variance: [[-5, 5], [0, 0], [5, 18]],
                                     normal: [0, -1, 0],
                                     color: "yellow",
+                                })
+                            }
+                        }
+                        break
+                    }
+                    case "rocket": {
+                        if (bullet.owner === Owner.PLAYER) {
+                            damageRocket(client.data.id, bullet.damage) 
+
+                            let intersection = intersect(instances.cylinder.mesh, bullet.position, bullet.speed)
+
+                            if (intersection) {
+                                createParticles({
+                                    position: intersection.point.toArray(),
+                                    count: [2, 4],
+                                    speed: [8, 12],
+                                    offset: [[0, 0], [0, 0], [0, 0]],
+                                    variance: [[-5, 5], [0, 0], [-5, 5]],
+                                    normal: intersection.face?.normal.toArray() as Tuple3,
+                                    color: "purple",
                                 })
                             }
                         }

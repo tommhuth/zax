@@ -4,7 +4,7 @@ import random from "@huth/random"
 import { Tuple2, Tuple3 } from "../types"
 import { OBB } from "three/examples/jsm/math/OBB"
 import Counter from "./Counter"
-import { Barrel, Building, Bullet, Instance, Particle, Plane, RepeaterMesh, Turret, WorldPart } from "./types"
+import { Barrel, Building, Bullet, Explosion, Instance, Particle, Plane, RepeaterMesh, Rocket, Turret, WorldPart } from "./types"
 import { getNextWorldPart, makeDefault } from "./generators"
 import { SpatialHashGrid3D } from "./SpatialHashGrid3D"
 
@@ -15,22 +15,6 @@ export const dpr = 1 / frc
 
 export const bulletSize: Tuple3 = [.2, .2, 1.5]
 
-interface Fireball {
-    isPrimary?: boolean
-    position: Tuple3
-    index: number
-    startRadius: number
-    maxRadius: number
-    lifetime: number
-    time: number
-    id: string
-}
-
-interface Explosion {
-    position: Tuple3
-    id: string
-    fireballs: Fireball[]
-}
 
 interface Store {
     world: {
@@ -44,6 +28,7 @@ interface Store {
     bullets: Bullet[]
     turrets: Turret[]
     barrels: Barrel[]
+    rockets: Rocket[]
     planes: Plane[]
     particles: Particle[]
     explosions: Explosion[],
@@ -63,18 +48,19 @@ interface Store {
     }
 }
 
-export function removeExplosion(id: string) {
-    store.setState({
-        explosions: store.getState().explosions.filter(i => i.id !== id)
-    })
-}
-
 interface CreateExplosionParams {
     position: Tuple3
     count?: number
     radius?: number
     fireballPath?: [start: Tuple3, direction: Tuple3]
     fireballCount?: number
+}
+
+
+export function removeExplosion(id: string) {
+    store.setState({
+        explosions: store.getState().explosions.filter(i => i.id !== id)
+    })
 }
 
 export function createExplosion({
@@ -161,6 +147,7 @@ const store = create<Store>(() => ({
     turrets: [],
     barrels: [],
     bullets: [],
+    rockets: [],
     particles: [],
     player: {
         speed: 8,
@@ -180,6 +167,51 @@ const store = create<Store>(() => ({
     }
 }))
 const useStore = store
+
+
+export function removeRocket(id: string) {
+    let { rockets, world } = store.getState()
+    let rocket = rockets.find(i => i.id === id)
+
+    if (rocket) {
+        store.setState({
+            rockets: rockets.filter(i => i.id !== id)
+        })
+        world.grid.remove(rocket.client)
+    }
+}
+
+export function createRocket(
+    [x = 0, y = 0, z = -10] = [],
+    speed = random.float(2.5, 4),
+    health = 35,
+) {
+    let id = random.id()
+    let size = [1.15, 3, 1.15] as Tuple3
+    let position = new Vector3(x, y, z)
+    let aabb = new Box3().setFromCenterAndSize(position, new Vector3(...size))
+    let { world, rockets } = store.getState()
+    let client = world.grid.newClient(
+        position.toArray(),
+        [...size],
+        { type: "rocket", id, size, position }
+    )
+
+    store.setState({
+        rockets: [
+            ...rockets,
+            {
+                id,
+                position,
+                aabb,
+                client,
+                size,
+                health,
+                speed,
+            }
+        ]
+    })
+}
 
 export function createWorldPart() {
     let world = store.getState().world
@@ -586,6 +618,31 @@ export function damageTurret(id: string, damage: number) {
             {
                 ...turret,
                 health: Math.max(turret.health - damage, 0)
+            }
+        ]
+    })
+
+}
+
+export function damageRocket(id: string, damage: number) {
+    let rocket = store.getState().rockets.find(i => i.id === id) as Plane
+    let health = Math.max(rocket.health - damage, 0)
+    let score = store.getState().player.score
+
+    if (!rocket) {
+        return
+    }
+
+    store.setState({
+        player: {
+            ...store.getState().player,
+            score: score + (health === 0 ? 1000 : 100)
+        },
+        rockets: [
+            ...store.getState().rockets.filter(i => i.id !== id),
+            {
+                ...rocket,
+                health,
             }
         ]
     })

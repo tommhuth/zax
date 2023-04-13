@@ -1,7 +1,7 @@
 import { useFrame, useLoader, useThree } from "@react-three/fiber"
 import { useEffect, useMemo, useRef } from "react"
 import { Group, Mesh, Vector3 } from "three"
-import { bulletSize, createBullet, damageBarrel, damagePlane, damagePlayer, damageTurret, dpr, setPlayerObject, useStore } from "../data/store"
+import { bulletSize, createBullet, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, dpr, setPlayerObject, useStore } from "../data/store"
 import { Tuple3 } from "../types"
 import { WORLD_BOTTOM_EDGE, WORLD_CENTER_X, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
@@ -71,6 +71,10 @@ export default function Player({
             plane: (data) => {
                 damagePlayer(100)
                 damagePlane(data.id, 100)
+            },
+            rocket: (data) => {
+                damagePlayer(100)
+                damageRocket(data.id, 100)
             }
         }
     })

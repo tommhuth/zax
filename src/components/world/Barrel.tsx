@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react"
 import { Vector3 } from "three"
 import { createExplosion, createParticles, removeBarrel, useStore } from "../../data/store"
 import { Barrel } from "../../data/types"
-import { setMatrixAt, setMatrixNullAt } from "../../utils/utils"
+import { setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import { useInstance } from "../InstancedMesh"
 import random from "@huth/random"
 
@@ -22,6 +22,12 @@ export default function Barrel({
         setTimeout(() => removeBarrel(id), 300)
         removed.current = true
     }
+
+    useEffect(() => {
+        if (instance && typeof index === "number") {
+            setColorAt(instance, index, "red")
+        }
+    }, [index, instance])
 
     useEffect(() => {
         if (health === 0) {

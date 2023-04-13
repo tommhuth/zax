@@ -113,9 +113,9 @@ function App() {
                 <meshBasicMaterial onBeforeCompile={onBeforeCompile} transparent attach={"material"} />
             </InstancedMesh>
 
-            <InstancedMesh name="cylinder" count={40}>
+            <InstancedMesh name="cylinder" count={75}>
                 <cylinderGeometry args={[.5, .5, 1, 10, 1]} attach="geometry" />
-                <meshPhongMaterial color="red" attach={"material"} />
+                <meshPhongMaterial attach={"material"} />
             </InstancedMesh>
 
             <Models />

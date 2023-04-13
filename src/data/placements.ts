@@ -11,6 +11,10 @@ interface PlacementBuilding extends PlaceableObject {
     size: Tuple3
 }
 
+interface PlacementRocket extends PlaceableObject {
+    health?: number
+}
+
 interface PlacementTurret extends PlaceableObject {
     fireFrequency?: number
 }
@@ -20,6 +24,7 @@ type PlacementBarrel = PlaceableObject
 interface Placement {
     buildings: PlacementBuilding[]
     turrets: PlacementTurret[]
+    rockets: PlacementRocket[]
     barrels: PlacementBarrel[]
 }
 
@@ -37,6 +42,11 @@ const placements: Placement[] = [
             },
             {
                 position: [WORLD_CENTER_X + 3, 0, -4], 
+            }
+        ],
+        rockets: [ 
+            {
+                position: [WORLD_CENTER_X, -2, 6], 
             }
         ],
         barrels: [
@@ -66,6 +76,11 @@ const placements: Placement[] = [
                 size: [3, 1, 5]
             }
         ],
+        rockets: [ 
+            {
+                position: [WORLD_RIGHT_EDGE, -2, 4], 
+            }
+        ],
         turrets: [
             {
                 position: [WORLD_CENTER_X, 0, 5.5], 
@@ -91,6 +106,11 @@ const placements: Placement[] = [
             {
                 position: [WORLD_CENTER_X + 2, 1, 5], 
             },
+        ],
+        rockets: [ 
+            {
+                position: [2, -2, 1], 
+            }
         ],
         barrels: [
             {
@@ -121,5 +141,6 @@ export function getRandomPlacement(origin: Tuple3 = [0, 0, 0]) {
         buildings: placement.buildings.map(obj => toWorldSpace<typeof obj>(obj, origin, direction)),
         barrels: placement.barrels.map(obj => toWorldSpace<typeof obj>(obj, origin, direction)),
         turrets: placement.turrets.map(obj => toWorldSpace<typeof obj>(obj, origin, direction)),
+        rockets: placement.rockets.map(obj => toWorldSpace<typeof obj>(obj, origin, direction)),
     }
 }

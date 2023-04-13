@@ -4,6 +4,34 @@ import { Tuple2, Tuple3 } from "../types"
 import Counter from "./Counter"
 import { Client } from "./SpatialHashGrid3D"
 
+
+export interface Fireball {
+    isPrimary?: boolean
+    position: Tuple3
+    index: number
+    startRadius: number
+    maxRadius: number
+    lifetime: number
+    time: number
+    id: string
+}
+
+export interface Explosion {
+    position: Tuple3
+    id: string
+    fireballs: Fireball[]
+}
+
+export interface Rocket {
+    position: Vector3
+    size: Tuple3
+    client: Client
+    aabb: Box3
+    id: string
+    speed: number
+    health: number
+}
+
 export interface Instance {
     mesh: InstancedMesh;
     maxCount: number;
@@ -79,6 +107,12 @@ export interface SpawnedPlane {
     fireFrequency?: number
 }
 
+export interface SpawnedRocket {
+    position: Tuple3
+    id: string
+    speed?: number 
+}
+
 export interface SpawnedTurret {
     position: Tuple3
     id: string
@@ -99,6 +133,7 @@ export interface WorldPartDefault extends WorldPart {
     turrets: SpawnedTurret[]
     barrels: SpawnedBarrel[]
     buildings: SpawnedBuilding[]
+    rockets: SpawnedRocket[]
     planes: SpawnedPlane[]
     type: WorldPartType.DEFAULT
 }

@@ -12,6 +12,7 @@ import BulletHandler from "./BulletHandler"
 import { WorldPartDefault, WorldPartBuildingsGap, WorldPartType, WorldPartBuildingsLow } from "../../data/types"
 import BuildingsGap from "./parts/BuildingsGap"
 import BuildingsLow from "./parts/BuildingsLow"
+import Rocket from "./Rocket"
 
 export const WORLD_CENTER_X = 1
 export const WORLD_LEFT_EDGE = -2
@@ -65,6 +66,7 @@ const Parts = memo(() => {
     let buildings = useStore(i => i.buildings)
     let turrets = useStore(i => i.turrets)
     let planes = useStore(i => i.planes)
+    let rockets = useStore(i => i.rockets)
 
     return (
         <>
@@ -79,6 +81,9 @@ const Parts = memo(() => {
             })}
             {barrels.map(i => {
                 return <Barrel key={i.id} {...i} />
+            })}
+            {rockets.map(i => {
+                return <Rocket key={i.id} {...i} />
             })}
         </>
     )

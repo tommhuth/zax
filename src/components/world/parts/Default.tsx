@@ -5,6 +5,7 @@ import EdgeBuilding from "../decoration/EdgeBuilding"
 import Barrel from "../spawner/Barrel"
 import Plane from "../spawner/Plane"
 import Building from "../spawner/Building"
+import Rocket from "../spawner/Rocket"
 
 export default function Default({
     id,
@@ -14,6 +15,7 @@ export default function Default({
     turrets,
     planes,
     size,
+    rockets,
 }: WorldPartDefault) {
     return (
         <WorldPartWrapper
@@ -23,6 +25,15 @@ export default function Default({
         >
             <EdgeBuilding z={position.z + size[1] / 2} />
 
+            {rockets.map(i => {
+                return (
+                    <Rocket
+                        key={i.id}
+                        position={i.position}
+                        speed={i.speed}
+                    />
+                )
+            })}
             {turrets.map(i => {
                 return (
                     <Turret

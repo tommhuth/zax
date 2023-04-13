@@ -37,7 +37,7 @@ export default function Ui() {
         let player = useStore.getState().player.object
 
         if (player && currentHeightRef.current) {
-            let height = (player.position.y - WORLD_BOTTOM_EDGE) / (WORLD_TOP_EDGE - WORLD_BOTTOM_EDGE)
+            let height = (player.position.y - WORLD_BOTTOM_EDGE) / (WORLD_TOP_EDGE - WORLD_BOTTOM_EDGE) 
 
             currentHeightRef.current.style.height = (height * 100 + 1).toFixed(1) + "%"
         }
@@ -48,11 +48,13 @@ export default function Ui() {
             <RotateMe />
             
             <div className="height">
+                <div className="height__top">H</div>
                 <div
                     className="height__current"
                     ref={currentHeightRef}
                 />
-                {new Array(bars).fill(null).map((i, index) => {
+                {new Array(bars).fill(null).map((i, index) => { 
+
                     return (
                         <div
                             className="height__bar"
@@ -63,6 +65,7 @@ export default function Ui() {
                         />
                     )
                 })}
+                <div className="height__bottom">L</div>
             </div>
             <div className="ui">
                 {player.health.toFixed(0)}%
