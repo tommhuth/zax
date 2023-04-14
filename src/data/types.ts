@@ -182,6 +182,7 @@ export interface Particle {
     index: number
     color: string
     id: string
+    rotationFactor: number
 }
 
 export interface RepeaterMesh {

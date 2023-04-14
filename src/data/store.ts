@@ -187,7 +187,7 @@ export function createRocket(
     health = 35,
 ) {
     let id = random.id()
-    let size = [1.15, 3, 1.15] as Tuple3
+    let size = [1.15, 2.5, 1.15] as Tuple3
     let position = new Vector3(x, y, z)
     let aabb = new Box3().setFromCenterAndSize(position, new Vector3(...size))
     let { world, rockets } = store.getState()
@@ -521,12 +521,13 @@ interface CreateParticlesParams {
     offset?: [x: Tuple2, y: Tuple2, z: Tuple2]
     speed?: Tuple2
     variance?: [x: Tuple2, y: Tuple2, z: Tuple2]
-    count?: Tuple2
+    count?: Tuple2 | number
     restitution?: Tuple2
-    friction?: Tuple2
-    radius?: Tuple2
+    friction?: Tuple2 | number
+    radius?: Tuple2 | number
     color?: string
     name?: string
+    rotationFactor?: number
 }
 
 export function createParticles({
@@ -542,9 +543,10 @@ export function createParticles({
     restitution = [.3, .5],
     color = "#FFFFFF",
     radius = [.15, .25],
+    rotationFactor = 1
 }: CreateParticlesParams) {
     let instance = store.getState().instances[name]
-    let particles: Particle[] = new Array(random.integer(...count)).fill(null).map((i, index, list) => {
+    let particles: Particle[] = new Array(typeof count === "number" ? count : random.integer(...count)).fill(null).map((i, index, list) => {
         return {
             id: random.id(),
             instance,
@@ -559,9 +561,10 @@ export function createParticles({
             ),
             rotation: random.float(0, Math.PI * 2),
             restitution: random.float(...restitution),
-            friction: random.float(...friction),
-            radius: radius[0] + (radius[1] - radius[0]) * (index / (list.length - 1)),
+            friction: typeof friction == "number" ? friction : random.float(...friction),
+            radius: typeof radius === "number" ? radius : radius[0] + (radius[1] - radius[0]) * (index / (list.length - 1)),
             color,
+            rotationFactor,
             lifetime: 0,
             maxLifetime: 90,
         }

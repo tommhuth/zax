@@ -7,6 +7,7 @@ import { ndelta, setColorAt, setMatrixAt } from "../../utils/utils"
 function ParticleHandler() {
     let { viewport } = useThree()
     let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
+    let floorY = 0
 
     useFrame((state, delta) => {
         let { particles } = store.getState()
@@ -15,11 +16,10 @@ function ParticleHandler() {
 
         for (let i = 0; i < particles.length; i++) {
             let particle = particles[i]
-            let floorY = 0
             let {
                 position, velocity, radius, acceleration,
                 friction, restitution, index, instance,
-                mounted, color, rotation,
+                mounted, color, rotation, rotationFactor
             } = particle
 
             if (particle.lifetime > particle.maxLifetime || position.z > diagonal * .75) {
@@ -33,10 +33,10 @@ function ParticleHandler() {
             }
 
             position.x += velocity.x * nd
-            position.y = Math.max(floorY + radius, position.y + velocity.y * nd)
+            position.y = Math.max(floorY, position.y + velocity.y * nd)
             position.z += velocity.z  * nd
 
-            if (position.y <= floorY + radius) {
+            if (position.y <= floorY) {
                 velocity.y *= -restitution
             }
 
@@ -53,9 +53,9 @@ function ParticleHandler() {
                 position: position.toArray(),
                 scale: [radius, radius, radius],
                 rotation: [
-                    rotation + velocity.x * -.1,
-                    rotation + velocity.y * -.1,
-                    rotation + velocity.z * -.1
+                    (rotation + velocity.x * -.1) * rotationFactor,
+                    (rotation + velocity.y * -.1) * rotationFactor,
+                    (rotation + velocity.z * -.1) * rotationFactor,
                 ]
             })
 

@@ -2,11 +2,11 @@ import { useEffect, useLayoutEffect, useRef } from "react"
 import { Rocket } from "../../data/types"
 import { useInstance } from "../InstancedMesh"
 import { useFrame } from "@react-three/fiber"
-import { ndelta, setColorAt, setMatrixAt } from "../../utils/utils"
+import { ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import { createExplosion, createParticles, increaseScore, removeRocket, useStore } from "../../data/store"
 import { Vector3 } from "three"
 import random from "@huth/random"
-import { Tuple3 } from "../../types"
+import { Tuple2, Tuple3 } from "../../types"
 import { WORLD_TOP_EDGE } from "./World"
 
 let _size = new Vector3()
@@ -21,8 +21,7 @@ export default function Rocket({
     health,
 }: Rocket) {
     let grid = useStore(i => i.world.grid)
-    let removed = useRef(false)
-    let dead = useRef(false)
+    let removed = useRef(false) 
     let gravity = useRef(0)
     let actualSpeed = useRef(speed)
     let rotation = useRef([0, 0, 0])
@@ -30,7 +29,9 @@ export default function Rocket({
     let [index, instance] = useInstance("cylinder")
     let remove = () => {
         removed.current = true
+        increaseScore(500)
         removeRocket(id)
+        setMatrixNullAt(instance, index as number)
     }
 
     useLayoutEffect(() => {
@@ -40,16 +41,8 @@ export default function Rocket({
     }, [index, instance])
 
     useEffect(() => {
-        if (health === 0) {
-            dead.current = true
-            increaseScore(500)
-            createExplosion({
-                position: [position.x, position.y - 1, position.z],
-                count: 10,
-                radius: .4,
-                fireballCount: 6,
-                fireballPath: [[position.x, position.y - 2, position.z], [0, 4, 0]]
-            })
+        if (health === 0) { 
+            remove()
             createParticles({
                 position: position.toArray(),
                 speed: [12, 16],
@@ -60,6 +53,39 @@ export default function Rocket({
                 radius: [.1, .45],
                 color: "purple",
             })
+ 
+            for (let direction of [-1, 1]) {
+                createExplosion({
+                    position: [position.x, position.y - direction, position.z],
+                    count: 10,
+                    radius: .35,
+                    fireballCount: 6,
+                    fireballPath: [[position.x, position.y, position.z], [0, 4 * direction, 0]]
+                })
+            }
+ 
+            const variations = [
+                [[[-5, -2], [2, 5], [-5, 5]], 1] as [[Tuple2, Tuple2, Tuple2], number],
+                [[[2, 5], [2, 5], [-5, 5]], -1] as [[Tuple2, Tuple2, Tuple2], number],
+            ]
+
+            for (let [variance, y] of variations) {
+                createParticles({
+                    position: [position.x, position.y + y, position.z],
+                    speed: [0, 0],
+                    variance: variance,
+                    offset: [[0, 0], [0, 0], [0, 0]],
+                    normal: [0, -1, 0],
+                    restitution: [.1, .25],
+                    count: 1,
+                    name: "cylinder",
+                    gravity: [0, -20, 0],
+                    friction: .95,
+                    radius: 1.15,
+                    rotationFactor: .85,
+                    color: "purple",
+                })
+            }
         }
     }, [health])
 
@@ -95,27 +121,6 @@ export default function Rocket({
 
             client.position = position.toArray()
             grid.updateClient(client)
-        }
-    })
-
-    useFrame(() => {
-        if (instance && typeof index === "number" && dead.current && position.y < 0 && !removed.current) {
-            createExplosion({
-                position: [position.x, 0, position.z],
-                count: 10,
-                radius: .6,
-            })
-            createParticles({
-                position: position.toArray(),
-                speed: [15, 25],
-                variance: [[-10, 10], [0, 5], [-10, 10]],
-                offset: [[-.5, .5], [-.5, .5], [-.5, .5]],
-                normal: [0, 1, 0],
-                count: [4, 8],
-                radius: [.15, .45],
-                color: "purple",
-            })
-            remove()
         }
     })
 
