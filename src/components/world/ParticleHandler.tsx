@@ -33,37 +33,38 @@ function ParticleHandler() {
             }
 
             position.x += velocity.x * nd
-            position.y = Math.max(floorY, position.y + velocity.y * nd)
-            position.z += velocity.z  * nd
+            position.y = Math.max(floorY + radius * .25, position.y + velocity.y * nd)
+            position.z += velocity.z * nd
 
-            if (position.y <= floorY) {
-                velocity.y *= -restitution
-            }
-
-            velocity.x *= friction
+            velocity.x *= friction 
             velocity.z *= friction
 
             velocity.x += acceleration.x * nd
             velocity.y += acceleration.y * nd
             velocity.z += acceleration.z * nd
 
+            rotation.x += velocity.x * rotationFactor * .1
+            rotation.y += -velocity.z * rotationFactor * .1 
+            rotation.z += velocity.z * rotationFactor * .1
+
+
+            if (position.y <= floorY + radius * .25) {
+                velocity.y *= -restitution  
+            }   
+
             setMatrixAt({
                 instance: instance.mesh,
                 index,
                 position: position.toArray(),
                 scale: [radius, radius, radius],
-                rotation: [
-                    (rotation + velocity.x * -.1) * rotationFactor,
-                    (rotation + velocity.y * -.1) * rotationFactor,
-                    (rotation + velocity.z * -.1) * rotationFactor,
-                ]
+                rotation: rotation.toArray()
             })
 
             particles[i].lifetime++
         }
 
         if (dead.length) {
-            removeParticle(dead.map(i => i.id)) 
+            removeParticle(dead.map(i => i.id))
         }
     })
 

@@ -554,12 +554,16 @@ export function createParticles({
             index: instance.index.next(),
             position: new Vector3(...position.map((i, index) => i + random.float(...offset[index]))),
             acceleration: new Vector3(...gravity),
+            rotation: new Vector3(
+                random.float(0, Math.PI * 2), 
+                random.float(0, Math.PI * 2), 
+                random.float(0, Math.PI * 2)
+            ),
             velocity: new Vector3(
                 normal[0] * random.float(...speed) + random.float(...variance[0]),
                 normal[1] * random.float(...speed) + random.float(...variance[1]),
                 normal[2] * random.float(...speed) + random.float(...variance[2]),
-            ),
-            rotation: random.float(0, Math.PI * 2),
+            ), 
             restitution: random.float(...restitution),
             friction: typeof friction == "number" ? friction : random.float(...friction),
             radius: typeof radius === "number" ? radius : radius[0] + (radius[1] - radius[0]) * (index / (list.length - 1)),

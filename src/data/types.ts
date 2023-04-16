@@ -178,7 +178,7 @@ export interface Particle {
     maxLifetime: number
     instance: Instance
     radius: number
-    rotation: number
+    rotation: Vector3
     index: number
     color: string
     id: string

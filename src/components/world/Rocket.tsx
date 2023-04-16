@@ -21,7 +21,7 @@ export default function Rocket({
     health,
 }: Rocket) {
     let grid = useStore(i => i.world.grid)
-    let removed = useRef(false) 
+    let removed = useRef(false)
     let gravity = useRef(0)
     let actualSpeed = useRef(speed)
     let rotation = useRef([0, 0, 0])
@@ -41,7 +41,7 @@ export default function Rocket({
     }, [index, instance])
 
     useEffect(() => {
-        if (health === 0) { 
+        if (health === 0) {
             remove()
             createParticles({
                 position: position.toArray(),
@@ -53,7 +53,7 @@ export default function Rocket({
                 radius: [.1, .45],
                 color: "purple",
             })
- 
+
             for (let direction of [-1, 1]) {
                 createExplosion({
                     position: [position.x, position.y - direction, position.z],
@@ -63,26 +63,26 @@ export default function Rocket({
                     fireballPath: [[position.x, position.y, position.z], [0, 4 * direction, 0]]
                 })
             }
- 
-            const variations = [
-                [[[-5, -2], [2, 5], [-5, 5]], 1] as [[Tuple2, Tuple2, Tuple2], number],
-                [[[2, 5], [2, 5], [-5, 5]], -1] as [[Tuple2, Tuple2, Tuple2], number],
-            ]
 
-            for (let [variance, y] of variations) {
+            const variations = [
+                [[[-5, -2], [2, 5], [-5, 5]], 1, [random.pick(-1, 1), -.25, -1]],
+                [[[2, 5], [2, 5], [-5, 5]], -1, [random.pick(-1, 1), -.25, 1]],
+            ] as [[Tuple2, Tuple2, Tuple2], number, Tuple3][]
+
+            for (let [variance, y, normal] of variations) {
                 createParticles({
                     position: [position.x, position.y + y, position.z],
-                    speed: [0, 0],
+                    speed: [8, 10],
                     variance: variance,
                     offset: [[0, 0], [0, 0], [0, 0]],
-                    normal: [0, -1, 0],
+                    normal,
                     restitution: [.1, .25],
                     count: 1,
                     name: "cylinder",
                     gravity: [0, -20, 0],
-                    friction: .95,
+                    friction: .9,
                     radius: 1.15,
-                    rotationFactor: .85,
+                    rotationFactor: .65,
                     color: "purple",
                 })
             }
@@ -98,7 +98,7 @@ export default function Rocket({
                 if (Math.abs(position.z - player.object.position.z) < triggerZ.current) {
                     position.y += actualSpeed.current * ndelta(delta)
 
-                    if (position.y > WORLD_TOP_EDGE - 1) {
+                    if (position.y > WORLD_TOP_EDGE + 1) {
                         actualSpeed.current += 5 * ndelta(delta)
                     }
                 }
