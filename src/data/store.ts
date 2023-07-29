@@ -9,7 +9,7 @@ import { getNextWorldPart, makeDefault } from "./generators"
 import { SpatialHashGrid3D } from "./SpatialHashGrid3D"
 
 export let isSmallScreen = window.matchMedia("(max-height: 400px)").matches || window.matchMedia("(max-width: 800px)").matches
-let frc = isSmallScreen ? 4 : 7
+let frc = isSmallScreen ? 4 : 6
 
 export const dpr = 1 / frc
 
@@ -48,19 +48,19 @@ interface Store {
     }
 }
 
+
+export function removeExplosion(id: string) {
+    store.setState({
+        explosions: store.getState().explosions.filter(i => i.id !== id)
+    })
+}
+
 interface CreateExplosionParams {
     position: Tuple3
     count?: number
     radius?: number
     fireballPath?: [start: Tuple3, direction: Tuple3]
     fireballCount?: number
-}
-
-
-export function removeExplosion(id: string) {
-    store.setState({
-        explosions: store.getState().explosions.filter(i => i.id !== id)
-    })
 }
 
 export function createExplosion({
@@ -168,6 +168,31 @@ const store = create<Store>(() => ({
 }))
 const useStore = store
 
+export function removeByProximity(
+    sourceItem: { id: string, position: Vector3 }, 
+    threshold = 2, 
+    delay = random.integer(150, 200)
+) {
+    let tid = setTimeout(() => {
+        let { turrets, barrels } = store.getState()
+        let sourcePosition = sourceItem.position.clone()
+
+        for (let [index, item] of Object.entries([...turrets, ...barrels])) {
+            let isTurrent = parseFloat(index) < turrets.length
+            let distance = sourcePosition.distanceTo(item.position)
+
+            if (distance < threshold && sourceItem.id !== item.id) {
+                if (isTurrent) {
+                    damageTurret(item.id, 1000)
+                } else {
+                    damageBarrel(item.id, 1000)
+                }
+            }
+        }
+    }, delay)
+
+    return () => clearTimeout(tid)
+}
 
 export function removeRocket(id: string) {
     let { rockets, world } = store.getState()
@@ -187,8 +212,8 @@ export function createRocket(
     health = 35,
 ) {
     let id = random.id()
-    let size = [1.15, 2.5, 1.15] as Tuple3
-    let position = new Vector3(x, y, z)
+    let size = [.75, 3, .75] as Tuple3
+    let position = new Vector3(x, y - size[1], z)
     let aabb = new Box3().setFromCenterAndSize(position, new Vector3(...size))
     let { world, rockets } = store.getState()
     let client = world.grid.newClient(
@@ -314,7 +339,7 @@ export function createTurret(
     [x = 0, y = 0, z = -10] = [],
 ) {
     let id = random.id()
-    let size = [1, 2, 1] as Tuple3
+    let size = [1.65, 1.5, 1.65] as Tuple3
     let position = new Vector3(x, y + size[1] / 2, z)
     let aabb = new Box3().setFromCenterAndSize(position, new Vector3(...size))
     let { world, turrets } = store.getState()
@@ -323,6 +348,8 @@ export function createTurret(
         [...size],
         { type: "turret", id, size, position }
     )
+    let rotation = random.pick(Math.PI * 2, Math.PI * .5, Math.PI, Math.PI * 1.5)
+
 
     store.setState({
         turrets: [
@@ -331,6 +358,7 @@ export function createTurret(
                 fireFrequency,
                 size,
                 health: 70,
+                rotation,
                 id,
                 aabb,
                 client,
@@ -416,10 +444,10 @@ interface CreateBarrelParams {
 export function createBarrel({
     position: [x = 0, y = 0, z = 0] = [0, 0, 0],
     rotation = 0,
-    size = [2, 1.75, 2],
     health = 25,
 }: CreateBarrelParams) {
     let id = random.id()
+    let size = [2, 1.85, 2] as Tuple3
     let position = new Vector3(x, y + size[1] / 2, z)
     let obb = new OBB(new Vector3(x, y, z), new Vector3(...size.map(i => i / 2)), new Matrix3().rotate(rotation))
     let aabb = new Box3().setFromCenterAndSize(new Vector3(z, y, z), new Vector3(...size))
@@ -484,7 +512,7 @@ export function createBullet({
     rotation,
     owner,
     size = bulletSize,
-    speed = [0, 0, 0],
+    speed = 10,
     damage,
     color,
 }) {
@@ -505,7 +533,7 @@ export function createBullet({
                 aabb,
                 color,
                 size: [size[0], size[1], size[2]],
-                speed: speed as Tuple3,
+                speed,
                 owner,
                 rotation,
             },
@@ -516,63 +544,64 @@ export function createBullet({
 
 interface CreateParticlesParams {
     gravity?: Tuple3
-    position: Tuple3
-    normal: Tuple3
-    offset?: [x: Tuple2, y: Tuple2, z: Tuple2]
-    speed?: Tuple2
-    variance?: [x: Tuple2, y: Tuple2, z: Tuple2]
+    position: Tuple3 // base position
+    positionOffset?: [x: Tuple2, y: Tuple2, z: Tuple2] // additional position offset
+    normal: Tuple3 // main particle direction
+    speed?: Tuple2 // speed along normal
+    speedOffset?: [x: Tuple2, y: Tuple2, z: Tuple2] // additional speed offset
+    normalOffset?: [x: Tuple2, y: Tuple2, z: Tuple2]
     count?: Tuple2 | number
     restitution?: Tuple2
     friction?: Tuple2 | number
     radius?: Tuple2 | number
     color?: string
-    name?: string
-    rotationFactor?: number
+    name?: string 
 }
 
 export function createParticles({
     name = "sphere",
-    position = [0, 0, 0], // base position
-    offset = [[-1, 1], [-1, 1], [-1, 1]],// additional  position offset
-    normal = [0, 1, 0], // particle direction
-    speed = [10, 20], // main normal speed
-    variance = [[0, 0], [0, 0], [0, 0]], // additional speed 
+    position = [0, 0, 0], 
+    positionOffset = [[-1, 1], [-1, 1], [-1, 1]],
+    normal = [0, 1, 0], 
+    normalOffset = [[-.2, .2],[-.2, .2],[-.2, .2]],
+    speed = [10, 20], 
+    speedOffset = [[0, 0], [0, 0], [0, 0]], 
     count = [2, 3],
     friction = [.9, .98],
     gravity = [0, -50, 0],
-    restitution = [.3, .5],
+    restitution = [.1, .5],
     color = "#FFFFFF",
-    radius = [.15, .25],
-    rotationFactor = 1
+    radius = [.15, .25], 
 }: CreateParticlesParams) {
     let instance = store.getState().instances[name]
     let particles: Particle[] = new Array(typeof count === "number" ? count : random.integer(...count)).fill(null).map((i, index, list) => {
+        let velocity = new Vector3(
+            (normal[0] + random.float(...normalOffset[0])) * random.float(...speed) + random.float(...speedOffset[0]),
+            (normal[1] + random.float(...normalOffset[1])) * random.float(...speed) + random.float(...speedOffset[1]),
+            (normal[2] + random.float(...normalOffset[2])) * random.float(...speed) + random.float(...speedOffset[2]),
+        )
+
         return {
             id: random.id(),
             instance,
             mounted: false,
             index: instance.index.next(),
-            position: new Vector3(...position.map((i, index) => i + random.float(...offset[index]))),
+            position: new Vector3(...position.map((i, index) => i + random.float(...positionOffset[index]))),
             acceleration: new Vector3(...gravity),
             rotation: new Vector3(
-                random.float(0, Math.PI * 2), 
-                random.float(0, Math.PI * 2), 
+                random.float(0, Math.PI * 2),
+                random.float(0, Math.PI * 2),
                 random.float(0, Math.PI * 2)
             ),
-            velocity: new Vector3(
-                normal[0] * random.float(...speed) + random.float(...variance[0]),
-                normal[1] * random.float(...speed) + random.float(...variance[1]),
-                normal[2] * random.float(...speed) + random.float(...variance[2]),
-            ), 
+            velocity,
             restitution: random.float(...restitution),
             friction: typeof friction == "number" ? friction : random.float(...friction),
             radius: typeof radius === "number" ? radius : radius[0] + (radius[1] - radius[0]) * (index / (list.length - 1)),
-            color,
-            rotationFactor,
+            color, 
             lifetime: 0,
-            maxLifetime: 90,
+            maxLifetime: velocity.length() * 10,
         }
-    })
+    }) 
 
     store.setState({
         particles: [

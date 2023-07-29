@@ -40,6 +40,7 @@ export default function InstancedMesh({
                     }
                 }
             }}
+            frustumCulled={false}
         >
             <instancedBufferAttribute attach="instanceColor" args={[colors, 3]} />
             {children}

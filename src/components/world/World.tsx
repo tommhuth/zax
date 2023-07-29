@@ -18,7 +18,7 @@ export const WORLD_CENTER_X = 1
 export const WORLD_LEFT_EDGE = -2
 export const WORLD_RIGHT_EDGE = 5
 export const WORLD_TOP_EDGE = 5
-export const WORLD_BOTTOM_EDGE = 1.5
+export const WORLD_BOTTOM_EDGE = 1
 
 export default function World() {
     let parts = useStore(i => i.world.parts)

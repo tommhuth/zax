@@ -3,9 +3,11 @@ import React, { startTransition, useEffect, useRef } from "react"
 import { Box3, Vector3 } from "three"
 import { removeWorldPart, useStore } from "../../data/store"
 import { Tuple2 } from "../../types"
-import { setColorAt, setMatrixAt } from "../../utils/utils"
+import { Only, setColorAt, setMatrixAt } from "../../utils/utils"
 import { useInstance } from "../InstancedMesh"
 import random from "@huth/random"
+import { WORLD_CENTER_X } from "./World"
+import Config from "../../Config"
 
 interface Asset {
     release: () => void
@@ -31,11 +33,11 @@ export default function WorldPartWrapper({
 }: WorldPartWrapperProps) {
     let [index, instance] = useInstance("box")
     let dead = useRef(false)
-    let i = useRef(random.integer(0, 100)) 
+    let i = useRef(random.integer(0, 100))
 
     useEffect(() => {
         if (typeof index === "number" && instance) {
-            setColorAt(instance, index, 0xFFFFFF * Math.random())
+            setColorAt(instance, index, 0x222222)
         }
     }, [index, instance])
 
@@ -45,7 +47,7 @@ export default function WorldPartWrapper({
                 instance,
                 index,
                 position: [position.x, position.y - 5, position.z + depth / 2],
-                scale: [30, 10, depth],
+                scale: [30, 10, depth + .1],
             })
         }
     })
@@ -73,6 +75,13 @@ export default function WorldPartWrapper({
     return (
         <>
             {children}
+
+            <Only if={Config.DEBUG}>
+                <mesh position-y={-1} position-z={position.z + depth / 2} position-x={WORLD_CENTER_X}>
+                    <boxGeometry args={[width, 2, depth, 1, 1, 1]} />
+                    <meshBasicMaterial wireframe color="black" />
+                </mesh>
+            </Only>
         </>
     )
 }

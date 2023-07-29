@@ -4,10 +4,11 @@ import { useInstance } from "../InstancedMesh"
 import { useFrame } from "@react-three/fiber"
 import { ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import { createExplosion, createParticles, increaseScore, removeRocket, useStore } from "../../data/store"
-import { Vector3 } from "three"
+import { Mesh, Vector3 } from "three"
 import random from "@huth/random"
 import { Tuple2, Tuple3 } from "../../types"
 import { WORLD_TOP_EDGE } from "./World"
+import Config from "../../Config"
 
 let _size = new Vector3()
 
@@ -23,10 +24,12 @@ export default function Rocket({
     let grid = useStore(i => i.world.grid)
     let removed = useRef(false)
     let gravity = useRef(0)
+    let ref =useRef<Mesh>(null)
     let actualSpeed = useRef(speed)
-    let rotation = useRef([0, 0, 0])
-    let triggerZ = useRef(random.integer(18, 24))
-    let [index, instance] = useInstance("cylinder")
+    let rotation = useRef<Tuple3>([0, random.float(0, Math.PI * 2), 0])
+    let triggerZ = useRef(25)
+    let [index, instance] = useInstance("rocket")
+    let [platformIndex, platformInstance] = useInstance("platform")
     let remove = () => {
         removed.current = true
         increaseScore(500)
@@ -36,7 +39,7 @@ export default function Rocket({
 
     useLayoutEffect(() => {
         if (instance && typeof index === "number") {
-            setColorAt(instance, index, "purple")
+            setColorAt(instance, index, "#fff")
         }
     }, [index, instance])
 
@@ -46,48 +49,37 @@ export default function Rocket({
             createParticles({
                 position: position.toArray(),
                 speed: [12, 16],
-                variance: [[-5, 5], [0, 10], [-15, 5]],
-                offset: [[-.5, .5], [-.5, .5], [-.5, .5]],
+                speedOffset: [[-5, 5], [-10, 10], [-15, 5]],
+                positionOffset: [[-1.5, 1.5], [-.5, .5], [-1.5, 1.5]],
                 normal: [0, -1, 0],
-                count: [4, 8],
+                count: [10, 18],
                 radius: [.1, .45],
-                color: "purple",
+                color: "#fff",
             })
 
             for (let direction of [-1, 1]) {
                 createExplosion({
                     position: [position.x, position.y - direction, position.z],
                     count: 10,
-                    radius: .35,
+                    radius: .45,
                     fireballCount: 6,
-                    fireballPath: [[position.x, position.y, position.z], [0, 4 * direction, 0]]
+                    fireballPath: [[position.x, position.y, position.z], [0, 3 * direction, 0]]
                 })
-            }
-
-            const variations = [
-                [[[-5, -2], [2, 5], [-5, 5]], 1, [random.pick(-1, 1), -.25, -1]],
-                [[[2, 5], [2, 5], [-5, 5]], -1, [random.pick(-1, 1), -.25, 1]],
-            ] as [[Tuple2, Tuple2, Tuple2], number, Tuple3][]
-
-            for (let [variance, y, normal] of variations) {
-                createParticles({
-                    position: [position.x, position.y + y, position.z],
-                    speed: [8, 10],
-                    variance: variance,
-                    offset: [[0, 0], [0, 0], [0, 0]],
-                    normal,
-                    restitution: [.1, .25],
-                    count: 1,
-                    name: "cylinder",
-                    gravity: [0, -20, 0],
-                    friction: .9,
-                    radius: 1.15,
-                    rotationFactor: .65,
-                    color: "purple",
-                })
-            }
+            } 
         }
     }, [health])
+
+    useEffect(() => {
+        if (typeof platformIndex === "number") {
+            setColorAt(platformInstance, platformIndex, "#333")
+            setMatrixAt({
+                instance: platformInstance,
+                index: platformIndex,
+                position: [position.x, 0, position.z],
+                rotation: [0, random.float(0, Math.PI * 2), 0]
+            })
+        }
+    }, [platformIndex, platformInstance])
 
 
     useFrame((state, delta) => {
@@ -103,9 +95,7 @@ export default function Rocket({
                     }
                 }
             } else {
-                gravity.current += 14 * ndelta(delta)
-                rotation.current[0] += 1 * ndelta(delta)
-                rotation.current[2] -= 1.25 * ndelta(delta)
+                gravity.current += 14 * ndelta(delta) 
                 position.y -= gravity.current * ndelta(delta)
             }
 
@@ -115,14 +105,24 @@ export default function Rocket({
                 instance,
                 index,
                 position: position.toArray(),
-                scale: size,
-                rotation: rotation.current as Tuple3
+                rotation: rotation.current
             })
+
+            ref.current?.position.set(...position.toArray())
 
             client.position = position.toArray()
             grid.updateClient(client)
         }
     })
 
-    return null
+    if (!Config.DEBUG) {
+        return null
+    }
+
+    return (
+        <mesh position={position.toArray()} ref={ref}>
+            <boxGeometry args={[...size, 1, 1, 1]} />
+            <meshBasicMaterial wireframe color="orange" />
+        </mesh>
+    )
 }

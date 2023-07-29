@@ -82,6 +82,7 @@ export function setMatrixAt({
         _scale.set(...scale)
     ))
     instance.instanceMatrix.needsUpdate = true
+    instance.computeBoundingSphere()
 }
 
 export function setMatrixNullAt(instance:InstancedMesh, index: number) {

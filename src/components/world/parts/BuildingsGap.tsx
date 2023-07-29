@@ -6,32 +6,14 @@ import Plane from "../spawner/Plane"
 export default function BuildingsGap({
     id,
     position,
-    size,
-    planes,
-    buildings = [],
+    size, 
 }: WorldPartBuildingsGap) {  
     return (
         <WorldPartWrapper
             position={position} 
             size={size}
             id={id}
-        >
-            {buildings.map(i => {
-                return (
-                    <Building
-                        key={i.id}
-                        {...i}
-                    />
-                )
-            })} 
-            {planes.map(i => {
-                return (
-                    <Plane
-                        key={i.id}
-                        {...i}
-                    />
-                )
-            })}
+        > 
         </WorldPartWrapper>
     )
 } 

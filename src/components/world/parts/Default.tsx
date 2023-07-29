@@ -6,16 +6,13 @@ import Barrel from "../spawner/Barrel"
 import Plane from "../spawner/Plane"
 import Building from "../spawner/Building"
 import Rocket from "../spawner/Rocket"
+import { WORLD_CENTER_X, WORLD_LEFT_EDGE } from "../World"
+ 
 
 export default function Default({
-    id,
-    barrels,
-    buildings,
-    position,
-    turrets,
-    planes,
-    size,
-    rockets,
+    id, 
+    position, 
+    size, 
 }: WorldPartDefault) {
     return (
         <WorldPartWrapper
@@ -25,47 +22,25 @@ export default function Default({
         >
             <EdgeBuilding z={position.z + size[1] / 2} />
 
-            {rockets.map(i => {
-                return (
-                    <Rocket
-                        key={i.id}
-                        position={i.position}
-                        speed={i.speed}
-                    />
-                )
-            })}
-            {turrets.map(i => {
-                return (
-                    <Turret
-                        key={i.id}
-                        position={i.position}
-                    />
-                )
-            })}
-            {buildings.map(i => {
-                return (
-                    <Building
-                        key={i.id}
-                        {...i}
-                    />
-                )
-            })}
-            {barrels.map(i => {
-                return (
-                    <Barrel
-                        key={i.id}
-                        position={i.position}
-                    />
-                )
-            })}
-            {planes.map(i => {
-                return (
-                    <Plane
-                        key={i.id}
-                        {...i}
-                    />
-                )
-            })}
+            <Turret 
+                position={[WORLD_CENTER_X + 3, 0, position.z + 4]}
+            />
+            <Turret 
+                position={[WORLD_CENTER_X + 3, 0, position.z + -4]}
+            />
+            <Building 
+                position={[WORLD_CENTER_X, 0, position.z +  2]}
+                size={[3, 1, 3]}
+            />
+            <Rocket 
+                position={[WORLD_CENTER_X, -2, position.z + 6]}
+            />
+            <Barrel 
+                position={[WORLD_CENTER_X + 3, 0, position.z +  0]}
+            />
+            <Barrel 
+                position={[WORLD_LEFT_EDGE + 3, 0, position.z +  -4]}
+            />
         </WorldPartWrapper>
     )
 }

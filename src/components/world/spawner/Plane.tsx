@@ -14,7 +14,7 @@ export default function Plane({
     fireFrequency,
 }: PlaneProps) {
     useEffect(() => {
-        let id
+        let id 
 
         startTransition(() => {
             id = createPlane(position, speed, fireFrequency)

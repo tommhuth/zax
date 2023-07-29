@@ -94,8 +94,8 @@ function Plane({
             createParticles({
                 position: position.toArray(),
                 speed: [12, 16],
-                variance: [[-5, 5], [0, 20], [-15, 5]],
-                offset: [[-.5, .5], [-.5, .5], [-.5, .5]],
+                speedOffset: [[-5, 5], [0, 20], [-15, 5]],
+                positionOffset: [[-.5, .5], [-.5, .5], [-.5, .5]],
                 normal: [0, 0, -.5],
                 count: [4, 8],
                 radius: [.1, .45],
@@ -128,8 +128,8 @@ function Plane({
                 ],
                 damage: 15,
                 color: "red",
-                speed: [0, 0, bulletSpeed],
-                rotation: 0,
+                speed: bulletSpeed,
+                rotation: Math.PI *.5,
                 owner: Owner.ENEMY
             })
             shootTimer.current = 0

@@ -139,12 +139,12 @@ export default function Player({
     useFrame(() => {
         if (Date.now() - lastShotAt.current > weapon.fireFrequency && keys.Space) {
             createBullet({
-                position: [position.x, position.y, position.z - (depth / 2 + bulletSize[2] / 2) * 1.25],
+                position: [position.x, position.y, position.z - (depth / 2 + bulletSize[2] / 2) * 1.5],
                 owner: Owner.PLAYER,
                 damage: weapon.damage,
                 color: weapon.color,
-                rotation: Math.PI,
-                speed: [0, 0, -weapon.speed],
+                rotation: -Math.PI *.5,
+                speed: weapon.speed,
             })
             lastShotAt.current = Date.now()
         }

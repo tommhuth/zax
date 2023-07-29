@@ -51,6 +51,7 @@ export interface Turret {
     id: string
     position: Vector3
     size: Tuple3
+    rotation: number
     client: Client
     aabb: Box3
     health: number
@@ -123,26 +124,15 @@ export interface SpawnedBarrel {
     id: string
 }
 
-export interface WorldPartBuildingsGap extends WorldPart {
-    buildings: SpawnedBuilding[]
-    planes: SpawnedPlane[]
+export interface WorldPartBuildingsGap extends WorldPart { 
     type: WorldPartType.BUILDINGS_GAP
 }
 
-export interface WorldPartDefault extends WorldPart {
-    turrets: SpawnedTurret[]
-    barrels: SpawnedBarrel[]
-    buildings: SpawnedBuilding[]
-    rockets: SpawnedRocket[]
-    planes: SpawnedPlane[]
+export interface WorldPartDefault extends WorldPart { 
     type: WorldPartType.DEFAULT
 }
 
-export interface WorldPartBuildingsLow extends WorldPart {
-    turrets: SpawnedTurret[]
-    barrels: SpawnedBarrel[]
-    buildings: SpawnedBuilding[]
-    planes: SpawnedPlane[]
+export interface WorldPartBuildingsLow extends WorldPart { 
     type: WorldPartType.BUILDINGS_LOW
 }
 
@@ -155,7 +145,7 @@ export enum Owner {
 export interface Bullet {
     id: string
     position: Vector3
-    speed: Tuple3
+    speed: number
     index: number
     rotation: number
     mounted: boolean
@@ -181,8 +171,7 @@ export interface Particle {
     rotation: Vector3
     index: number
     color: string
-    id: string
-    rotationFactor: number
+    id: string 
 }
 
 export interface RepeaterMesh {

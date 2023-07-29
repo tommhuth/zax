@@ -6,8 +6,7 @@
     right: var(--offsetx);
     bottom: calc(max(var(--offsety), env(safe-area-inset-left)));
     display: flex;
-    gap: 1.5em;
-    color: white;
+    gap: 1.5em; 
     z-index: 100;
     flex-direction: row-reverse;
     pointer-events: none;
@@ -28,6 +27,7 @@
     flex-wrap: wrap;
     top: 50%;
     color: white;
+    mix-blend-mode: difference;
     width: 1em;  
     transform: translateY(-50%) ;
     height: clamp(12em, 25vh, 14em); 

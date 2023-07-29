@@ -19,38 +19,37 @@ function ParticleHandler() {
             let {
                 position, velocity, radius, acceleration,
                 friction, restitution, index, instance,
-                mounted, color, rotation, rotationFactor
+                mounted, color, rotation
             } = particle
-
-            if (particle.lifetime > particle.maxLifetime || position.z > diagonal * .75) {
-                dead.push(particle)
-                continue
-            }
 
             if (!mounted) {
                 setColorAt(instance.mesh, index, color)
                 particles[i].mounted = true
             }
 
+            if (particle.lifetime > particle.maxLifetime || position.z > diagonal * .75) {
+                dead.push(particle)
+                continue
+            }
+
             position.x += velocity.x * nd
             position.y = Math.max(floorY + radius * .25, position.y + velocity.y * nd)
             position.z += velocity.z * nd
 
-            velocity.x *= friction 
+            velocity.x *= friction
             velocity.z *= friction
 
             velocity.x += acceleration.x * nd
             velocity.y += acceleration.y * nd
             velocity.z += acceleration.z * nd
 
-            rotation.x += velocity.x * rotationFactor * .1
-            rotation.y += -velocity.z * rotationFactor * .1 
-            rotation.z += velocity.z * rotationFactor * .1
-
+            rotation.x += velocity.x * .1
+            rotation.y += -velocity.y * .01
+            rotation.z += velocity.z * .1 
 
             if (position.y <= floorY + radius * .25) {
-                velocity.y *= -restitution  
-            }   
+                velocity.y *= -restitution
+            }
 
             setMatrixAt({
                 instance: instance.mesh,
