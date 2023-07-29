@@ -15,7 +15,7 @@ if (Config.REGISTER_SERVICEWORKER) {
     let worker = new Workbox("/serviceworker.js")
 
     worker.addEventListener("installed", e => {
-        console.info(`Service worker ${e.isUpdate ? "updated" : "installed"}`)
+        alert(`Service worker ${e.isUpdate ? "updated" : "installed"}`)
     })
     worker.register()
 }

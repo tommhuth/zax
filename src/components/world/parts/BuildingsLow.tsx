@@ -23,7 +23,7 @@ export default function BuildingsLow({
             />
             <Building
                 position={[WORLD_CENTER_X, 0, position.z + 8]}
-                size={[5, 1, 5]}
+                size={[5, 2, 5]}
             />
         </WorldPartWrapper>
     )

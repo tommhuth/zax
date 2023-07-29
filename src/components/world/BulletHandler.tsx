@@ -80,7 +80,7 @@ function BulletHandler() {
                         createParticles({
                             position: intersection.point.toArray(),
                             positionOffset: [[0, 0], [0, 0], [0, 0]],
-                            speed: [7, 8],
+                            speed: [7, 14],
                             speedOffset: [[-2, 2], [-2, 2], [-2, 2]],
                             normal: intersection.face.normal.toArray(),
                             count: [1, 2],

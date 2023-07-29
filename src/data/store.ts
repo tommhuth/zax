@@ -159,7 +159,7 @@ const store = create<Store>(() => ({
         position: new Vector3(),
         lastImpactLocation: [0,-10,0],
         weapon: {
-            fireFrequency: 200,
+            fireFrequency: 170,
             damage: 35,
             color: "yellow",
             speed: 40,
