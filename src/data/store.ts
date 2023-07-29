@@ -37,6 +37,7 @@ interface Store {
         cameraShake: number
         health: number
         score: number
+        lastImpactLocation: Tuple3
         weapon: {
             fireFrequency: number,
             color: string,
@@ -156,6 +157,7 @@ const store = create<Store>(() => ({
         score: 0,
         object: null,
         position: new Vector3(),
+        lastImpactLocation: [0,-10,0],
         weapon: {
             fireFrequency: 200,
             damage: 35,
@@ -569,7 +571,7 @@ export function createParticles({
     count = [2, 3],
     friction = [.9, .98],
     gravity = [0, -50, 0],
-    restitution = [.1, .5],
+    restitution = [.2, .5],
     color = "#FFFFFF",
     radius = [.15, .25], 
 }: CreateParticlesParams) {
@@ -656,6 +658,17 @@ export function damageTurret(id: string, damage: number) {
                 health: Math.max(turret.health - damage, 0)
             }
         ]
+    })
+
+}
+
+export function setLastImpactLocation(x,y,z) { 
+
+    store.setState({
+        player: {
+            ...store.getState().player, 
+            lastImpactLocation: [x,y,z]
+        }, 
     })
 
 }

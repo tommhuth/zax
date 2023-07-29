@@ -43,12 +43,13 @@ function ParticleHandler() {
             velocity.y += acceleration.y * nd
             velocity.z += acceleration.z * nd
 
-            rotation.x += velocity.x * .1
+            rotation.x += -velocity.x * .075
             rotation.y += -velocity.y * .01
-            rotation.z += velocity.z * .1 
+            rotation.z += -velocity.z * .075 
 
             if (position.y <= floorY + radius * .25) {
                 velocity.y *= -restitution
+                position.y = floorY + radius * .25 
             }
 
             setMatrixAt({

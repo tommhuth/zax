@@ -1,7 +1,7 @@
 
 import Camera from "./components/Camera"
-import { Suspense } from "react"
-import { Canvas } from "@react-three/fiber"
+import { Suspense, useEffect } from "react"
+import { Canvas, useThree } from "@react-three/fiber"
 import { Perf } from "r3f-perf"
 import Player from "./components/Player"
 import World from "./components/world/World"
@@ -9,7 +9,7 @@ import { Only } from "./utils/utils"
 import Config from "./Config"
 import Ui from "./components/ui/Ui" 
 import Lights from "./components/Lights"
-import { BasicShadowMap } from "three"
+import { BasicShadowMap, Vector2 } from "three"
 import { dpr, isSmallScreen } from "./data/store"
 import ExplosionsHandler from "./components/world/ExplosionsHandler" 
 import Models from "./components/Models"
@@ -47,7 +47,7 @@ export default function Wrapper() {
                     near: -30,
                     far: 50
                 }}
-                dpr={dpr} 
+                dpr={dpr}
             >
                 <Only if={Config.DEBUG}>
                     <Perf deepAnalyze />
@@ -62,7 +62,7 @@ export default function Wrapper() {
     )
 } 
 
-function App() {
+function App() { 
     return (
         <>
             <Camera /> 
@@ -73,7 +73,7 @@ function App() {
             <Player />
             <ExplosionsHandler />
 
-            <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={-7}>
+            <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={-7} >
                 <planeGeometry args={[12, 10000, 1, 1]} />
                 <meshBasicMaterial color="white" toneMapped={false} precision={"lowp"} />
             </mesh>
