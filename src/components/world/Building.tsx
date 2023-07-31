@@ -10,7 +10,7 @@ export default function Building({ size, position }: Building) {
 
     useEffect(() => {
         if (typeof index === "number" && instance) {  
-            setColorAt(instance, index, "#333")
+            setColorAt(instance, index, "#fff")
             setMatrixAt({
                 instance,
                 index,

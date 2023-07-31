@@ -71,7 +71,7 @@ export default function Rocket({
 
     useEffect(() => {
         if (typeof platformIndex === "number") {
-            setColorAt(platformInstance, platformIndex, "#333")
+            setColorAt(platformInstance, platformIndex, "#ddd")
             setMatrixAt({
                 instance: platformInstance,
                 index: platformIndex,

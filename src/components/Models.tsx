@@ -1,9 +1,7 @@
 import { useLoader } from "@react-three/fiber"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import RepeaterMesh from "./RepeaterMesh"
-import InstancedMesh from "./InstancedMesh"
-import { useShader } from "../utils/hooks"
-import { glsl } from "../utils/utils"
+import InstancedMesh from "./InstancedMesh" 
 import { Mesh } from "three"
 
 export default function Models() {
@@ -20,34 +18,10 @@ export default function Models() {
         "/models/rocket.glb",
         "/models/platform.glb",
         "/models/device.glb",
-    ])
-    let { onBeforeCompile } = useShader({
-        uniforms: {
-
-        },
-
-        vertex: {
-            head: glsl`
-                varying vec3 vPosition;
-            `,
-            main: glsl`
-                vPosition = position;
-            `,
-        },
-        fragment: {
-            head: glsl`
-                varying vec3 vPosition;
-            `,
-            main: glsl`
-                float opacity = clamp((vPosition.z + .75) / 1.5, 0., 1.);
-
-                gl_FragColor = vec4(0., 0., 1, opacity);
-            `,
-        }
-    })
+    ]) 
 
     return (
-        <> 
+        <>
             <InstancedMesh name="box" count={30}>
                 <boxGeometry args={[1, 1, 1, 1, 1, 1]} attach="geometry" />
                 <meshPhongMaterial color="white" attach={"material"} dithering />
@@ -58,9 +32,13 @@ export default function Models() {
                 <meshPhongMaterial color="white" attach={"material"} dithering />
             </InstancedMesh>
 
-            <InstancedMesh name="line" count={35}>
+            <InstancedMesh name="line" count={35} colors={false}>
                 <boxGeometry args={[1, 1, 1, 1, 1, 1]} attach="geometry" />
-                <meshBasicMaterial onBeforeCompile={onBeforeCompile} transparent attach={"material"} />
+                <meshBasicMaterial
+                    color={"#00f"}
+                    attach={"material"}
+                    precision={"mediump"}
+                />
             </InstancedMesh>
 
             <InstancedMesh name="cylinder" count={20}>
@@ -85,7 +63,7 @@ export default function Models() {
 
             <InstancedMesh name="barrel4" count={15}>
                 <primitive object={(barrel4.nodes.barrel4 as Mesh).geometry} attach="geometry" />
-                <meshPhongMaterial attach={"material"} dithering  />
+                <meshPhongMaterial attach={"material"} dithering />
             </InstancedMesh>
 
             <InstancedMesh name="turret" count={15}>
@@ -102,7 +80,7 @@ export default function Models() {
                 <primitive object={(platform.nodes.platform as Mesh).geometry} attach="geometry" />
                 <meshPhongMaterial attach={"material"} dithering />
             </InstancedMesh>
-            
+
             <InstancedMesh name="device" count={50}>
                 <primitive object={(device.nodes.device as Mesh).geometry} attach="geometry" />
                 <meshPhongMaterial attach={"material"} dithering />

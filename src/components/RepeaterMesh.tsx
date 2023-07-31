@@ -34,7 +34,7 @@ export function useRepeater(name: string) {
 
 const materials = {
     darkgray: new MeshLambertMaterial({ color: "#333", dithering: true }),
-    gray: new MeshLambertMaterial({ color: "#fff", dithering: true }),
+    gray: new MeshLambertMaterial({ color: "#eee", dithering: true }),
     "": new MeshBasicMaterial({ color: "red", dithering: true }),
 
 }

@@ -2,6 +2,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
 import { DirectionalLight, PointLight } from "three"
 import { useStore } from "../data/store" 
+import random from "@huth/random"
 
 export default function Lights() {
     let lightRef = useRef<DirectionalLight>(null)
@@ -47,7 +48,7 @@ export default function Lights() {
             playerLightRef.current.position.y = player.position.y
             playerLightRef.current.position.x = player.position.x
 
-            playerLightRef.current.intensity = 0 //random.float(10, 12)
+            playerLightRef.current.intensity = random.float(40, 60)
         }
 
         if (explosionLightRef.current) {
@@ -83,6 +84,7 @@ export default function Lights() {
                 ref={playerLightRef}
                 distance={4}
                 intensity={0}
+                
             />
             <pointLight
                 color={"red"}

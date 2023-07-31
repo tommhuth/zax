@@ -37,7 +37,7 @@ export default function WorldPartWrapper({
 
     useEffect(() => {
         if (typeof index === "number" && instance) {
-            setColorAt(instance, index, 0x222222)
+            setColorAt(instance, index, 0xdddddd)
         }
     }, [index, instance])
 

@@ -19,11 +19,12 @@ export default function InstancedMesh({
     children,
     receiveShadow = true,
     castShadow = true,
+    colors = true,
     count,
     name,
     userData = {}
 }) {
-    let colors = useMemo(() => new Float32Array(count * 3).fill(1), [])
+    let colorData = useMemo(() => new Float32Array(count * 3).fill(1), [])
 
     return (
         <instancedMesh
@@ -42,7 +43,7 @@ export default function InstancedMesh({
             }}
             frustumCulled={false}
         >
-            <instancedBufferAttribute attach="instanceColor" args={[colors, 3]} />
+            {colors ? <instancedBufferAttribute attach="instanceColor" args={[colorData, 3]} /> : null}
             {children}
         </instancedMesh>
     )

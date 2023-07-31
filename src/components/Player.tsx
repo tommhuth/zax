@@ -189,7 +189,7 @@ export default function Player({
         <>
             <mesh ref={impactRef}>
                 <sphereGeometry args={[.5, 16, 16]} />
-                <meshBasicMaterial color={"white"} />
+                <meshBasicMaterial color={"blue"} />
             </mesh>
             <group
                 ref={(object: Group) => {

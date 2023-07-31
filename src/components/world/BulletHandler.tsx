@@ -86,7 +86,7 @@ function BulletHandler() {
                             count: [1, 2],
                             radius: [.1, .2],
                             friction: [.8, .95],
-                            color: "gray",
+                            color: "#fff",
                         })
                     } 
                 } else if (client.data.type === "plane") {
