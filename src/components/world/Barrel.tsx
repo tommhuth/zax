@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Vector3 } from "three"
-import { createExplosion, createParticles, damageBarrel, damageTurret, removeBarrel, removeByProximity, store, useStore } from "../../data/store"
+import { createExplosion, createParticles, createShimmer, damageBarrel, damageTurret, removeBarrel, removeByProximity, store, useStore } from "../../data/store"
 import { Barrel } from "../../data/types"
 import { setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
 import { useInstance } from "../InstancedMesh"
@@ -20,7 +20,7 @@ export default function Barrel({
     let removed = useRef(false)
     let model = useMemo(() => random.pick("barrel1", "barrel2", "barrel3", "barrel4"), [])
     let [index, instance] = useInstance(model)
-    let [rotation] = useState(random.pick(...new Array(8 * 2).fill(null).map((i, index, list) =>  (index /list.length) * Math.PI  * 2)))
+    let [rotation] = useState(random.pick(...new Array(8 * 2).fill(null).map((i, index, list) => (index / list.length) * Math.PI * 2)))
     let remove = () => {
         setTimeout(() => removeBarrel(id), 300)
         removed.current = true
@@ -36,6 +36,14 @@ export default function Barrel({
     useEffect(() => {
         if (health === 0) {
             remove()
+            createShimmer({ 
+                position: [
+                    position.x,
+                    position.y + size[1]/2,
+                    position.z,
+                ], 
+                size: [4,5,4] 
+            })
             createExplosion({
                 position: [position.x, 0, position.z],
                 count: 10,

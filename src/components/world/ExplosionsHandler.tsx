@@ -21,7 +21,7 @@ function blend(values = [75, 100, 0], t = 0, threshold = .5) {
     return (1 - (t - threshold) / (1 - threshold)) * values[left] + (t - threshold) / (1 - threshold) * values[right]
 }
 
-export default function ExplosionsHandler() { 
+export default function ExplosionsHandler() {
     let latestExplosion = useStore(i => i.explosions[0])
     let centerAttributes = useMemo(() => {
         return new Float32Array(new Array(100 * 3).fill(0))
@@ -36,10 +36,15 @@ export default function ExplosionsHandler() {
                 attribute vec3 aCenter;   
                 varying float vDistance;
                 varying float vLifetime;
-                attribute float aLifetime;
+                varying vec3 vPosition;
+                attribute float aLifetime; 
                 
                 float easeInOutQuint(float x) {
                     return x < 0.5 ? 16. * x * x * x * x * x : 1. - pow(-2. * x + 2., 5.) / 2.;
+                }
+
+                float easeInOutCubic(float x) {
+                    return x < 0.5 ? 4. * x * x * x : 1. - pow(-2. * x + 2., 3.) / 2.;
                 }
 
                 float easeOutQuint(float x) {
@@ -49,28 +54,38 @@ export default function ExplosionsHandler() {
             `,
             main: glsl`
                 vec4 globalPosition = instanceMatrix * vec4(transformed, 1.);  
-                float radius = 7.;
+                float radius = 6.;
  
-                vDistance = easeInOutQuint(clamp(length(globalPosition.xyz - aCenter) / radius, 0., 1.));
+                vDistance = clamp(length(globalPosition.xyz - aCenter) / radius, 0., 1.); // );
                 vLifetime = aLifetime;
+                vPosition = globalPosition.xyz; 
             `
         },
         fragment: {
             head: glsl`  
                 varying float vDistance; 
                 varying float vLifetime;
+                varying vec3 vPosition; 
+                
+                float easeInOutCubic(float x) {
+                    return x < 0.5 ? 4. * x * x * x : 1. - pow(-2. * x + 2., 3.) / 2.;
+                }
 
                 float easeOutQuart(float x) {
-                    return 1. - pow(1. - x, 4.);
+                    return 1. - pow(1. - x, 2.);
+                }
+
+                float easeInCubic(float x) {
+                    return x * x * x;
                 }
             `,
             main: glsl`   
-                vec3 brightRed = vec3(.85, 0.0, 0.25); 
-                vec3 brightYellow = vec3(1., 0.9, 0.);
-                vec3 orange =  vec3(1., 0.4, .0);
+                vec3 start = vec3(.0, 0.3, 1.); 
+                vec3 mid = vec3(0.05, .9, 1.)  ; 
+                vec3 end = vec3(0., 0.1, .450); // vec3(.0, .3, .85)  ; 
 
-                vec3 c1 = mix(brightYellow, orange, vDistance);
-                vec3 c2 = mix(c1, brightRed, easeOutQuart(clamp(vLifetime - .5, 0., 0.5) / .5));
+                vec3 c1 = mix(start, mid, easeInOutCubic(vDistance));
+                vec3 c2 = mix(c1, end,   (vLifetime));
 
                 gl_FragColor = vec4(c2, 1.);
             `
@@ -96,16 +111,17 @@ export default function ExplosionsHandler() {
         }
 
         let explosions = useStore.getState().explosions
+        let dead: string[] = []
 
         for (let explosion of explosions) {
-            if (explosion.fireballs[0].time > explosion.fireballs[0].lifetime) {
-                removeExplosion(explosion.id)
+            if (explosion.fireballs[0].time > explosion.fireballs[0].lifetime) { 
+                dead.push(explosion.id)
                 continue
             }
 
             for (let sphere of explosion.fireballs) {
-                let t = easeOutQuart(clamp(sphere.time / sphere.lifetime, 0, 1))
-                let scale = blend([sphere.startRadius, sphere.maxRadius, 0], t)
+                let t = clamp(sphere.time / sphere.lifetime, 0, 1)
+                let scale = blend([sphere.startRadius, sphere.maxRadius, 0], easeOutQuart(t))
 
                 if (sphere.time < 0) {
                     scale = 0
@@ -121,7 +137,7 @@ export default function ExplosionsHandler() {
                     index: sphere.index,
                     position: [
                         sphere.position[0],
-                        sphere.position[1] + (clamp(sphere.time / sphere.lifetime, 0, 1)) * 2,
+                        sphere.position[1] + t * (sphere.index % 3 + 1),
                         sphere.position[2],
                     ],
                     scale: [scale, scale, scale]
@@ -130,10 +146,14 @@ export default function ExplosionsHandler() {
                 sphere.time += ndelta(delta) * 1000
             }
         }
+
+        if (dead.length) {
+            removeExplosion(dead)
+        }
     })
 
     return (
-        <InstancedMesh castShadow receiveShadow={false} count={100} name="fireball">
+        <InstancedMesh castShadow receiveShadow={false} count={60} name="fireball">
             <sphereGeometry args={[1, 12, 12]} >
                 <instancedBufferAttribute
                     needsUpdate={true}

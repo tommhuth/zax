@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber"
 import { memo } from "react"
 import { InstancedMesh, Matrix3, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three"
-import { createParticles, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, increaseScore, removeBullet, setLastImpactLocation, store } from "../../data/store"
+import { createParticles, createShimmer, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, increaseScore, removeBullet, setLastImpactLocation, store } from "../../data/store"
 import { Bullet, Owner } from "../../data/types"
 import { Tuple3 } from "../../types"
 import { getCollisions } from "../../utils/hooks"
@@ -149,7 +149,7 @@ function BulletHandler() {
                     damagePlayer(bullet.damage)
                     increaseScore(-10) 
                 } else if (client.data.type === "barrel") {
-                    if (bullet.owner === Owner.PLAYER) {
+                    if (bullet.owner === Owner.PLAYER) { 
                         damageBarrel(client.data.id, 100)
                         increaseScore(1000)
                     } 

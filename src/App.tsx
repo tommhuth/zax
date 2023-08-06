@@ -13,6 +13,7 @@ import { BasicShadowMap, Vector2 } from "three"
 import { dpr, isSmallScreen } from "./data/store"
 import ExplosionsHandler from "./components/world/ExplosionsHandler" 
 import Models from "./components/Models"
+import ShimmerHandler from "./components/world/ShimmerHandler"
 
 export default function Wrapper() { 
     return (
@@ -72,6 +73,7 @@ function App() {
             <World />
             <Player />
             <ExplosionsHandler />
+            <ShimmerHandler />
 
             <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={-7} >
                 <planeGeometry args={[12, 10000, 1, 1]} />

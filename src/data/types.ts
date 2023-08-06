@@ -31,6 +31,15 @@ export interface Rocket {
     speed: number
     health: number
 }
+export interface Shimmer {
+    position: Vector3
+    id: string  
+    speed: number
+    index: number
+    time: number
+    lifetime: number
+    radius: number
+}
 
 export interface Instance {
     mesh: InstancedMesh;

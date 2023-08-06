@@ -4,7 +4,7 @@ import random from "@huth/random"
 import { Tuple2, Tuple3 } from "../types"
 import { OBB } from "three/examples/jsm/math/OBB"
 import Counter from "./Counter"
-import { Barrel, Building, Bullet, Explosion, Instance, Particle, Plane, RepeaterMesh, Rocket, Turret, WorldPart } from "./types"
+import { Barrel, Building, Bullet, Explosion, Instance, Particle, Plane, RepeaterMesh, Rocket, Shimmer, Turret, WorldPart } from "./types"
 import { getNextWorldPart, makeDefault } from "./generators"
 import { SpatialHashGrid3D } from "./SpatialHashGrid3D"
 
@@ -29,6 +29,7 @@ interface Store {
     turrets: Turret[]
     barrels: Barrel[]
     rockets: Rocket[]
+    shimmer: Shimmer[]
     planes: Plane[]
     particles: Particle[]
     explosions: Explosion[],
@@ -50,9 +51,9 @@ interface Store {
 }
 
 
-export function removeExplosion(id: string) {
+export function removeExplosion(id: string | string[]) {
     store.setState({
-        explosions: store.getState().explosions.filter(i => i.id !== id)
+        explosions: store.getState().explosions.filter(i => Array.isArray(id) ? !id.includes(i.id) : i.id !== id)
     })
 }
 
@@ -132,6 +133,50 @@ export function createExplosion({
     })
 }
 
+export function removeShimmer(id: string | string[]) {
+    store.setState({
+        shimmer: store.getState().shimmer.filter(i => Array.isArray(id) ? !id.includes(i.id) : i.id !== id)
+    })
+}
+
+
+interface CreateShimmerParams {
+    position: Tuple3
+    count?: [min: number, max: number]
+    size?: Tuple3
+    radius?: [min: number, max: number]
+}
+
+export function createShimmer({
+    position = [0, 0, 0],
+    count = [10, 20],
+    size = [4, 4, 4],
+    radius = [.05, .2]
+}: CreateShimmerParams) {
+    let instance = useStore.getState().instances.shimmer
+
+    store.setState({
+        shimmer: [
+            ...store.getState().shimmer,
+            ...new Array(random.integer(...count)).fill(null).map(() => {
+                return {
+                    id: random.id(),
+                    index: instance.index.next(),
+                    speed: random.float(.5, 2),
+                    time: random.integer(-500, 0),
+                    radius: random.float(...radius),
+                    lifetime: random.integer(1500, 5000),
+                    position: new Vector3(
+                        position[0] + random.float(-size[0] / 2, size[0] / 2),
+                        position[1] + random.float(-size[1] / 2, size[1] / 2),
+                        position[2] + random.float(-size[2] / 2, size[2] / 2),
+                    )
+                }
+            })
+        ]
+    })
+}
+
 const store = create<Store>(() => ({
     world: {
         grid: new SpatialHashGrid3D([4, 3, 4]),
@@ -144,6 +189,7 @@ const store = create<Store>(() => ({
     repeaters: {},
     buildings: [],
     explosions: [],
+    shimmer: [],
     planes: [],
     turrets: [],
     barrels: [],
@@ -157,7 +203,7 @@ const store = create<Store>(() => ({
         score: 0,
         object: null,
         position: new Vector3(),
-        lastImpactLocation: [0,-10,0],
+        lastImpactLocation: [0, -10, 0],
         weapon: {
             fireFrequency: 100,
             damage: 35,
@@ -171,8 +217,8 @@ const store = create<Store>(() => ({
 const useStore = store
 
 export function removeByProximity(
-    sourceItem: { id: string, position: Vector3 }, 
-    threshold = 2, 
+    sourceItem: { id: string, position: Vector3 },
+    threshold = 2,
     delay = random.integer(150, 200)
 ) {
     let tid = setTimeout(() => {
@@ -557,23 +603,23 @@ interface CreateParticlesParams {
     friction?: Tuple2 | number
     radius?: Tuple2 | number
     color?: string
-    name?: string 
+    name?: string
 }
 
 export function createParticles({
     name = "sphere",
-    position = [0, 0, 0], 
+    position = [0, 0, 0],
     positionOffset = [[-1, 1], [-1, 1], [-1, 1]],
-    normal = [0, 1, 0], 
-    normalOffset = [[-.2, .2],[-.2, .2],[-.2, .2]],
-    speed = [10, 20], 
-    speedOffset = [[0, 0], [0, 0], [0, 0]], 
+    normal = [0, 1, 0],
+    normalOffset = [[-.2, .2], [-.2, .2], [-.2, .2]],
+    speed = [10, 20],
+    speedOffset = [[0, 0], [0, 0], [0, 0]],
     count = [2, 3],
     friction = [.9, .98],
     gravity = [0, -50, 0],
     restitution = [.2, .5],
     color = "#FFFFFF",
-    radius = [.15, .25], 
+    radius = [.15, .25],
 }: CreateParticlesParams) {
     let instance = store.getState().instances[name]
     let particles: Particle[] = new Array(typeof count === "number" ? count : random.integer(...count)).fill(null).map((i, index, list) => {
@@ -599,11 +645,11 @@ export function createParticles({
             restitution: random.float(...restitution),
             friction: typeof friction == "number" ? friction : random.float(...friction),
             radius: typeof radius === "number" ? radius : radius[0] + (radius[1] - radius[0]) * (index / (list.length - 1)),
-            color, 
+            color,
             lifetime: 0,
             maxLifetime: velocity.length() * 10,
         }
-    }) 
+    })
 
     store.setState({
         particles: [
@@ -662,13 +708,13 @@ export function damageTurret(id: string, damage: number) {
 
 }
 
-export function setLastImpactLocation(x,y,z) { 
+export function setLastImpactLocation(x, y, z) {
 
     store.setState({
         player: {
-            ...store.getState().player, 
-            lastImpactLocation: [x,y,z]
-        }, 
+            ...store.getState().player,
+            lastImpactLocation: [x, y, z]
+        },
     })
 
 }

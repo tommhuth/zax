@@ -3,7 +3,7 @@ import { Rocket } from "../../data/types"
 import { useInstance } from "../InstancedMesh"
 import { useFrame } from "@react-three/fiber"
 import { ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
-import { createExplosion, createParticles, increaseScore, removeRocket, useStore } from "../../data/store"
+import { createExplosion, createParticles, createShimmer, increaseScore, removeRocket, useStore } from "../../data/store"
 import { Mesh, Vector3 } from "three"
 import random from "@huth/random"
 import { Tuple2, Tuple3 } from "../../types"
@@ -46,6 +46,14 @@ export default function Rocket({
     useEffect(() => {
         if (health === 0) {
             remove()
+            createShimmer({  
+                position: [
+                    position.x,
+                    position.y + size[1]/2,
+                    position.z,
+                ], 
+                size: [3,6,3]
+            })
             createParticles({
                 position: position.toArray(),
                 speed: [12, 16],
