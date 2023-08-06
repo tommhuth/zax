@@ -153,7 +153,7 @@ export default function ExplosionsHandler() {
     })
 
     return (
-        <InstancedMesh castShadow receiveShadow={false} count={60} name="fireball">
+        <InstancedMesh castShadow receiveShadow={false} count={100} name="fireball">
             <sphereGeometry args={[1, 12, 12]} >
                 <instancedBufferAttribute
                     needsUpdate={true}
