@@ -149,7 +149,7 @@ interface CreateShimmerParams {
 
 export function createShimmer({
     position = [0, 0, 0],
-    count = [10, 20],
+    count = [6, 15],
     size = [4, 4, 4],
     radius = [.05, .2]
 }: CreateShimmerParams) {
@@ -162,7 +162,7 @@ export function createShimmer({
                 return {
                     id: random.id(),
                     index: instance.index.next(),
-                    speed: random.float(.5, 2),
+                    speed: random.float(.1, 1.5),
                     time: random.integer(-500, 0),
                     radius: random.float(...radius),
                     lifetime: random.integer(1500, 5000),
