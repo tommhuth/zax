@@ -1,10 +1,11 @@
-import { useEffect, useMemo } from "react"
-import { BufferAttribute } from "three"
+import { useEffect, useMemo, useRef } from "react"
+import { AdditiveBlending, BufferAttribute,   MultiplyBlending,   Sprite } from "three"
 import { clamp, glsl, ndelta, setMatrixAt } from "../../utils/utils"
 import { useShader } from "../../utils/hooks"
 import { removeExplosion, useStore } from "../../data/store"
-import { useFrame } from "@react-three/fiber"
-import InstancedMesh from "../InstancedMesh"
+import { useFrame, useLoader, useThree } from "@react-three/fiber"
+import InstancedMesh from "../InstancedMesh" 
+import { TextureLoader } from "three/src/loaders/TextureLoader"
 
 function easeOutQuart(x: number): number {
     return 1 - Math.pow(1 - x, 4)
@@ -22,7 +23,9 @@ function blend(values = [75, 100, 0], t = 0, threshold = .5) {
 }
 
 export default function ExplosionsHandler() {
-    let latestExplosion = useStore(i => i.explosions[0])
+    let latestExplosion = useStore(i => i.explosions[0]) 
+    let glowMap = useLoader(TextureLoader, "/textures/glow.png")
+    let ref = useRef<Sprite>(null)
     let centerAttributes = useMemo(() => {
         return new Float32Array(new Array(100 * 3).fill(0))
     }, [])
@@ -30,7 +33,7 @@ export default function ExplosionsHandler() {
         return new Float32Array(new Array(100).fill(0))
     }, [])
     let instance = useStore(i => i.instances.fireball?.mesh)
-    let { onBeforeCompile } = useShader({ 
+    let { onBeforeCompile } = useShader({
         vertex: {
             head: glsl` 
                 attribute vec3 aCenter;   
@@ -114,7 +117,7 @@ export default function ExplosionsHandler() {
         let dead: string[] = []
 
         for (let explosion of explosions) {
-            if (explosion.fireballs[0].time > explosion.fireballs[0].lifetime) { 
+            if (explosion.fireballs[0].time > explosion.fireballs[0].lifetime) {
                 dead.push(explosion.id)
                 continue
             }
@@ -152,21 +155,43 @@ export default function ExplosionsHandler() {
         }
     })
 
+    useEffect(()=> {
+        if (ref.current && latestExplosion) {
+            ref.current.position.set(...latestExplosion.position)
+            ref.current.position.y += 6
+            ref.current.position.x += 5
+            ref.current.position.z += 5
+            ref.current.material.opacity = 1
+        }
+    }, [latestExplosion])
+
+    useFrame(()=> {
+        if (ref.current) {
+            ref.current.material.opacity *= .9
+        }
+    }) 
+
     return (
-        <InstancedMesh castShadow receiveShadow={false} count={100} name="fireball">
-            <sphereGeometry args={[1, 12, 12]} >
-                <instancedBufferAttribute
-                    needsUpdate={true}
-                    attach="attributes-aCenter"
-                    args={[centerAttributes, 3, false, 1]}
-                />
-                <instancedBufferAttribute
-                    needsUpdate={true}
-                    attach="attributes-aLifetime"
-                    args={[lifetimeAttributes, 1, false, 1]}
-                />
-            </sphereGeometry>
-            <meshBasicMaterial onBeforeCompile={onBeforeCompile} color={"white"} />
-        </InstancedMesh>
+        <>
+            <InstancedMesh castShadow={false} receiveShadow={false} count={100} name="fireball">
+                <sphereGeometry args={[1, 12, 12]} >
+                    <instancedBufferAttribute
+                        needsUpdate={true}
+                        attach="attributes-aCenter"
+                        args={[centerAttributes, 3, false, 1]}
+                    />
+                    <instancedBufferAttribute
+                        needsUpdate={true}
+                        attach="attributes-aLifetime"
+                        args={[lifetimeAttributes, 1, false, 1]}
+                    />
+                </sphereGeometry>
+                <meshBasicMaterial onBeforeCompile={onBeforeCompile} color={"white"} />
+            </InstancedMesh>
+
+            <sprite ref={ref} scale={10}> 
+                <spriteMaterial color="blue" map={glowMap} transparent blending={AdditiveBlending} />
+            </sprite>
+        </>
     )
 }

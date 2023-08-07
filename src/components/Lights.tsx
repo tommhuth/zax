@@ -1,12 +1,10 @@
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
 import { DirectionalLight, PointLight } from "three"
-import { useStore } from "../data/store" 
-import random from "@huth/random"
+import { useStore } from "../data/store"  
 
 export default function Lights() {
-    let lightRef = useRef<DirectionalLight>(null)
-    let playerLightRef = useRef<PointLight>(null)
+    let lightRef = useRef<DirectionalLight>(null) 
     let explosionLightRef = useRef<PointLight>(null)
     let { scene, viewport } = useThree()
     let ticks = useRef(0)
@@ -43,14 +41,6 @@ export default function Lights() {
             ticks.current += delta * 1000
         }
 
-        if (playerLightRef.current && player) {
-            playerLightRef.current.position.z = player.position.z + 1
-            playerLightRef.current.position.y = player.position.y
-            playerLightRef.current.position.x = player.position.x
-
-            playerLightRef.current.intensity = random.float(40, 60)
-        }
-
         if (explosionLightRef.current) {
             explosionLightRef.current.intensity *= .8
         }
@@ -59,15 +49,15 @@ export default function Lights() {
     return (
         <>
             <directionalLight
-                color={0xffffff}
+                color={0xddddff}
                 position={[4, 14, 10]}
-                intensity={.45}
+                intensity={.55}
             />
             <directionalLight
                 ref={lightRef}
                 color={0xffffff}
                 position={[0, 15, 0]}
-                intensity={.75}
+                intensity={.7}
                 castShadow
                 shadow-radius={1.5}
                 shadow-camera-near={0} // y
@@ -78,21 +68,13 @@ export default function Lights() {
                 shadow-camera-bottom={-diagonal * .5}
                 shadow-mapSize={[512, 512]}
                 shadow-bias={-0.001}
-            />
+            /> 
             <pointLight
                 color={"blue"}
-                ref={playerLightRef}
-                distance={4}
-                intensity={0}
-                
-            />
-            <pointLight
-                color={"red"}
                 ref={explosionLightRef}
                 distance={8}
-
             />
-            <ambientLight intensity={.25} color="lightblue" />
+            <ambientLight intensity={.2} color="lightblue" />
         </>
     )
 }
