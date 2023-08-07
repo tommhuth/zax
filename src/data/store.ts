@@ -69,7 +69,7 @@ export function createExplosion({
     position,
     count = 12,
     radius = .75,
-    fireballPath: [fireballStart, freballDirection] = [[0, 0, 0], [0, 0, 0]],
+    fireballPath: [fireballStart, fireballDirection] = [[0, 0, 0], [0, 0, 0]],
     fireballCount = 0,
 }: CreateExplosionParams) {
     let baseLifetime = random.integer(1600, 1800)
@@ -99,9 +99,9 @@ export function createExplosion({
                             index: instance.index.next(),
                             id: random.id(),
                             position: [
-                                fireballStart[0] + tn * freballDirection[0] + random.float(-.25, .25),
-                                fireballStart[1] + tn * freballDirection[1],
-                                fireballStart[2] + tn * freballDirection[2] + random.float(-.25, .25),
+                                fireballStart[0] + tn * fireballDirection[0] + random.float(-.25, .25),
+                                fireballStart[1] + tn * fireballDirection[1],
+                                fireballStart[2] + tn * fireballDirection[2] + random.float(-.25, .25),
                             ] as Tuple3,
                             startRadius: radius * 1.5,
                             maxRadius: radius * 3.5,

@@ -21,23 +21,27 @@ function blend(values = [75, 100, 0], t = 0, threshold = .5) {
     return (1 - (t - threshold) / (1 - threshold)) * values[left] + (t - threshold) / (1 - threshold) * values[right]
 }
 
-export default function ShimmerHandler() { 
-    let instance = useStore(i => i.instances.shimmer?.mesh) 
+export default function ShimmerHandler() {
+    let instance = useStore(i => i.instances.shimmer?.mesh)
+    let player = useStore(i => i.player.object)
 
     useFrame((state, delta) => {
-        if (!instance) {
+        if (!instance || !player) {
             return
         }
 
         let shimmers = useStore.getState().shimmer
         let d = ndelta(delta)
-        let dead: string[] = [] 
+        let dead: string[] = []
 
         for (let shimmer of shimmers) {
-            let scale = (1 - clamp(shimmer.time / shimmer.lifetime, 0, 1)) * shimmer.radius
+            let scale = (1 - clamp(shimmer.time / shimmer.lifetime, 0, 1)) * shimmer.radius 
+            let dist = 2.5
+            let z = 1 - clamp(shimmer.position.distanceTo(player.position) / dist, 0, 1)
 
             shimmer.position.y = Math.max(shimmer.position.y - d * shimmer.speed, shimmer.radius)
             shimmer.time += d * 1000
+            shimmer.position.z -= z * d * shimmer.speed*5
 
             if (shimmer.time > shimmer.lifetime || shimmer.position.y === shimmer.radius) {
                 dead.push(shimmer.id)
@@ -68,7 +72,7 @@ export default function ShimmerHandler() {
             name="shimmer"
             count={100}
             colors={false}
-        > 
+        >
             <meshBasicMaterial
                 attach={"material"}
                 precision={"lowp"}
