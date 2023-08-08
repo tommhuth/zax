@@ -36,8 +36,7 @@ export default function Models() {
                 <boxGeometry args={[1, 1, 1, 1, 1, 1]} attach="geometry" />
                 <meshBasicMaterial
                     color={"#00f"}
-                    attach={"material"}
-                    precision={"mediump"}
+                    attach={"material"} 
                 />
             </InstancedMesh>
 
