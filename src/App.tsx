@@ -77,11 +77,11 @@ function App() {
 
             <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={-7} >
                 <planeGeometry args={[12, 10000, 1, 1]} />
-                <meshBasicMaterial color="black" toneMapped={false} precision={"mediump"} />
+                <meshBasicMaterial color="black" toneMapped={false} />
             </mesh>
             <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={23}>
                 <planeGeometry args={[12, 10000, 1, 1]} />
-                <meshBasicMaterial color="#000" toneMapped={false} precision={"mediump"} />
+                <meshBasicMaterial color="#000" toneMapped={false} />
             </mesh>
         </>
     )
