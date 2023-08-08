@@ -7,15 +7,15 @@ import Player from "./components/Player"
 import World from "./components/world/World"
 import { Only } from "./utils/utils"
 import Config from "./Config"
-import Ui from "./components/ui/Ui" 
+import Ui from "./components/ui/Ui"
 import Lights from "./components/Lights"
-import { BasicShadowMap, Vector2 } from "three"
+import { BasicShadowMap, NoToneMapping, Vector2 } from "three"
 import { dpr, isSmallScreen } from "./data/store"
-import ExplosionsHandler from "./components/world/ExplosionsHandler" 
+import ExplosionsHandler from "./components/world/ExplosionsHandler"
 import Models from "./components/Models"
 import ShimmerHandler from "./components/world/ShimmerHandler"
 
-export default function Wrapper() { 
+export default function Wrapper() {
     return (
         <div
             style={{
@@ -26,7 +26,7 @@ export default function Wrapper() {
                 position: "fixed",
             }}
         >
-            <Ui /> 
+            <Ui />
             <Canvas
                 gl={{
                     antialias: false,
@@ -34,6 +34,7 @@ export default function Wrapper() {
                     stencil: false,
                     alpha: false,
                     powerPreference: "high-performance",
+                    toneMapping: NoToneMapping
                 }}
                 style={{
                     height: "100%",
@@ -45,7 +46,7 @@ export default function Wrapper() {
                 orthographic
                 camera={{
                     zoom: isSmallScreen ? 40 : 70,
-                    near: -30,
+                    near: 0,
                     far: 50
                 }}
                 dpr={dpr}
@@ -53,36 +54,28 @@ export default function Wrapper() {
                 <Only if={Config.DEBUG}>
                     <Perf deepAnalyze />
                 </Only>
- 
+
                 <Suspense fallback={null}>
-                    <App />  
+                    <Camera />
+                    <Lights />
+
+                    <Models />
+                    <World />
+                    <Player />
+                    <ExplosionsHandler />
+                    <ShimmerHandler />
+
+                    <mesh rotation-x={-Math.PI / 2} position-y={12} position-x={-7} >
+                        <planeGeometry args={[12, 10000, 1, 1]} />
+                        <meshBasicMaterial color="black" />
+                    </mesh>
+                    <mesh rotation-x={-Math.PI / 2} position-y={12} position-x={23}>
+                        <planeGeometry args={[12, 10000, 1, 1]} />
+                        <meshBasicMaterial color="#000" />
+                    </mesh>
                 </Suspense>
             </Canvas>
         </div>
 
     )
 } 
-
-function App() { 
-    return (
-        <>
-            <Camera /> 
-            <Lights />
- 
-            <Models />
-            <World />
-            <Player />
-            <ExplosionsHandler />
-            <ShimmerHandler />
-
-            <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={-7} >
-                <planeGeometry args={[12, 10000, 1, 1]} />
-                <meshBasicMaterial color="black" toneMapped={false} />
-            </mesh>
-            <mesh rotation-x={-Math.PI / 2} position-y={8} position-x={23}>
-                <planeGeometry args={[12, 10000, 1, 1]} />
-                <meshBasicMaterial color="#000" toneMapped={false} />
-            </mesh>
-        </>
-    )
-}

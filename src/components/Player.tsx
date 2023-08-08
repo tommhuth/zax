@@ -27,9 +27,8 @@ export default function Player({
 }: PlayerProps) {
     let playerGroupRef = useRef<Group | null>(null)
     let hitboxRef = useRef<Mesh>(null)
-    let lastShotAt = useRef(0)
-    let zStart = useRef(0)
-    let dyes = useRef(false)
+    let lastShotAt = useRef(0) 
+    let isMovingUp = useRef(false)
     let impactRef = useRef<Mesh>(null)
     let grid = useStore(i => i.world.grid)
     let keys = useMemo<Record<string, boolean>>(() => ({}), [])
@@ -46,10 +45,9 @@ export default function Player({
             position,
         })
     }, [grid])
-    let startPosition = useMemo(() => new Vector3(), [])
-    let { viewport } = useThree()
-    let pixelSize = (window.innerWidth) / (window.innerWidth * dpr)
-    let unitPixel = pixelSize * (viewport.width / window.innerWidth)
+    let currentPosition = useMemo(() => new Vector3(), []) 
+    let originalPosition = useMemo(() => new Vector3(), []) 
+    let speed = 7
 
     useCollisionDetection({
         position,
@@ -174,11 +172,11 @@ export default function Player({
 
             playerGroup.position.x += (targetPosition.x - playerGroup.position.x) * (.09 * 60 * nd)
             playerGroup.position.y += (y - playerGroup.position.y) * (.08 * 60 * nd)
-            playerGroup.position.z -= unitPixel * 60 * nd
+            playerGroup.position.z -= speed * nd
 
-            startPosition.z -= unitPixel * 60 * nd
-            zStart.current -= unitPixel * 60 * nd
+            currentPosition.z -= speed * nd 
             hitboxRef.current.position.z = playerGroup.position.z
+
             position.copy(playerGroup.position)
             client.position = position.toArray()
             grid.updateClient(client)
@@ -209,37 +207,36 @@ export default function Player({
                 <mesh userData={{ type: "player" }} visible={false}>
                     <boxGeometry args={[...size, 1, 1, 1]} />
                     <meshBasicMaterial color="red" wireframe />
-                </mesh>
-
+                </mesh> 
             </group>
             <mesh
                 ref={hitboxRef}
                 position={[0, .1, 0]}
                 rotation-x={-Math.PI / 2}
                 onPointerUp={() => {
-                    dyes.current = false
+                    isMovingUp.current = false
                 }}
                 onPointerMove={(e) => {
                     if (e.pointerType === "touch") {
                         let depthThreshold = 2
 
-                        if (!dyes.current && Math.abs(zStart.current - e.point.z) > depthThreshold) {
-                            dyes.current = true
+                        if (!isMovingUp.current && Math.abs(originalPosition.z - e.point.z) > depthThreshold) {
+                            isMovingUp.current = true
                         }
 
-                        if (dyes.current) {
-                            targetPosition.y += (startPosition.z - e.point.z)
+                        if (isMovingUp.current) {
+                            targetPosition.y += (currentPosition.z - e.point.z)
                         }
 
-                        targetPosition.x += (e.point.x - startPosition.x) * 1.5
+                        targetPosition.x += (e.point.x - currentPosition.x) * 1.5
                         targetPosition.clamp(_edgemin, _edgemax)
-                        startPosition.copy(e.point)
+                        currentPosition.copy(e.point)
                     }
                 }}
                 onPointerDown={(e) => {
                     if (e.pointerType === "touch") {
-                        startPosition.set(e.point.x, 0, e.point.z)
-                        zStart.current = e.point.z
+                        currentPosition.set(e.point.x, 0, e.point.z)
+                        originalPosition.set(0, 0, e.point.z) 
                     }
                 }}
             >
