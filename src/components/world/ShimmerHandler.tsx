@@ -65,8 +65,7 @@ export default function ShimmerHandler() {
             colors={false}
         >
             <meshBasicMaterial
-                attach={"material"}
-                precision={"lowp"}
+                attach={"material"} 
                 color={"blue"}
             />
             <sphereGeometry args={[1, 6, 6]} />
