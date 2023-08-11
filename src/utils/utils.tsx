@@ -1,7 +1,7 @@
 import React, { createContext } from "react"
 import { Color, ColorRepresentation, Euler, InstancedMesh, Matrix4, Quaternion, Vector3 } from "three"
 import { Tuple3, Tuple4 } from "../types"
- 
+
 export function ndelta(delta: number) {
     let nDelta = clamp(delta, 1 / 120, 1 / 30)
 
@@ -66,7 +66,7 @@ interface SetMatrixAtParams {
     index: number
     position?: Tuple3
     rotation?: Tuple3 | Tuple4
-    scale?: Tuple3
+    scale?: Tuple3 | number
 }
 
 export function setMatrixAt({
@@ -79,13 +79,13 @@ export function setMatrixAt({
     instance.setMatrixAt(index, _matrix.compose(
         _position.set(...position),
         rotation.length === 3 ? _quaternion.setFromEuler(_euler.set(...rotation, "XYZ")) : _quaternion.set(...rotation),
-        _scale.set(...scale)
+        Array.isArray(scale) ? _scale.set(...scale) : _scale.set(scale, scale, scale),
     ))
     instance.instanceMatrix.needsUpdate = true
     instance.computeBoundingSphere()
 }
 
-export function setMatrixNullAt(instance:InstancedMesh, index: number) {
+export function setMatrixNullAt(instance: InstancedMesh, index: number) {
     setMatrixAt({
         instance,
         index,

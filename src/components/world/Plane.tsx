@@ -1,4 +1,4 @@
-import { useRef, memo } from "react"
+import { useRef, memo, startTransition, useMemo } from "react"
 import { useFrame } from "@react-three/fiber"
 import { useEffect } from "react"
 import { createBullet, createExplosion, createParticles, damageBarrel, damageTurret, increaseScore, removePlane, store, useStore } from "../../data/store"
@@ -24,20 +24,22 @@ function Plane({
     fireFrequency = 300,
     speed
 }: Plane) {
-    let removed = useRef(false)
-    let grounded = useRef(false)
+    let data = useMemo(() => ({
+        removed: false,
+        grounded: false,
+        gravity: 0,
+        actualSpeed: speed,
+        rotation: [0, 0, 0] as Tuple3,
+        tilt: random.float(0.001, 0.05),
+        shootTimer: random.float(0, fireFrequency),
+        nextShotAt: fireFrequency * .5
+    }), [])
     let bottomY = 0
-    let gravity = useRef(0)
-    let actualSpeed = useRef(speed)
     let grid = useStore(i => i.world.grid)
-    let rotation = useRef([0, 0, 0] as Tuple3)
-    let tilt = useRef(random.float(0.001, 0.05))
-    let [index, instance] = useInstance("box")
-    let shootTimer = useRef(random.float(0, fireFrequency))
-    let nextShotAt = useRef(fireFrequency * .5)
+    let [index, instance] = useInstance("box") 
     let remove = () => {
         removePlane(id)
-        removed.current = true
+        data.removed = true
     }
 
     useCollisionDetection({
@@ -52,10 +54,10 @@ function Plane({
         },
         actions: {
             turret: (data) => {
-                damageTurret(data.id, 100)
+                startTransition(() => damageTurret(data.id, 100))
             },
             barrel: (data) => {
-                damageBarrel(data.id, 100)
+                startTransition(() => damageBarrel(data.id, 100))
             },
         }
     })
@@ -85,21 +87,23 @@ function Plane({
 
     useEffect(() => {
         if (health === 0) {
-            increaseScore(500)
-            createExplosion({
-                position: [position.x, position.y - 1, position.z], 
-                count: 10, 
-                radius: .4
-            })
-            createParticles({
-                position: position.toArray(),
-                speed: [12, 16],
-                speedOffset: [[-5, 5], [0, 20], [-15, 5]],
-                positionOffset: [[-.5, .5], [-.5, .5], [-.5, .5]],
-                normal: [0, 0, -.5],
-                count: [4, 8],
-                radius: [.1, .45],
-                color: "yellow",
+            startTransition(() => {
+                increaseScore(500)
+                createExplosion({
+                    position: [position.x, position.y - 1, position.z],
+                    count: 10,
+                    radius: .4
+                })
+                createParticles({
+                    position: position.toArray(),
+                    speed: [12, 16],
+                    speedOffset: [[-5, 5], [0, 20], [-15, 5]],
+                    positionOffset: [[-.5, .5], [-.5, .5], [-.5, .5]],
+                    normal: [0, 0, -.5],
+                    count: [4, 8],
+                    radius: [.1, .45],
+                    color: "yellow",
+                })
             })
         }
     }, [health])
@@ -117,34 +121,35 @@ function Plane({
         let shootDisabled = position.z > playerPosition.z || !world.frustum.containsPoint(position)
         let canShoot = position.y > playerPosition.y - 3 && health > 0
 
-        if (!shootDisabled && canShoot && shootTimer.current > nextShotAt.current + heightPenalty * fireFrequency * 4) {
+        if (!shootDisabled && canShoot && data.shootTimer > data.nextShotAt + heightPenalty * fireFrequency * 4) {
             let bulletSpeed = 20
 
-            createBullet({
-                position: [
-                    position.x,
-                    position.y,
-                    position.z + 2
-                ],
-                damage: 15,
-                color: "red",
-                speed: bulletSpeed,
-                rotation: Math.PI *.5,
-                owner: Owner.ENEMY
+            startTransition(() => {
+                createBullet({
+                    position: [
+                        position.x,
+                        position.y,
+                        position.z + 2
+                    ],
+                    damage: 15,
+                    color: "red",
+                    speed: bulletSpeed,
+                    rotation: Math.PI * .5,
+                    owner: Owner.ENEMY
+                })
+                data.shootTimer = 0
+                data.nextShotAt = fireFrequency - fireFrequency * distanceFromPlayer * .5
             })
-            shootTimer.current = 0
-            nextShotAt.current = fireFrequency - fireFrequency * distanceFromPlayer * .5
         }
 
-        shootTimer.current += ndelta(delta) * 1000
+        data.shootTimer += ndelta(delta) * 1000
     })
 
     useFrame((state, delta) => {
-        let { world, player } = useStore.getState()
+        if (instance && typeof index === "number" && !data.removed) {
+            let { world, player } = useStore.getState()
 
-        if (instance && typeof index === "number" && !removed.current) {
-            position.z += actualSpeed.current * ndelta(delta)
-
+            position.z += data.actualSpeed * ndelta(delta) 
             aabb.setFromCenterAndSize(position, _size.set(...size))
 
             setMatrixAt({
@@ -152,11 +157,11 @@ function Plane({
                 index,
                 position: position.toArray(),
                 scale: [size[0], .5, size[2]],
-                rotation: rotation.current
+                rotation: data.rotation
             })
 
             if (!world.frustum.intersectsBox(aabb) && player.object && position.z > player.object.position.z) {
-                remove()
+                startTransition(remove)
             } else {
                 client.position = position.toArray()
                 grid.updateClient(client)
@@ -165,30 +170,32 @@ function Plane({
     })
 
     useFrame((state, delta) => {
-        if (health === 0 && !grounded.current) {
-            let nd = ndelta(delta)
+        if (health === 0) {
+            if (!data.grounded) {
+                let nd = ndelta(delta)
 
-            gravity.current += -.015 * 60 * nd
-            position.y += gravity.current * 60 * nd
-            rotation.current[0] += tilt.current * 60 * nd
-            rotation.current[2] += tilt.current * .25 * 60 * nd
-            grounded.current = position.y <= (bottomY + .5 / 2)
-            actualSpeed.current *= .99
+                data.gravity += -.015 * 60 * nd
+                position.y += data.gravity * 60 * nd
+                data.rotation[0] += data.tilt * 60 * nd
+                data.rotation[2] += data.tilt * .25 * 60 * nd
+                data.grounded = position.y <= (bottomY + .5 / 2)
+                data.actualSpeed *= .99
 
-            if (grounded.current) { 
-                createExplosion({
-                    position: [position.x, -.5, position.z], 
-                    count: 8,  
-                    radius: .3,
-                    fireballCount: 5,
-                    fireballPath: [[position.x, 0, position.z], [0, 0, 2]]
-                }) 
+                if (data.grounded) {
+                    startTransition(() => {
+                        createExplosion({
+                            position: [position.x, -.5, position.z],
+                            count: 8,
+                            radius: .3,
+                            fireballCount: 5,
+                            fireballPath: [[position.x, 0, position.z], [0, 0, 2]]
+                        })
+                    })
+                }
+            } else {
+                data.actualSpeed *= .9
+                position.y = (bottomY + .5 / 2)
             }
-        }
-
-        if (grounded.current) {
-            actualSpeed.current *= .9
-            position.y = (bottomY + .5 / 2)
         }
     })
 

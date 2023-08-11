@@ -18,13 +18,7 @@ export default function EdgeBuilding({
             building.mesh.scale.set(.3, .3, .3)
             building.mesh.position.set(x + WORLD_LEFT_EDGE - 2, y, z)
         }
-    }, [building])
-
-    useEffect(() => {
-        return () => {
-            building?.release()
-        }
-    }, [])
+    }, [building]) 
 
     return null
 }

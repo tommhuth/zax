@@ -1,5 +1,5 @@
 import { useThree } from "@react-three/fiber"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D } from "three"
 import { requestRepeater, setRepeater, useStore } from "../data/store"
 
@@ -7,6 +7,20 @@ export function useRepeater(name: string) {
     let [repeater, setRepeater] = useState<Object3D | null>(null)
     let hasRepeater = useRef(false)
     let hasData = !!useStore(i => i.repeaters[name])
+    let release = useCallback(() => {
+        if (!repeater) {
+            return
+        }
+        
+        repeater.visible = false
+        repeater.position.set(-1000,-1000,-1000)
+    }, [repeater])
+
+    useEffect(()=> {
+        if (repeater) {
+            return () => release()
+        }
+    }, [repeater, release])
 
     useEffect(() => {
         if (!hasRepeater.current && hasData) { 
@@ -21,14 +35,7 @@ export function useRepeater(name: string) {
 
     return {
         mesh: repeater,
-        release() {
-            if (!repeater) {
-                return
-            }
-            
-            repeater.visible = false
-            repeater.position.set(-1000,-1000,-1000)
-        }
+        release
     }
 }
 

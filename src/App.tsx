@@ -47,7 +47,7 @@ export default function Wrapper() {
                 camera={{
                     zoom: isSmallScreen ? 40 : 70,
                     near: 0,
-                    far: 50
+                    far: 150
                 }}
                 dpr={dpr}
             >
@@ -65,12 +65,12 @@ export default function Wrapper() {
                     <ExplosionsHandler />
                     <ShimmerHandler />
 
-                    <mesh rotation-x={-Math.PI / 2} position-y={12} position-x={-7} >
-                        <planeGeometry args={[12, 10000, 1, 1]} />
+                    <mesh rotation-x={-Math.PI / 2} position-y={12} position-x={-4} >
+                        <planeGeometry args={[12, 1000, 1, 1]} />
                         <meshBasicMaterial color="black" />
                     </mesh>
-                    <mesh rotation-x={-Math.PI / 2} position-y={12} position-x={23}>
-                        <planeGeometry args={[12, 10000, 1, 1]} />
+                    <mesh rotation-x={-Math.PI / 2} position-y={12} position-x={28}>
+                        <planeGeometry args={[12, 1000, 1, 1]} />
                         <meshBasicMaterial color="#000" />
                     </mesh>
                 </Suspense>

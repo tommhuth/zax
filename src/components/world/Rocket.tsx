@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react"
+import { startTransition, useEffect, useLayoutEffect, useRef } from "react"
 import { Rocket } from "../../data/types"
 import { useInstance } from "../InstancedMesh"
 import { useFrame } from "@react-three/fiber"
@@ -24,7 +24,7 @@ export default function Rocket({
     let grid = useStore(i => i.world.grid)
     let removed = useRef(false)
     let gravity = useRef(0)
-    let ref =useRef<Mesh>(null)
+    let ref = useRef<Mesh>(null)
     let actualSpeed = useRef(speed)
     let rotation = useRef<Tuple3>([0, random.float(0, Math.PI * 2), 0])
     let triggerZ = useRef(25)
@@ -43,37 +43,39 @@ export default function Rocket({
         }
     }, [index, instance])
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (health === 0) {
-            remove()
-            createShimmer({  
-                position: [
-                    position.x,
-                    position.y + size[1]/2,
-                    position.z,
-                ], 
-                size: [3,6,3]
-            })
-            createParticles({
-                position: position.toArray(),
-                speed: [12, 16],
-                speedOffset: [[-5, 5], [-10, 10], [-15, 5]],
-                positionOffset: [[-1.5, 1.5], [-.5, .5], [-1.5, 1.5]],
-                normal: [0, -1, 0],
-                count: [10, 18],
-                radius: [.1, .45],
-                color: "#fff",
-            })
-
-            for (let direction of [-1, 1]) {
-                createExplosion({
-                    position: [position.x, position.y - direction, position.z],
-                    count: 10,
-                    radius: .45,
-                    fireballCount: 6,
-                    fireballPath: [[position.x, position.y, position.z], [0, 3 * direction, 0]]
+            startTransition(() => { 
+                remove()
+                createShimmer({
+                    position: [
+                        position.x,
+                        position.y + size[1] / 2,
+                        position.z,
+                    ],
+                    size: [3, 6, 3]
                 })
-            } 
+                createParticles({
+                    position: position.toArray(),
+                    speed: [12, 16],
+                    speedOffset: [[-5, 5], [-10, 10], [-15, 5]],
+                    positionOffset: [[-1.5, 1.5], [-.5, .5], [-1.5, 1.5]],
+                    normal: [0, -1, 0],
+                    count: [10, 18],
+                    radius: [.1, .45],
+                    color: "#fff",
+                })
+
+                for (let direction of [-1, 1]) {
+                    createExplosion({
+                        position: [position.x, position.y - direction, position.z],
+                        count: 10,
+                        radius: .45,
+                        fireballCount: 6,
+                        fireballPath: [[position.x, position.y, position.z], [0, 3 * direction, 0]]
+                    })
+                }
+            })
         }
     }, [health])
 
@@ -103,7 +105,7 @@ export default function Rocket({
                     }
                 }
             } else {
-                gravity.current += 14 * ndelta(delta) 
+                gravity.current += 14 * ndelta(delta)
                 position.y -= gravity.current * ndelta(delta)
             }
 

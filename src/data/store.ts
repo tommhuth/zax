@@ -153,6 +153,8 @@ export function createShimmer({
     size = [4, 4, 4],
     radius = [.05, .2]
 }: CreateShimmerParams) {
+    return 
+    
     let instance = useStore.getState().instances.shimmer
 
     store.setState({
@@ -205,7 +207,7 @@ const store = create<Store>(() => ({
         position: new Vector3(),
         lastImpactLocation: [0, -10, 0],
         weapon: {
-            fireFrequency: 100,
+            fireFrequency: 150,
             damage: 35,
             color: "yellow",
             speed: 40,
@@ -284,6 +286,8 @@ export function createRocket(
             }
         ]
     })
+
+    return id
 }
 
 export function createWorldPart() {
@@ -449,6 +453,8 @@ export function createPlane(
             ...planes,
         ]
     })
+
+    return id
 }
 
 export function createBuilding(

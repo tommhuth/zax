@@ -1,5 +1,5 @@
 import { useFrame } from "@react-three/fiber"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { startTransition, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { Vector3 } from "three"
 import { createExplosion, createParticles, createShimmer, damageBarrel, damageTurret, removeBarrel, removeByProximity, store, useStore } from "../../data/store"
 import { Barrel } from "../../data/types"
@@ -33,36 +33,36 @@ export default function Barrel({
         }
     }, [index, instance])
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (health === 0) {
-            remove()
-            createShimmer({ 
-                position: [
-                    position.x,
-                    position.y + size[1]/2,
-                    position.z,
-                ], 
-                size: [4,5,4] 
+            startTransition(() => {
+                remove()
+                createShimmer({
+                    position: [
+                        position.x,
+                        position.y + size[1] / 2,
+                        position.z,
+                    ],
+                    size: [4, 5, 4]
+                })
+                createExplosion({
+                    position: [position.x, 0, position.z],
+                    count: 10,
+                    radius: .65,
+                    fireballPath: [[position.x, 1, position.z], [0, 4, 0]],
+                    fireballCount: random.pick(0, 5),
+                })
+                createParticles({
+                    position: [position.x, 1, position.z],
+                    speed: [12, 20],
+                    speedOffset: [[-10, 10], [0, 5], [-10, 10]],
+                    positionOffset: [[-1, 1], [0, 1], [-1, 1]],
+                    normal: [0, 1, 0],
+                    count: [4, 8],
+                    radius: [.1, .4],
+                    color,
+                })
             })
-            createExplosion({
-                position: [position.x, 0, position.z],
-                count: 10,
-                radius: .65,
-                fireballPath: [[position.x, 1, position.z], [0, 4, 0]],
-                fireballCount: random.pick(0, 5),
-            })
-            createParticles({
-                position: [position.x, 1, position.z],
-                speed: [12, 20],
-                speedOffset: [[-10, 10], [0, 5], [-10, 10]],
-                positionOffset: [[-1, 1], [0, 1], [-1, 1]],
-                normal: [0, 1, 0],
-                count: [4, 8],
-                radius: [.1, .4],
-                color,
-            })
-
-            removeByProximity({ id, position }, 4)
         }
     }, [health])
 

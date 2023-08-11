@@ -1,5 +1,5 @@
 import { startTransition, useEffect } from "react"
-import {  createPlane, removeBarrel } from "../../../data/store"
+import {  createPlane, removePlane } from "../../../data/store"
 import { Tuple3 } from "../../../types"
 
 interface PlaneProps {
@@ -14,7 +14,7 @@ export default function Plane({
     fireFrequency,
 }: PlaneProps) {
     useEffect(() => {
-        let id 
+        let id: string
 
         startTransition(() => {
             id = createPlane(position, speed, fireFrequency)
@@ -22,7 +22,7 @@ export default function Plane({
 
         return () => {
             startTransition(() => {
-                removeBarrel(id)
+                removePlane(id)
             })
         }
     }, [...position])

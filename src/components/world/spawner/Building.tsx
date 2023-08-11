@@ -13,7 +13,7 @@ export default function Building({
     position = [0, 0, 0]
 }: BuildingProps) {
     useEffect(() => {
-        let id
+        let id: string
 
         startTransition(() => {
             id = createBuilding(size, position)

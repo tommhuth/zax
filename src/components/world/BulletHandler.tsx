@@ -1,5 +1,5 @@
 import { useFrame } from "@react-three/fiber"
-import { memo } from "react"
+import { memo, startTransition } from "react"
 import { InstancedMesh, Matrix3, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three"
 import { createParticles, createShimmer, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, increaseScore, removeBullet, setLastImpactLocation, store } from "../../data/store"
 import { Bullet, Owner } from "../../data/types"
@@ -88,7 +88,7 @@ function BulletHandler() {
                             friction: [.8, .95],
                             color: "#fff",
                         })
-                    } 
+                    }
                 } else if (client.data.type === "plane") {
                     if (bullet.owner === Owner.PLAYER) {
                         let intersection = intersect(instances.box.mesh, bullet.position, movement)
@@ -106,7 +106,7 @@ function BulletHandler() {
                         }
 
                         damagePlane(client.data.id, bullet.damage)
-                    } 
+                    }
                 } else if (client.data.type === "rocket") {
                     if (bullet.owner === Owner.PLAYER) {
                         let intersection = intersect(instances.cylinder.mesh, bullet.position, movement)
@@ -124,7 +124,7 @@ function BulletHandler() {
                         }
 
                         damageRocket(client.data.id, bullet.damage)
-                    } 
+                    }
                 } else if (client.data.type === "turret") {
                     if (bullet.owner === Owner.PLAYER) {
                         let intersection = intersect(instances.turret.mesh, bullet.position, movement)
@@ -144,16 +144,16 @@ function BulletHandler() {
                         }
 
                         damageTurret(client.data.id, bullet.damage)
-                    } 
+                    }
                 } else if (client.data.type === "player") {
                     damagePlayer(bullet.damage)
-                    increaseScore(-10) 
+                    increaseScore(-10)
                 } else if (client.data.type === "barrel") {
-                    if (bullet.owner === Owner.PLAYER) { 
+                    if (bullet.owner === Owner.PLAYER) {
                         damageBarrel(client.data.id, 100)
                         increaseScore(1000)
-                    } 
-                } 
+                    }
+                }
             }
 
             bullet.position.x += movement[0] * ndelta(delta)
@@ -188,7 +188,7 @@ function BulletHandler() {
         }
 
         if (removed.length) {
-            removeBullet(...removed.map(i => i.id))
+            startTransition(() => removeBullet(...removed.map(i => i.id)))
         }
     })
 

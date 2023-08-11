@@ -55,7 +55,7 @@ export default function WorldPartWrapper({
     useFrame(() => {
         i.current++
 
-        if (dead.current || i.current % 6 > 0) {
+        if (dead.current || i.current % 20 > 0) {
             return
         }
 

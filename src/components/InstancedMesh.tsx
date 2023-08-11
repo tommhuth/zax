@@ -37,7 +37,7 @@ export default function InstancedMesh({
                     setInstance(name, mesh, count)
 
                     for (let i = 0; i < count; i++) {
-                        setMatrixAt({ instance: mesh, index: i, scale: [0, 0, 0] })
+                        setMatrixAt({ instance: mesh, index: i, scale: 0 })
                     }
                 }
             }}

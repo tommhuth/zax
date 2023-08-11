@@ -1,5 +1,5 @@
 import { useFrame, useLoader, useThree } from "@react-three/fiber"
-import { useEffect, useMemo, useRef } from "react"
+import { startTransition, useEffect, useMemo, useRef } from "react"
 import { Group, Mesh, Vector3 } from "three"
 import { bulletSize, createBullet, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, dpr, setPlayerObject, useStore } from "../data/store"
 import { Tuple3 } from "../types"
@@ -151,15 +151,17 @@ export default function Player({
     // shoot
     useFrame(() => {
         if (Date.now() - lastShotAt.current > weapon.fireFrequency && keys.Space) {
-            createBullet({
-                position: [position.x, position.y, position.z - (depth / 2 + bulletSize[2] / 2) * 1.5],
-                owner: Owner.PLAYER,
-                damage: weapon.damage,
-                color: weapon.color,
-                rotation: -Math.PI * .5,
-                speed: weapon.speed,
+            startTransition(()=> {
+                createBullet({
+                    position: [position.x, position.y, position.z - (depth / 2 + bulletSize[2] / 2) * 1.5],
+                    owner: Owner.PLAYER,
+                    damage: weapon.damage,
+                    color: weapon.color,
+                    rotation: -Math.PI * .5,
+                    speed: weapon.speed,
+                })
+                lastShotAt.current = Date.now() 
             })
-            lastShotAt.current = Date.now()
         }
     })
 
@@ -220,7 +222,7 @@ export default function Player({
                     if (e.pointerType === "touch") {
                         let depthThreshold = 2
 
-                        if (!isMovingUp.current && Math.abs(originalPosition.z - e.point.z) > depthThreshold) {
+                        if (Math.abs(originalPosition.z - e.point.z) > depthThreshold) {
                             isMovingUp.current = true
                         }
 

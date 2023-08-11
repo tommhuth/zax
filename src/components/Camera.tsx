@@ -12,7 +12,7 @@ export default function Camera({ startPosition = [10, 15, 10] }: { startPosition
 
     useLayoutEffect(() => {
         camera.position.setFromSphericalCoords(
-            35,
+            100,
             Math.PI / 3, // 60 degrees from positive Y-axis and 30 degrees to XZ-plane
             Math.PI / 4  // 45 degrees, between positive X and Z axes, thus on XZ-plane
         )

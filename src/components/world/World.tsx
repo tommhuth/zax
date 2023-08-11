@@ -28,12 +28,9 @@ export default function World() {
     useFrame(() => {
         let { world: { parts }, player: { object: player } } = store.getState()
         let forwardWorldPart = parts[parts.length - 1]
+        let lastPartIsAtEdge = forwardWorldPart && player && forwardWorldPart.position.z > player.position.z - diagonal
 
-        if (forwardWorldPart) {
-            if (player && forwardWorldPart.position.z > player.position.z - diagonal) {
-                startTransition(createWorldPart)
-            }
-        } else {
+        if (lastPartIsAtEdge || !forwardWorldPart) {
             startTransition(createWorldPart)
         }
     })

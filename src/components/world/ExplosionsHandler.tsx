@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef } from "react"
-import { AdditiveBlending, BufferAttribute,   MultiplyBlending,   Sprite } from "three"
+import { startTransition, useEffect, useMemo, useRef } from "react"
+import { AdditiveBlending, BufferAttribute, MultiplyBlending, Sprite } from "three"
 import { clamp, glsl, ndelta, setMatrixAt } from "../../utils/utils"
 import { useShader } from "../../utils/hooks"
 import { removeExplosion, useStore } from "../../data/store"
 import { useFrame, useLoader, useThree } from "@react-three/fiber"
-import InstancedMesh from "../InstancedMesh" 
+import InstancedMesh from "../InstancedMesh"
 import { TextureLoader } from "three/src/loaders/TextureLoader"
 
 function easeOutQuart(x: number): number {
@@ -23,7 +23,7 @@ function blend(values = [75, 100, 0], t = 0, threshold = .5) {
 }
 
 export default function ExplosionsHandler() {
-    let latestExplosion = useStore(i => i.explosions[0]) 
+    let latestExplosion = useStore(i => i.explosions[0])
     let glowMap = useLoader(TextureLoader, "/textures/glow.png")
     let ref = useRef<Sprite>(null)
     let centerAttributes = useMemo(() => {
@@ -143,7 +143,7 @@ export default function ExplosionsHandler() {
                         sphere.position[1] + t * (sphere.index % 3 + 1),
                         sphere.position[2],
                     ],
-                    scale: [scale, scale, scale]
+                    scale
                 })
 
                 sphere.time += ndelta(delta) * 1000
@@ -151,11 +151,11 @@ export default function ExplosionsHandler() {
         }
 
         if (dead.length) {
-            removeExplosion(dead)
+            startTransition(() => removeExplosion(dead))
         }
     })
 
-    useEffect(()=> {
+    useEffect(() => {
         if (ref.current && latestExplosion) {
             ref.current.position.set(...latestExplosion.position)
             ref.current.position.y += 6
@@ -165,11 +165,11 @@ export default function ExplosionsHandler() {
         }
     }, [latestExplosion])
 
-    useFrame(()=> {
+    useFrame(() => {
         if (ref.current) {
-            ref.current.material.opacity *= .9
+            ref.current.material.opacity *= .95
         }
-    }) 
+    })
 
     return (
         <>
@@ -189,7 +189,7 @@ export default function ExplosionsHandler() {
                 <meshBasicMaterial onBeforeCompile={onBeforeCompile} color={"white"} />
             </InstancedMesh>
 
-            <sprite ref={ref} scale={10}> 
+            <sprite ref={ref} scale={10}>
                 <spriteMaterial color="blue" map={glowMap} transparent blending={AdditiveBlending} />
             </sprite>
         </>

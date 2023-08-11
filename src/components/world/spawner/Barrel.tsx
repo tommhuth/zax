@@ -14,7 +14,7 @@ export default function Barrel({
     health,
 }: BarrelProps) {
     useEffect(() => {
-        let id  
+        let id: string  
 
         startTransition(() => {
             id = createBarrel({ position, rotation, health })

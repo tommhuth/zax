@@ -1,5 +1,5 @@
 import { useFrame, useThree } from "@react-three/fiber"
-import { memo } from "react"
+import { memo, startTransition } from "react"
 import { removeParticle, store } from "../../data/store"
 import { Particle } from "../../data/types"
 import { ndelta, setColorAt, setMatrixAt } from "../../utils/utils"
@@ -45,18 +45,18 @@ function ParticleHandler() {
 
             rotation.x += -velocity.x * .075
             rotation.y += -velocity.y * .01
-            rotation.z += -velocity.z * .075 
+            rotation.z += -velocity.z * .075
 
             if (position.y <= floorY + radius * .25) {
                 velocity.y *= -restitution
-                position.y = floorY + radius * .25 
+                position.y = floorY + radius * .25
             }
 
             setMatrixAt({
                 instance: instance.mesh,
                 index,
                 position: position.toArray(),
-                scale: [radius, radius, radius],
+                scale: radius,
                 rotation: rotation.toArray()
             })
 
@@ -64,7 +64,7 @@ function ParticleHandler() {
         }
 
         if (dead.length) {
-            removeParticle(dead.map(i => i.id))
+            startTransition(() => removeParticle(dead.map(i => i.id)))
         }
     })
 

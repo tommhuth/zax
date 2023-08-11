@@ -1,4 +1,4 @@
-import { memo, useRef } from "react"
+import { memo, startTransition, useLayoutEffect, useRef } from "react"
 
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect } from "react"
@@ -54,34 +54,34 @@ function Turret({ id, size, position, health, fireFrequency, rotation, aabb }: T
         }
     }, [instance, health, index])
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (health === 0) {
-            remove()
-            createShimmer({  
-                position: [
-                    position.x,
-                    position.y + size[1]/2,
-                    position.z,
-                ], 
-                size: [3,4,3]
+            startTransition(()=> {
+                remove()
+                createShimmer({  
+                    position: [
+                        position.x,
+                        position.y + size[1]/2,
+                        position.z,
+                    ], 
+                    size: [3,4,3]
+                })
+                createExplosion({
+                    position: [position.x, 0, position.z],
+                    count: 10,
+                    radius: .65
+                })
+                createParticles({
+                    position: [position.x, 0, position.z],
+                    positionOffset: [[-1, 1], [0, 2], [-1, 1]],
+                    speed: [6, 22],
+                    speedOffset: [[-10, 10], [0, 5], [-10, 10]],
+                    normal: [0, 1, 0],
+                    count: [6, 12],
+                    radius: [.1, .45],
+                    color: "#fff",
+                })  
             })
-            createExplosion({
-                position: [position.x, 0, position.z],
-                count: 10,
-                radius: .65
-            })
-            createParticles({
-                position: [position.x, 0, position.z],
-                positionOffset: [[-1, 1], [0, 2], [-1, 1]],
-                speed: [6, 22],
-                speedOffset: [[-10, 10], [0, 5], [-10, 10]],
-                normal: [0, 1, 0],
-                count: [6, 12],
-                radius: [.1, .45],
-                color: "#fff",
-            })
-
-            removeByProximity({ id, position }, 1.5)
         }
     }, [health])
 

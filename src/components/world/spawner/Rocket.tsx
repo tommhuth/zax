@@ -14,7 +14,7 @@ export default function Rocket({
     health,
 }: RocketProps) {
     useEffect(() => {
-        let id
+        let id: string
 
         startTransition(() => {
             id = createRocket(position, speed, health)
