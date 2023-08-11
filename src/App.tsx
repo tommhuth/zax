@@ -10,13 +10,12 @@ import Config from "./Config"
 import Ui from "./components/ui/Ui"
 import Lights from "./components/Lights"
 import { BasicShadowMap, Group, NoToneMapping } from "three"
-import { dpr, isSmallScreen, useStore } from "./data/store"
+import { dpr, isSmallScreen, pixelSize, useStore } from "./data/store"
 import ExplosionsHandler from "./components/world/ExplosionsHandler"
 import Models from "./components/Models"
 import ShimmerHandler from "./components/world/ShimmerHandler"
 
 export default function Wrapper() { 
-    let pixelSize = 6
     let getSize = () => [
         Math.ceil(window.innerWidth / pixelSize) * pixelSize,
         Math.ceil(window.innerHeight / pixelSize) * pixelSize
@@ -95,16 +94,7 @@ export default function Wrapper() {
 }
 
 function EdgeOverlay() {
-    let groupRef = useRef<Group>(null)
-    let r = useThree()
-
-
-    useEffect(() => {
-        r.setSize
-
-        let w = window.innerWidth * dpr
-
-    }, [])
+    let groupRef = useRef<Group>(null) 
 
     useFrame(() => {
         let player = useStore.getState().player.object
