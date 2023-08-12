@@ -1,7 +1,7 @@
 import { useFrame, useLoader, useThree } from "@react-three/fiber"
 import { startTransition, useEffect, useMemo, useRef } from "react"
 import { Group, Mesh, Vector3 } from "three"
-import { bulletSize, createBullet, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, dpr, setPlayerObject, useStore } from "../data/store"
+import { bulletSize, createBullet, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, dpr, pixelSize, setPlayerObject, useStore } from "../data/store"
 import { Tuple3 } from "../types"
 import { WORLD_BOTTOM_EDGE, WORLD_CENTER_X, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
@@ -27,7 +27,7 @@ export default function Player({
 }: PlayerProps) {
     let playerGroupRef = useRef<Group | null>(null)
     let hitboxRef = useRef<Mesh>(null)
-    let lastShotAt = useRef(0) 
+    let lastShotAt = useRef(0)
     let isMovingUp = useRef(false)
     let impactRef = useRef<Mesh>(null)
     let grid = useStore(i => i.world.grid)
@@ -45,9 +45,9 @@ export default function Player({
             position,
         })
     }, [grid])
-    let currentPosition = useMemo(() => new Vector3(), []) 
+    let currentPosition = useMemo(() => new Vector3(), [])
     let originalPosition = useMemo(() => new Vector3(), []) 
-    let speed = 7
+    let speed = 6 
 
     useCollisionDetection({
         position,
@@ -151,7 +151,7 @@ export default function Player({
     // shoot
     useFrame(() => {
         if (Date.now() - lastShotAt.current > weapon.fireFrequency && keys.Space) {
-            startTransition(()=> {
+            startTransition(() => {
                 createBullet({
                     position: [position.x, position.y, position.z - (depth / 2 + bulletSize[2] / 2) * 1.5],
                     owner: Owner.PLAYER,
@@ -160,7 +160,7 @@ export default function Player({
                     rotation: -Math.PI * .5,
                     speed: weapon.speed,
                 })
-                lastShotAt.current = Date.now() 
+                lastShotAt.current = Date.now()
             })
         }
     })
@@ -176,7 +176,7 @@ export default function Player({
             playerGroup.position.y += (y - playerGroup.position.y) * (.08 * 60 * nd)
             playerGroup.position.z -= speed * nd
 
-            currentPosition.z -= speed * nd 
+            currentPosition.z -= speed * nd
             hitboxRef.current.position.z = playerGroup.position.z
 
             position.copy(playerGroup.position)
@@ -209,7 +209,7 @@ export default function Player({
                 <mesh userData={{ type: "player" }} visible={false}>
                     <boxGeometry args={[...size, 1, 1, 1]} />
                     <meshBasicMaterial color="red" wireframe />
-                </mesh> 
+                </mesh>
             </group>
             <mesh
                 ref={hitboxRef}
@@ -238,7 +238,7 @@ export default function Player({
                 onPointerDown={(e) => {
                     if (e.pointerType === "touch") {
                         currentPosition.set(e.point.x, 0, e.point.z)
-                        originalPosition.set(0, 0, e.point.z) 
+                        originalPosition.set(0, 0, e.point.z)
                     }
                 }}
             >
