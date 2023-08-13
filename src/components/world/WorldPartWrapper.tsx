@@ -1,9 +1,9 @@
 import { useFrame } from "@react-three/fiber"
-import React, { startTransition, useEffect, useRef } from "react"
+import React, { startTransition, useRef } from "react"
 import { Box3, Vector3 } from "three"
 import { removeWorldPart, useStore } from "../../data/store"
 import { Tuple2 } from "../../types"
-import { Only, setColorAt, setMatrixAt } from "../../utils/utils"
+import { Only } from "../../utils/utils"
 import { useInstance } from "../InstancedMesh"
 import random from "@huth/random"
 import { WORLD_CENTER_X } from "./World"
@@ -31,27 +31,16 @@ export default function WorldPartWrapper({
     size: [width, depth],
     id,
 }: WorldPartWrapperProps) {
-    let [index, instance] = useInstance("box")
     let dead = useRef(false)
-    let i = useRef(random.integer(0, 100))
-
-    useEffect(() => {
-        if (typeof index === "number" && instance) {
-            setColorAt(instance, index, 0xdddddd)
-        }
-    }, [index, instance])
-
-    useFrame(() => {
-        if (typeof index === "number" && instance) {
-            setMatrixAt({
-                instance,
-                index,
-                position: [position.x, position.y - 5, position.z + depth / 2],
-                scale: [30, 10, depth + .1],
-            })
-        }
+    let i = useRef(random.integer(0, 100)) 
+ 
+    useInstance("box", { 
+        color: 0xdddddd, 
+        reset: false ,
+        position: [position.x, position.y - 5, position.z + depth / 2],
+        scale: [30, 10, depth + .1],
     })
-
+    
     useFrame(() => {
         i.current++
 
@@ -68,8 +57,7 @@ export default function WorldPartWrapper({
         if (!world.frustum.intersectsBox(_box) && player.object && position.z > player.object.position.z) {
             dead.current = true
             startTransition(() => removeWorldPart(id))
-        }
-
+        } 
     })
 
     return (

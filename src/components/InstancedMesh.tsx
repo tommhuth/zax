@@ -1,16 +1,52 @@
 import { useEffect, useMemo, useState } from "react"
 import { setInstance, store, useStore } from "../data/store"
-import { setMatrixAt } from "../utils/utils"
+import { setColorAt, setMatrixAt, setMatrixNullAt } from "../utils/utils"
+import { ColorRepresentation, Vector3 } from "three"
+import { Tuple3, Tuple4 } from "../types"
 
-export function useInstance(name: string) {
+interface UseInstanceOptions {
+    reset?: boolean
+    color?: ColorRepresentation
+    scale?: Tuple3 | number
+    rotation?: Tuple3 | Tuple4
+    position?: Vector3 | Tuple3
+}
+
+export function useInstance(name: string, { reset = true, color, scale, rotation, position }: UseInstanceOptions = {}) {
     let instance = useStore(i => i.instances[name])
     let [index, setIndex] = useState<null | number>(null)
+
+    useEffect(() => {
+        if (typeof index === "number" && instance && (position || rotation || scale)) {
+            setMatrixAt({
+                instance: instance.mesh,
+                index,
+                position: position instanceof Vector3 ? position.toArray() : position,
+                scale,
+                rotation,
+            })
+        }
+    }, [index, instance])
 
     useEffect(() => {
         if (instance) {
             setIndex(instance.index.next())
         }
     }, [instance])
+
+    useEffect(() => {
+        if (typeof index === "number" && instance && reset) {
+            return () => {
+                setMatrixNullAt(instance.mesh, index as number)
+            }
+        }
+    }, [index, instance])
+
+    useEffect(() => {
+        if (instance && typeof index === "number" && color) {
+            setColorAt(instance.mesh, index, color)
+        }
+    }, [index, color, instance])
 
     return [index, instance?.mesh] as const
 }

@@ -1,7 +1,7 @@
-import { useFrame, useLoader, useThree } from "@react-three/fiber"
+import { useFrame, useLoader } from "@react-three/fiber"
 import { startTransition, useEffect, useMemo, useRef } from "react"
 import { Group, Mesh, Vector3 } from "three"
-import { bulletSize, createBullet, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, dpr, pixelSize, setPlayerObject, useStore } from "../data/store"
+import { bulletSize, createBullet, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, setPlayerObject, useStore } from "../data/store"
 import { Tuple3 } from "../types"
 import { WORLD_BOTTOM_EDGE, WORLD_CENTER_X, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
@@ -117,6 +117,7 @@ export default function Player({
         impactRef.current?.position.set(...lastImpactLocation)
     }, [lastImpactLocation])
 
+    // impact animation
     useFrame(() => {
         if (impactRef.current) {
             impactRef.current.scale.x += (0 - impactRef.current.scale.x) * .15

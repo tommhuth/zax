@@ -1,9 +1,9 @@
-import { useRef, memo, startTransition, useMemo } from "react"
+import { memo, startTransition, useMemo } from "react"
 import { useFrame } from "@react-three/fiber"
 import { useEffect } from "react"
 import { createBullet, createExplosion, createParticles, damageBarrel, damageTurret, increaseScore, removePlane, store, useStore } from "../../data/store"
 import { useInstance } from "../InstancedMesh"
-import { clamp, ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
+import { clamp, ndelta, setColorAt, setMatrixAt } from "../../utils/utils"
 import animate from "@huth/animate"
 import random from "@huth/random"
 import { Tuple3 } from "../../types"
@@ -13,6 +13,24 @@ import { WORLD_BOTTOM_EDGE, WORLD_TOP_EDGE } from "./World"
 import { Owner, Plane } from "../../data/types"
 
 let _size = new Vector3()
+
+function explode(position: Vector3) {
+    createExplosion({
+        position: [position.x, position.y - 1, position.z],
+        count: 10,
+        radius: .4
+    })
+    createParticles({
+        position: position.toArray(),
+        speed: [12, 16],
+        speedOffset: [[-5, 5], [0, 20], [-15, 5]],
+        positionOffset: [[-.5, .5], [-.5, .5], [-.5, .5]],
+        normal: [0, 0, -.5],
+        count: [4, 8],
+        radius: [.1, .45],
+        color: "yellow",
+    })
+}
 
 function Plane({
     id,
@@ -36,7 +54,7 @@ function Plane({
     }), [])
     let bottomY = 0
     let grid = useStore(i => i.world.grid)
-    let [index, instance] = useInstance("box") 
+    let [index, instance] = useInstance("box", { color: "yellow" })
     let remove = () => {
         removePlane(id)
         data.removed = true
@@ -63,16 +81,6 @@ function Plane({
     })
 
     useEffect(() => {
-        if (typeof index === "number" && instance) {
-            setColorAt(instance, index, "yellow")
-
-            return () => {
-                setMatrixNullAt(instance, index as number)
-            }
-        }
-    }, [index, instance])
-
-    useEffect(() => {
         if (health && health !== 100 && instance && typeof index === "number") {
             return animate({
                 from: "#FFFFFF",
@@ -89,21 +97,7 @@ function Plane({
         if (health === 0) {
             startTransition(() => {
                 increaseScore(500)
-                createExplosion({
-                    position: [position.x, position.y - 1, position.z],
-                    count: 10,
-                    radius: .4
-                })
-                createParticles({
-                    position: position.toArray(),
-                    speed: [12, 16],
-                    speedOffset: [[-5, 5], [0, 20], [-15, 5]],
-                    positionOffset: [[-.5, .5], [-.5, .5], [-.5, .5]],
-                    normal: [0, 0, -.5],
-                    count: [4, 8],
-                    radius: [.1, .45],
-                    color: "yellow",
-                })
+                explode(position)
             })
         }
     }, [health])
@@ -149,7 +143,7 @@ function Plane({
         if (instance && typeof index === "number" && !data.removed) {
             let { world, player } = useStore.getState()
 
-            position.z += data.actualSpeed * ndelta(delta) 
+            position.z += data.actualSpeed * ndelta(delta)
             aabb.setFromCenterAndSize(position, _size.set(...size))
 
             setMatrixAt({

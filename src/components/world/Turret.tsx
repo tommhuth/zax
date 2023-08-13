@@ -2,21 +2,51 @@ import { memo, startTransition, useLayoutEffect, useRef } from "react"
 
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect } from "react"
-import { createBullet, createExplosion, createParticles, createShimmer, damageBarrel, damageTurret, removeByProximity, removeTurret, store, useStore } from "../../data/store"
+import { createBullet, createExplosion, createParticles, createShimmer, removeTurret, store, useStore } from "../../data/store"
 import { useInstance } from "../InstancedMesh"
-import { clamp, ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
+import { clamp, ndelta, setColorAt } from "../../utils/utils"
 import animate from "@huth/animate"
 import random from "@huth/random"
 import { Vector3 } from "three"
 import { WORLD_BOTTOM_EDGE, WORLD_TOP_EDGE } from "./World"
 import { Owner, Turret } from "../../data/types"
 import Config from "../../Config"
+import { Tuple3 } from "../../types"
 
+function explode(position: Vector3, size: Tuple3) {
+    createShimmer({
+        position: [
+            position.x,
+            position.y + size[1] / 2,
+            position.z,
+        ],
+        size: [3, 4, 3]
+    })
+    createExplosion({
+        position: [position.x, 0, position.z],
+        count: 10,
+        radius: .65
+    })
+    createParticles({
+        position: [position.x, 0, position.z],
+        positionOffset: [[-1, 1], [0, 2], [-1, 1]],
+        speed: [6, 22],
+        speedOffset: [[-10, 10], [0, 5], [-10, 10]],
+        normal: [0, 1, 0],
+        count: [6, 12],
+        radius: [.1, .45],
+        color: "#fff",
+    })
+}
 
 function Turret({ id, size, position, health, fireFrequency, rotation, aabb }: Turret) {
     let removed = useRef(false)
     let { viewport } = useThree()
-    let [index, instance] = useInstance("turret")
+    let [index, instance] = useInstance("turret", {
+        color: "#fff", 
+        position: [position.x, position.y - .1, position.z],
+        rotation: [0, -rotation + Math.PI * .5, 0],
+    })
     let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
     let shootTimer = useRef(0)
     let nextShotAt = useRef(fireFrequency)
@@ -24,22 +54,6 @@ function Turret({ id, size, position, health, fireFrequency, rotation, aabb }: T
         setTimeout(() => removeTurret(id), 350)
         removed.current = true
     }
-
-    useEffect(() => {
-        if (typeof index === "number" && instance) {
-            setColorAt(instance, index, "#fff")
-            setMatrixAt({
-                instance,
-                index,
-                position: [position.x, position.y - .1, position.z],
-                rotation: [0, -rotation + Math.PI * .5, 0],
-            })
-
-            return () => {
-                setMatrixNullAt(instance, index as number)
-            }
-        }
-    }, [index, position, rotation, instance])
 
     useEffect(() => {
         if (health && health !== 100 && instance && typeof index === "number") {
@@ -56,31 +70,9 @@ function Turret({ id, size, position, health, fireFrequency, rotation, aabb }: T
 
     useLayoutEffect(() => {
         if (health === 0) {
-            startTransition(()=> {
+            startTransition(() => {
                 remove()
-                createShimmer({  
-                    position: [
-                        position.x,
-                        position.y + size[1]/2,
-                        position.z,
-                    ], 
-                    size: [3,4,3]
-                })
-                createExplosion({
-                    position: [position.x, 0, position.z],
-                    count: 10,
-                    radius: .65
-                })
-                createParticles({
-                    position: [position.x, 0, position.z],
-                    positionOffset: [[-1, 1], [0, 2], [-1, 1]],
-                    speed: [6, 22],
-                    speedOffset: [[-10, 10], [0, 5], [-10, 10]],
-                    normal: [0, 1, 0],
-                    count: [6, 12],
-                    radius: [.1, .45],
-                    color: "#fff",
-                })  
+                explode(position, size)
             })
         }
     }, [health])
@@ -99,17 +91,19 @@ function Turret({ id, size, position, health, fireFrequency, rotation, aabb }: T
             let offsetz = Math.sin(rotation) * offsetRadius
             let bulletSpeed = 18
 
-            createBullet({
-                position: [
-                    position.x + offsetx,
-                    position.y + size[1] / 2 - .15,
-                    position.z + offsetz
-                ],
-                color: "white",
-                damage: 5,
-                speed: bulletSpeed,
-                rotation: rotation,
-                owner: Owner.ENEMY
+            startTransition(() => {
+                createBullet({
+                    position: [
+                        position.x + offsetx,
+                        position.y + size[1] / 2 - .15,
+                        position.z + offsetz
+                    ],
+                    color: "white",
+                    damage: 5,
+                    speed: bulletSpeed,
+                    rotation: rotation,
+                    owner: Owner.ENEMY
+                })
             })
 
             shootTimer.current = 0
@@ -121,9 +115,10 @@ function Turret({ id, size, position, health, fireFrequency, rotation, aabb }: T
 
     useFrame(() => {
         let { world, player } = useStore.getState()
+        let outsideFrustum = !world.frustum.intersectsBox(aabb) && player.object && position.z > player.object.position.z
 
-        if (!removed.current && !world.frustum.intersectsBox(aabb) && player.object && position.z > player.object.position.z) {
-            remove()
+        if (!removed.current && outsideFrustum) {
+            startTransition(remove)
         }
     })
 

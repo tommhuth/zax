@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber"
 import { memo, startTransition } from "react"
-import { InstancedMesh, Matrix3, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three"
-import { createParticles, createShimmer, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, increaseScore, removeBullet, setLastImpactLocation, store } from "../../data/store"
+import { InstancedMesh, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three"
+import { createParticles, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, increaseScore, removeBullet, setLastImpactLocation, store } from "../../data/store"
 import { Bullet, Owner } from "../../data/types"
 import { Tuple3 } from "../../types"
 import { getCollisions } from "../../utils/hooks"
@@ -38,7 +38,6 @@ function intersect(object: Object3D, position: Vector3, movement: Tuple3) {
 
     return intersection
 }
-
 
 function BulletHandler() {
     useFrame((state, delta) => {
