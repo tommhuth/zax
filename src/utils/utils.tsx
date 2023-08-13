@@ -89,7 +89,7 @@ export function setMatrixNullAt(instance: InstancedMesh, index: number) {
     setMatrixAt({
         instance,
         index,
-        position: [100_000, 0, 0],
+        position: [0, 0, 100_000],
         scale: [0, 0, 0],
         rotation: [0, 0, 0]
     })

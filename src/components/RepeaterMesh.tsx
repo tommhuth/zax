@@ -13,7 +13,7 @@ export function useRepeater(name: string) {
         }
         
         repeater.visible = false
-        repeater.position.set(-1000,-1000,-1000)
+        repeater.position.set(0, 0, 100_000)
     }, [repeater])
 
     useEffect(()=> {
@@ -43,7 +43,6 @@ const materials = {
     darkgray: new MeshLambertMaterial({ color: "#333", dithering: true }),
     gray: new MeshLambertMaterial({ color: "#eee", dithering: true }),
     "": new MeshBasicMaterial({ color: "red", dithering: true }),
-
 }
 
 export default function RepeaterMesh({ name, count, object }: { object: Object3D, name: string, count: number }) {
