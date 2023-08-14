@@ -52,6 +52,10 @@ export default function Player({
     let originalPosition = useMemo(() => new Vector3(), []) 
     let speed = 6 
     let handleRef = useCallback((object: Group) => {  
+        if (!object) {
+            return 
+        }
+        
         playerGroupRef.current = object 
         setPlayerObject(object)
     }, [])
