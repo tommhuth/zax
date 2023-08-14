@@ -1,6 +1,6 @@
-import { startTransition, useEffect } from "react"
-import {  createRocket, removeRocket } from "../../../data/store"
+import { startTransition, useEffect } from "react" 
 import { Tuple3 } from "../../../types"
+import { createRocket, removeRocket } from "../../../data/store/actors"
 
 interface RocketProps {
     position: Tuple3

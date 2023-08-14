@@ -1,8 +1,9 @@
-import { clamp, ndelta, setMatrixAt } from "../../utils/utils"
-import { removeShimmer, useStore } from "../../data/store"
+import { clamp, ndelta, setMatrixAt } from "../../utils/utils" 
 import { useFrame } from "@react-three/fiber"
 import InstancedMesh from "../InstancedMesh"
 import { startTransition } from "react"
+import { useStore } from "../../data/store"
+import { removeShimmer } from "../../data/store/effects"
 
 function easeInOutCubic(x: number): number {
     return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
@@ -24,7 +25,7 @@ export default function ShimmerHandler() {
             return
         }
 
-        let shimmers = useStore.getState().shimmer
+        let shimmers = useStore.getState().world.shimmer
         let d = ndelta(delta)
         let dead: string[] = []
 

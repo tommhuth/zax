@@ -1,6 +1,6 @@
-import { useEffect, startTransition } from "react"
-import { createBuilding, removeBuilding } from "../../../data/store"
+import { useEffect, startTransition } from "react" 
 import { Tuple3 } from "../../../types"
+import { createBuilding, removeBuilding } from "../../../data/store/world"
 
 
 interface BuildingProps {

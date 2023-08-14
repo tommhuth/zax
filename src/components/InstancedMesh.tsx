@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react"
-import { setInstance, store, useStore } from "../data/store"
+import { useEffect, useMemo, useState } from "react" 
 import { setColorAt, setMatrixAt, setMatrixNullAt } from "../utils/utils"
 import { ColorRepresentation, Vector3 } from "three"
 import { Tuple3, Tuple4 } from "../types"
+import { store, useStore } from "../data/store"
+import { setInstance } from "../data/store/utils"
 
 interface UseInstanceOptions {
     reset?: boolean

@@ -2,13 +2,16 @@ import { startTransition, useLayoutEffect, useRef } from "react"
 import { Rocket } from "../../data/types"
 import { useInstance } from "../InstancedMesh"
 import { useFrame } from "@react-three/fiber"
-import { ndelta, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
-import { createExplosion, createParticles, createShimmer, increaseScore, removeRocket, useStore } from "../../data/store"
+import { ndelta, setMatrixAt, setMatrixNullAt } from "../../utils/utils" 
 import { Mesh, Vector3 } from "three"
 import random from "@huth/random"
 import { Tuple3 } from "../../types"
 import { WORLD_TOP_EDGE } from "./World"
 import Config from "../../Config"
+import { useStore } from "../../data/store"
+import { increaseScore } from "../../data/store/player"
+import { removeRocket } from "../../data/store/actors"
+import { createExplosion, createParticles, createShimmer } from "../../data/store/effects"
 
 let _size = new Vector3()
 

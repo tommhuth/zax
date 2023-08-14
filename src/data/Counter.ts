@@ -1,4 +1,3 @@
-
 export default class Counter {
     public current = 0
     private max = 0

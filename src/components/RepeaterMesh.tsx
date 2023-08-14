@@ -1,7 +1,8 @@
 import { useThree } from "@react-three/fiber"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D } from "three"
-import { requestRepeater, setRepeater, useStore } from "../data/store"
+import { useStore } from "../data/store"
+import { requestRepeater, setRepeater } from "../data/store/utils"
 
 export function useRepeater(name: string) {
     let [repeater, setRepeater] = useState<Object3D | null>(null)

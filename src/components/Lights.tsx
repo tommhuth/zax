@@ -8,7 +8,7 @@ export default function Lights() {
     let explosionLightRef = useRef<PointLight>(null)
     let { scene, viewport } = useThree()
     let ticks = useRef(0)
-    let explosion = useStore(i => i.explosions[0])
+    let explosion = useStore(i => i.world.explosions[0])
     let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
 
     useEffect(() => {

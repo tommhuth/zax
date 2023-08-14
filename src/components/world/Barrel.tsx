@@ -1,12 +1,14 @@
 import { useFrame } from "@react-three/fiber"
 import { startTransition, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { Vector3 } from "three"
-import { createExplosion, createParticles, createShimmer, removeBarrel, useStore } from "../../data/store"
+import {  useStore } from "../../data/store"
 import { Barrel } from "../../data/types" 
 import { useInstance } from "../InstancedMesh"
 import random from "@huth/random"
 import Config from "../../Config"
 import { Tuple3 } from "../../types"
+import { createExplosion, createParticles, createShimmer } from "../../data/store/effects"
+import { removeBarrel } from "../../data/store/world"
 
 let _size = new Vector3()
 

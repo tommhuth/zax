@@ -1,6 +1,6 @@
-import { startTransition, useEffect } from "react"
-import { createBarrel, removeBarrel } from "../../../data/store"
+import { startTransition, useEffect } from "react" 
 import { Tuple3 } from "../../../types"
+import { createBarrel, removeBarrel } from "../../../data/store/world"
 
 interface BarrelProps {
     position: Tuple3

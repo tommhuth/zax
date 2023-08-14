@@ -1,8 +1,7 @@
 import { memo, startTransition, useLayoutEffect, useRef } from "react"
 
 import { useFrame, useThree } from "@react-three/fiber"
-import { useEffect } from "react"
-import { createBullet, createExplosion, createParticles, createShimmer, removeTurret, store, useStore } from "../../data/store"
+import { useEffect } from "react" 
 import { useInstance } from "../InstancedMesh"
 import { clamp, ndelta, setColorAt } from "../../utils/utils"
 import animate from "@huth/animate"
@@ -12,6 +11,9 @@ import { WORLD_BOTTOM_EDGE, WORLD_TOP_EDGE } from "./World"
 import { Owner, Turret } from "../../data/types"
 import Config from "../../Config"
 import { Tuple3 } from "../../types"
+import { createBullet, removeTurret } from "../../data/store/actors"
+import { store, useStore } from "../../data/store"
+import { createExplosion, createParticles, createShimmer } from "../../data/store/effects"
 
 function explode(position: Vector3, size: Tuple3) {
     createShimmer({

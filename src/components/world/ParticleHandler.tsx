@@ -1,8 +1,9 @@
 import { useFrame, useThree } from "@react-three/fiber"
-import { memo, startTransition } from "react"
-import { removeParticle, store } from "../../data/store"
+import { memo, startTransition } from "react" 
 import { Particle } from "../../data/types"
 import { ndelta, setColorAt, setMatrixAt } from "../../utils/utils"
+import { store } from "../../data/store"
+import { removeParticle } from "../../data/store/effects"
 
 function ParticleHandler() {
     let { viewport } = useThree()
@@ -10,7 +11,7 @@ function ParticleHandler() {
     let floorY = 0
 
     useFrame((state, delta) => {
-        let { particles } = store.getState()
+        let { particles } = store.getState().world
         let dead: Particle[] = []
         let nd = ndelta(delta)
 

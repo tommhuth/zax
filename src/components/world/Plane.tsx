@@ -1,7 +1,6 @@
 import { memo, startTransition, useMemo } from "react"
 import { useFrame } from "@react-three/fiber"
-import { useEffect } from "react"
-import { createBullet, createExplosion, createParticles, damageBarrel, damageTurret, increaseScore, removePlane, store, useStore } from "../../data/store"
+import { useEffect } from "react" 
 import { useInstance } from "../InstancedMesh"
 import { clamp, ndelta, setColorAt, setMatrixAt } from "../../utils/utils"
 import animate from "@huth/animate"
@@ -11,6 +10,11 @@ import { useCollisionDetection } from "../../utils/hooks"
 import { Vector3 } from "three"
 import { WORLD_BOTTOM_EDGE, WORLD_TOP_EDGE } from "./World"
 import { Owner, Plane } from "../../data/types"
+import { createBullet, damageTurret, removePlane } from "../../data/store/actors"
+import { store, useStore } from "../../data/store"
+import { damageBarrel } from "../../data/store/world"
+import { increaseScore } from "../../data/store/player"
+import { createExplosion, createParticles } from "../../data/store/effects"
 
 let _size = new Vector3()
 

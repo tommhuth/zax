@@ -1,11 +1,15 @@
 import { useFrame } from "@react-three/fiber"
 import { memo, startTransition } from "react"
-import { InstancedMesh, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three"
-import { createParticles, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, increaseScore, removeBullet, setLastImpactLocation, store } from "../../data/store"
+import { InstancedMesh, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from "three" 
 import { Bullet, Owner } from "../../data/types"
 import { Tuple3 } from "../../types"
 import { getCollisions } from "../../utils/hooks"
 import { ndelta, setColorAt, setMatrixAt, setMatrixNullAt } from "../../utils/utils"
+import { store } from "../../data/store"
+import { damagePlayer, increaseScore, setLastImpactLocation } from "../../data/store/player"
+import { createParticles } from "../../data/store/effects"
+import { damagePlane, damageRocket, damageTurret, removeBullet } from "../../data/store/actors"
+import { damageBarrel } from "../../data/store/world"
 
 let _origin = new Vector3()
 let _direction = new Vector3()
@@ -41,7 +45,7 @@ function intersect(object: Object3D, position: Vector3, movement: Tuple3) {
 
 function BulletHandler() {
     useFrame((state, delta) => {
-        let { bullets, instances, world, player } = store.getState()
+        let { instances, world: { bullets, grid, frustum }, player } = store.getState()
         let removed: Bullet[] = []
 
         if (!instances.line || !player.object || !instances.device) {
@@ -52,7 +56,7 @@ function BulletHandler() {
             let bullet = bullets[i]
             let bulletDiagonal = Math.sqrt((bullet.size[2] * .5) ** 2 + bullet.size[2] ** 2)
             let collisions = getCollisions({
-                grid: world.grid,
+                grid,
                 position: bullet.position,
                 size: bullet.size,
                 source: {
@@ -170,7 +174,7 @@ function BulletHandler() {
                 scale: bullet.size,
             })
 
-            if (!world.frustum.containsPoint(bullet.position) || collisions.length) {
+            if (!frustum.containsPoint(bullet.position) || collisions.length) {
                 removed.push(bullet)
             }
 

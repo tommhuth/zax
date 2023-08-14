@@ -5,7 +5,10 @@ import InstancedMesh from "./InstancedMesh"
 import { Mesh } from "three"
 
 export default function Models() {
-    let [building1, building2, building3, hangar, barrel1, barrel2, barrel3, barrel4, turret2, rocket, platform, device] = useLoader(GLTFLoader, [
+    let [
+        building1, building2, building3, hangar, barrel1, barrel2, 
+        barrel3, barrel4, turret2, rocket, platform, device
+    ] = useLoader(GLTFLoader, [
         "/models/building1.glb",
         "/models/building2.glb",
         "/models/building3.glb",

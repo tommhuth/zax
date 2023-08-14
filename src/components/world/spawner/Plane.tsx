@@ -1,6 +1,6 @@
-import { startTransition, useEffect } from "react"
-import {  createPlane, removePlane } from "../../../data/store"
+import { startTransition, useEffect } from "react" 
 import { Tuple3 } from "../../../types"
+import { createPlane, removePlane } from "../../../data/store/actors"
 
 interface PlaneProps {
     position: Tuple3

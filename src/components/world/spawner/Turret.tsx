@@ -1,6 +1,6 @@
-import { useEffect, startTransition } from "react"
-import { createTurret, removeTurret } from "../../../data/store"
+import { useEffect, startTransition } from "react" 
 import { Tuple3 } from "../../../types"
+import { createTurret, removeTurret } from "../../../data/store/actors"
 
 interface TurretProps {
     position?: Tuple3

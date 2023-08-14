@@ -1,7 +1,7 @@
 
 import { useFrame, useThree } from "@react-three/fiber"
 import { memo, startTransition } from "react"
-import { createWorldPart, store, useStore } from "../../data/store"
+import { store, useStore } from "../../data/store"
 import Turret from "./Turret"
 import Plane from "./Plane"
 import Default from "./parts/Default"
@@ -13,6 +13,7 @@ import { WorldPartDefault, WorldPartBuildingsGap, WorldPartType, WorldPartBuildi
 import BuildingsGap from "./parts/BuildingsGap"
 import BuildingsLow from "./parts/BuildingsLow"
 import Rocket from "./Rocket"
+import { createWorldPart } from "../../data/store/world"
 
 export const WORLD_CENTER_X = 1
 export const WORLD_LEFT_EDGE = -2
@@ -59,27 +60,23 @@ export default function World() {
 
 
 const Parts = memo(() => {
-    let barrels = useStore(i => i.barrels)
-    let buildings = useStore(i => i.buildings)
-    let turrets = useStore(i => i.turrets)
-    let planes = useStore(i => i.planes)
-    let rockets = useStore(i => i.rockets)
+    let world = useStore(i => i.world)
 
     return (
         <>
-            {buildings.map(i => {
+            {world.buildings.map(i => {
                 return <Building key={i.id} {...i} />
             })}
-            {turrets.map(i => {
+            {world.turrets.map(i => {
                 return <Turret key={i.id} {...i} />
             })}
-            {planes.map(i => {
+            {world.planes.map(i => {
                 return <Plane key={i.id} {...i} />
             })}
-            {barrels.map(i => {
+            {world.barrels.map(i => {
                 return <Barrel key={i.id} {...i} />
             })}
-            {rockets.map(i => {
+            {world.rockets.map(i => {
                 return <Rocket key={i.id} {...i} />
             })}
         </>

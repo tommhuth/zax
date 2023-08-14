@@ -1,13 +1,14 @@
 import { useFrame } from "@react-three/fiber"
 import React, { startTransition, useRef } from "react"
-import { Box3, Vector3 } from "three"
-import { removeWorldPart, useStore } from "../../data/store"
+import { Box3, Vector3 } from "three" 
 import { Tuple2 } from "../../types"
 import { Only } from "../../utils/utils"
 import { useInstance } from "../InstancedMesh"
 import random from "@huth/random"
 import { WORLD_CENTER_X } from "./World"
 import Config from "../../Config"
+import { store } from "../../data/store"
+import { removeWorldPart } from "../../data/store/world"
 
 interface Asset {
     release: () => void
@@ -48,7 +49,7 @@ export default function WorldPartWrapper({
             return
         }
 
-        let { player, world } = useStore.getState()
+        let { player, world } = store.getState()
         let height = 6
 
         _center.set(position.x, position.y + height / 2, position.z + depth / 2)

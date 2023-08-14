@@ -1,11 +1,12 @@
 import { startTransition, useEffect, useMemo, useRef } from "react"
 import { AdditiveBlending, BufferAttribute, Sprite } from "three"
 import { clamp, glsl, ndelta, setMatrixAt } from "../../utils/utils"
-import { useShader } from "../../utils/hooks"
-import { removeExplosion, useStore } from "../../data/store"
+import { useShader } from "../../utils/hooks" 
 import { useFrame, useLoader } from "@react-three/fiber"
 import InstancedMesh from "../InstancedMesh"
 import { TextureLoader } from "three/src/loaders/TextureLoader"
+import { useStore } from "../../data/store"
+import { removeExplosion } from "../../data/store/effects"
 
 function easeOutQuart(x: number): number {
     return 1 - Math.pow(1 - x, 4)
@@ -23,7 +24,7 @@ function blend(values = [75, 100, 0], t = 0, threshold = .5) {
 }
 
 export default function ExplosionsHandler() {
-    let latestExplosion = useStore(i => i.explosions[0])
+    let latestExplosion = useStore(i => i.world.explosions[0])
     let glowMap = useLoader(TextureLoader, "/textures/glow.png")
     let ref = useRef<Sprite>(null)
     let centerAttributes = useMemo(() => {
@@ -113,7 +114,7 @@ export default function ExplosionsHandler() {
             return
         }
 
-        let explosions = useStore.getState().explosions
+        let explosions = useStore.getState().world.explosions
         let dead: string[] = []
 
         for (let explosion of explosions) {

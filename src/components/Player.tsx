@@ -1,13 +1,16 @@
 import { useFrame, useLoader } from "@react-three/fiber"
 import { startTransition, useEffect, useMemo, useRef } from "react"
-import { Group, Mesh, Vector3 } from "three"
-import { bulletSize, createBullet, damageBarrel, damagePlane, damagePlayer, damageRocket, damageTurret, setPlayerObject, useStore } from "../data/store"
+import { Group, Mesh, Vector3 } from "three" 
 import { Tuple3 } from "../types"
 import { WORLD_BOTTOM_EDGE, WORLD_CENTER_X, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { clamp, ndelta } from "../utils/utils"
 import { useCollisionDetection } from "../utils/hooks"
 import { Owner } from "../data/types"
+import { bulletSize, useStore } from "../data/store"
+import { damagePlayer, setPlayerObject } from "../data/store/player"
+import { createBullet, damagePlane, damageRocket, damageTurret } from "../data/store/actors"
+import { damageBarrel } from "../data/store/world"
 
 let _edgemin = new Vector3(WORLD_LEFT_EDGE, WORLD_BOTTOM_EDGE, -100)
 let _edgemax = new Vector3(WORLD_RIGHT_EDGE, WORLD_TOP_EDGE, 100)
@@ -154,7 +157,11 @@ export default function Player({
         if (Date.now() - lastShotAt.current > weapon.fireFrequency && keys.Space) {
             startTransition(() => {
                 createBullet({
-                    position: [position.x, position.y, position.z - (depth / 2 + bulletSize[2] / 2) * 1.5],
+                    position: [
+                        position.x, 
+                        position.y, 
+                        position.z - (depth / 2 + bulletSize[2] / 2) * 1.5
+                    ],
                     owner: Owner.PLAYER,
                     damage: weapon.damage,
                     color: weapon.color,
