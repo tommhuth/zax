@@ -1,5 +1,5 @@
 import { useFrame, useLoader } from "@react-three/fiber"
-import { startTransition, useEffect, useMemo, useRef } from "react"
+import { startTransition, useCallback, useEffect, useMemo, useRef } from "react"
 import { Group, Mesh, Vector3 } from "three" 
 import { Tuple3 } from "../types"
 import { WORLD_BOTTOM_EDGE, WORLD_CENTER_X, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
@@ -51,6 +51,10 @@ export default function Player({
     let currentPosition = useMemo(() => new Vector3(), [])
     let originalPosition = useMemo(() => new Vector3(), []) 
     let speed = 6 
+    let handleRef = useCallback((object: Group) => {  
+        playerGroupRef.current = object 
+        setPlayerObject(object)
+    }, [])
 
     useCollisionDetection({
         position,
@@ -200,14 +204,7 @@ export default function Player({
                 <meshBasicMaterial color={"blue"} />
             </mesh>
             <group
-                ref={(object: Group) => {
-                    if (playerGroupRef.current) {
-                        return 
-                    }
-                    
-                    playerGroupRef.current = object
-                    setPlayerObject(object)
-                }}
+                ref={handleRef}
                 scale={.75}
                 rotation-y={Math.PI}
             >
