@@ -1,10 +1,17 @@
 import random from "@huth/random"
 import { Tuple2, Tuple3 } from "../../types"
-import { store } from "../store"
+import { Store, store } from "../store"
 import { Vector3 } from "three"
 import { Particle } from "../types"
-import { updateWorld } from "./utils"
 
+function updateEffects(data: Partial<Store["effects"]>) {
+    store.setState({
+        effects: { 
+            ...store.getState().effects,
+            ...data
+        }
+    })
+}
 
 interface CreateShimmerParams {
     position: Tuple3
@@ -21,9 +28,9 @@ export function createShimmer({
 }: CreateShimmerParams) {
     let instance = store.getState().instances.shimmer
 
-    updateWorld({
+    updateEffects({
         shimmer: [
-            ...store.getState().world.shimmer,
+            ...store.getState().effects.shimmer,
             ...new Array(random.integer(...count)).fill(null).map(() => {
                 let offsetPosition = new Vector3(
                     position[0] + random.float(-size[0] / 2, size[0] / 2),
@@ -52,8 +59,8 @@ export function createShimmer({
 }
 
 export function removeShimmer(id: string | string[]) {
-    updateWorld({
-        shimmer: store.getState().world.shimmer.filter(i => Array.isArray(id) ? !id.includes(i.id) : i.id !== id)
+    updateEffects({
+        shimmer: store.getState().effects.shimmer.filter(i => Array.isArray(id) ? !id.includes(i.id) : i.id !== id)
     })
 }
 
@@ -77,7 +84,7 @@ export function createExplosion({
 
     radius *= random.float(1, 1.15)
 
-    updateWorld({
+    updateEffects({
         explosions: [
             {
                 position,
@@ -128,14 +135,14 @@ export function createExplosion({
                     })
                 ],
             },
-            ...store.getState().world.explosions,
+            ...store.getState().effects.explosions,
         ]
     })
 }
 
 export function removeExplosion(id: string | string[]) {
-    updateWorld({
-        explosions: store.getState().world.explosions.filter(i => Array.isArray(id) ? !id.includes(i.id) : i.id !== id)
+    updateEffects({
+        explosions: store.getState().effects.explosions.filter(i => Array.isArray(id) ? !id.includes(i.id) : i.id !== id)
     })
 }
 
@@ -200,16 +207,16 @@ export function createParticles({
         }
     })
 
-    updateWorld({
+    updateEffects({
         particles: [
-            ...store.getState().world.particles,
+            ...store.getState().effects.particles,
             ...particles,
         ]
     })
 }
 
 export function removeParticle(id: string | string[]) {
-    updateWorld({
-        particles: store.getState().world.particles.filter(i => Array.isArray(id) ? !id.includes(i.id) : i.id !== id)
+    updateEffects({
+        particles: store.getState().effects.particles.filter(i => Array.isArray(id) ? !id.includes(i.id) : i.id !== id)
     })
 }

@@ -14,7 +14,7 @@ export function createBullet({
     speed = 10,
     damage,
     color,
-}) {
+}) { 
     let id = random.id()
     let obb = new OBB(new Vector3(...position), new Vector3(...size.map(i => i / 2)))
     let aabb = new Box3().setFromCenterAndSize(new Vector3(...position), new Vector3(0, 0, 0))

@@ -24,7 +24,7 @@ export const WORLD_BOTTOM_EDGE = 1
 export default function World() {
     let parts = useStore(i => i.world.parts)
     let { viewport } = useThree()
-    let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
+    let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2) 
 
     useFrame(() => {
         let { world: { parts }, player: { object: player } } = store.getState()
@@ -60,23 +60,29 @@ export default function World() {
 
 
 const Parts = memo(() => {
-    let world = useStore(i => i.world)
+    let buildings = useStore(i => i.world.buildings)
+    let turrets = useStore(i => i.world.turrets)
+    let planes = useStore(i => i.world.planes)
+    let barrels = useStore(i => i.world.barrels)
+    let rockets = useStore(i => i.world.rockets)
+
+    console.log("PARTS")
 
     return (
         <>
-            {world.buildings.map(i => {
+            {buildings.map(i => {
                 return <Building key={i.id} {...i} />
             })}
-            {world.turrets.map(i => {
+            {turrets.map(i => {
                 return <Turret key={i.id} {...i} />
             })}
-            {world.planes.map(i => {
+            {planes.map(i => {
                 return <Plane key={i.id} {...i} />
             })}
-            {world.barrels.map(i => {
+            {barrels.map(i => {
                 return <Barrel key={i.id} {...i} />
             })}
-            {world.rockets.map(i => {
+            {rockets.map(i => {
                 return <Rocket key={i.id} {...i} />
             })}
         </>

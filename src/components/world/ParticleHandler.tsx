@@ -11,7 +11,7 @@ function ParticleHandler() {
     let floorY = 0
 
     useFrame((state, delta) => {
-        let { particles } = store.getState().world
+        let { particles } = store.getState().effects
         let dead: Particle[] = []
         let nd = ndelta(delta)
 

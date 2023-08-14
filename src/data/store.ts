@@ -22,11 +22,13 @@ export interface Store {
         turrets: Turret[]
         barrels: Barrel[]
         rockets: Rocket[]
-        shimmer: Shimmer[]
         planes: Plane[]
-        particles: Particle[]
-        explosions: Explosion[]
         buildings: Building[]
+    }
+    effects: {
+        particles: Particle[]
+        shimmer: Shimmer[]
+        explosions: Explosion[]
     }
     instances: Record<string, Instance>
     repeaters: Record<string, RepeaterMesh>
@@ -55,14 +57,16 @@ const store = create<Store>(() => ({
             makeDefault({ position: new Vector3(0, 0, 0), size: [10, 20] }),
         ],
         buildings: [],
-        explosions: [],
-        shimmer: [],
         planes: [],
         turrets: [],
         barrels: [],
         bullets: [],
         rockets: [],
+    },
+    effects: {
+        explosions: [],
         particles: [],
+        shimmer: [],
     },
     instances: {},
     repeaters: {},

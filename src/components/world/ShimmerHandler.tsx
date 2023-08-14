@@ -1,4 +1,4 @@
-import { clamp, ndelta, setMatrixAt } from "../../utils/utils" 
+import { clamp, ndelta, setMatrixAt } from "../../utils/utils"
 import { useFrame } from "@react-three/fiber"
 import InstancedMesh from "../InstancedMesh"
 import { startTransition } from "react"
@@ -25,7 +25,7 @@ export default function ShimmerHandler() {
             return
         }
 
-        let shimmers = useStore.getState().world.shimmer
+        let shimmers = useStore.getState().effects.shimmer
         let d = ndelta(delta)
         let dead: string[] = []
 
@@ -35,18 +35,18 @@ export default function ShimmerHandler() {
                 continue
             }
 
-            let explodeEffect = shimmer.time > 0 ? easeInQuad(1 - clamp(shimmer.time / (shimmer.lifetime * .25), 0, 1)) : 0 
+            let explodeEffect = shimmer.time > 0 ? easeInQuad(1 - clamp(shimmer.time / (shimmer.lifetime * .25), 0, 1)) : 0
             let scale = (1 - clamp(shimmer.time / shimmer.lifetime, 0, 1)) * shimmer.radius
             let dragEffect = getDistanceTo(shimmer.position.x, "x")
                 * getDistanceTo(shimmer.position.y, "y")
                 * getDistanceTo(shimmer.position.z, "z")
- 
+
             shimmer.position.x += shimmer.speed[0] * explodeEffect * d * shimmer.friction * 5
             shimmer.position.y += shimmer.speed[1] * explodeEffect * d * shimmer.friction * 5
             shimmer.position.z += shimmer.speed[2] * explodeEffect * d * shimmer.friction * 5
 
-            shimmer.position.z -= easeInOutCubic(dragEffect) * d * 5 
-            shimmer.position.y -=  shimmer.gravity * (1 - explodeEffect) * d  
+            shimmer.position.z -= easeInOutCubic(dragEffect) * d * 5
+            shimmer.position.y -= shimmer.gravity * (1 - explodeEffect) * d
             shimmer.position.y = Math.max(shimmer.position.y, shimmer.radius)
 
             shimmer.time += d * 1000

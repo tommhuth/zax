@@ -24,7 +24,7 @@ function blend(values = [75, 100, 0], t = 0, threshold = .5) {
 }
 
 export default function ExplosionsHandler() {
-    let latestExplosion = useStore(i => i.world.explosions[0])
+    let latestExplosion = useStore(i => i.effects.explosions[0])
     let glowMap = useLoader(TextureLoader, "/textures/glow.png")
     let ref = useRef<Sprite>(null)
     let centerAttributes = useMemo(() => {
@@ -114,7 +114,7 @@ export default function ExplosionsHandler() {
             return
         }
 
-        let explosions = useStore.getState().world.explosions
+        let explosions = useStore.getState().effects.explosions
         let dead: string[] = []
 
         for (let explosion of explosions) {
