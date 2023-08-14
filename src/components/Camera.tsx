@@ -3,6 +3,8 @@ import { useLayoutEffect, useMemo } from "react"
 import { Matrix4, Vector3 } from "three"
 import { store } from "../data/store"
 import { Tuple3 } from "../types"
+import { setCameraShake } from "../data/store/player"
+import random from "@huth/random"
 
 let _matrix = new Matrix4()
 
@@ -27,8 +29,11 @@ export default function Camera({ startPosition = [10, 15, 10] }: { startPosition
         _matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)
         world.frustum.setFromProjectionMatrix(_matrix)
 
+        setCameraShake(player.cameraShake * .9) 
+
         if (player.object) {
-            camera.position.z = basePosition.z + player.object.position.z - 8
+            camera.position.z = (basePosition.z + player.object.position.z - 8) + player.cameraShake * random.float(-1, 1)
+            camera.position.x = basePosition.x + player.cameraShake * random.float(-1, 1)
         }
     })
 

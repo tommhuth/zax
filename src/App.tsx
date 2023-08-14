@@ -1,7 +1,7 @@
 
 import Camera from "./components/Camera"
 import { Suspense, useEffect, useRef, useState } from "react"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { Canvas, useFrame } from "@react-three/fiber"
 import { Perf } from "r3f-perf"
 import Player from "./components/Player"
 import World from "./components/world/World"
@@ -10,10 +10,8 @@ import Config from "./Config"
 import Ui from "./components/ui/Ui"
 import Lights from "./components/Lights"
 import { BasicShadowMap, Group, NoToneMapping } from "three"
-import { dpr, isSmallScreen, pixelSize, useStore } from "./data/store"
-import ExplosionsHandler from "./components/world/ExplosionsHandler"
-import Models from "./components/Models"
-import ShimmerHandler from "./components/world/ShimmerHandler"
+import { dpr, isSmallScreen, pixelSize, useStore } from "./data/store" 
+import Models from "./components/Models" 
 
 export default function Wrapper() { 
     let getSize = () => [
@@ -84,8 +82,6 @@ export default function Wrapper() {
                     <Models />
                     <World />
                     <Player />
-                    <ExplosionsHandler />
-                    <ShimmerHandler />
                 </Suspense>
             </Canvas>
         </div>

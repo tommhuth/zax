@@ -3,10 +3,12 @@ import { Tuple2, Tuple3 } from "../../types"
 import { Store, store } from "../store"
 import { Vector3 } from "three"
 import { Particle } from "../types"
+import { setCameraShake } from "./player"
+import { clamp } from "three/src/math/MathUtils"
 
 function updateEffects(data: Partial<Store["effects"]>) {
     store.setState({
-        effects: { 
+        effects: {
             ...store.getState().effects,
             ...data
         }
@@ -81,9 +83,13 @@ export function createExplosion({
 }: CreateExplosionParams) {
     let baseLifetime = random.integer(1600, 1800)
     let instance = store.getState().instances.fireball
+    let { cameraShake, object } = store.getState().player
+    let playerZ = object?.position.z || 0
+    let shake = 1 - clamp(Math.abs(playerZ - position[2]) / 15, 0, 1)
 
     radius *= random.float(1, 1.15)
 
+    setCameraShake(Math.min(cameraShake + .5 * shake, 1)) 
     updateEffects({
         explosions: [
             {

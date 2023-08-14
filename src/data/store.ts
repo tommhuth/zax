@@ -75,8 +75,7 @@ const store = create<Store>(() => ({
         cameraShake: 0,
         health: 100,
         score: 0,
-        object: null,
-        position: new Vector3(),
+        object: null, 
         lastImpactLocation: [0, -10, 0],
         weapon: {
             fireFrequency: 150,
@@ -84,8 +83,7 @@ const store = create<Store>(() => ({
             color: "yellow",
             speed: 40,
             bulletSize: [.125, .125, 1.25]
-        },
-        weaponHeat: 0
+        }, 
     }
 }))
 const useStore = store

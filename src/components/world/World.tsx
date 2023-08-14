@@ -14,6 +14,8 @@ import BuildingsGap from "./parts/BuildingsGap"
 import BuildingsLow from "./parts/BuildingsLow"
 import Rocket from "./Rocket"
 import { createWorldPart } from "../../data/store/world"
+import ExplosionsHandler from "./ExplosionsHandler"
+import ShimmerHandler from "./ShimmerHandler"
 
 export const WORLD_CENTER_X = 1
 export const WORLD_LEFT_EDGE = -2
@@ -24,7 +26,7 @@ export const WORLD_BOTTOM_EDGE = 1
 export default function World() {
     let parts = useStore(i => i.world.parts)
     let { viewport } = useThree()
-    let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2) 
+    let diagonal = Math.sqrt(viewport.width ** 2 + viewport.height ** 2)
 
     useFrame(() => {
         let { world: { parts }, player: { object: player } } = store.getState()
@@ -54,6 +56,8 @@ export default function World() {
             <Parts />
             <ParticleHandler />
             <BulletHandler />
+            <ExplosionsHandler />
+            <ShimmerHandler />
         </>
     )
 }
@@ -65,8 +69,6 @@ const Parts = memo(() => {
     let planes = useStore(i => i.world.planes)
     let barrels = useStore(i => i.world.barrels)
     let rockets = useStore(i => i.world.rockets)
-
-    console.log("PARTS")
 
     return (
         <>

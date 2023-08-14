@@ -18,7 +18,7 @@ export default function ShimmerHandler() {
     let player = useStore(i => i.player.object)
     let getDistanceTo = (value: number, prop: "x" | "y" | "z", threshold = 3.5) => {
         return player ? 1 - clamp(Math.abs(value - player.position[prop]) / threshold, 0, 1) : 0
-    }
+    } 
 
     useFrame((state, delta) => {
         if (!instance || !player) {

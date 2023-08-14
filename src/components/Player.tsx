@@ -201,6 +201,10 @@ export default function Player({
             </mesh>
             <group
                 ref={(object: Group) => {
+                    if (playerGroupRef.current) {
+                        return 
+                    }
+                    
                     playerGroupRef.current = object
                     setPlayerObject(object)
                 }}
