@@ -150,27 +150,33 @@ export function createShimmer({
     count = [6, 15],
     size = [4, 4, 4],
     radius = [.05, .2]
-}: CreateShimmerParams) {
-    return 
-    
+}: CreateShimmerParams) { 
     let instance = useStore.getState().instances.shimmer
 
     store.setState({
         shimmer: [
             ...store.getState().shimmer,
             ...new Array(random.integer(...count)).fill(null).map(() => {
+                let offsetPosition = new Vector3(
+                    position[0] + random.float(-size[0] / 2, size[0] / 2),
+                    position[1] + random.float(-size[1] / 2, size[1] / 2),
+                    position[2] + random.float(-size[2] / 2, size[2] / 2),
+                ) 
+                let speed = offsetPosition.clone()
+                    .sub(new Vector3(...position))
+                    .normalize()
+                    .multiplyScalar(4)
+
                 return {
                     id: random.id(),
                     index: instance.index.next(),
-                    speed: random.float(.1, 1.5),
-                    time: random.integer(-500, 0),
+                    gravity: random.float(.1, 1.5),
+                    speed: speed.toArray(),
+                    time: random.integer(-400, -250),
                     radius: random.float(...radius),
-                    lifetime: random.integer(1500, 5000),
-                    position: new Vector3(
-                        position[0] + random.float(-size[0] / 2, size[0] / 2),
-                        position[1] + random.float(-size[1] / 2, size[1] / 2),
-                        position[2] + random.float(-size[2] / 2, size[2] / 2),
-                    )
+                    lifetime: random.integer(1500, 6000), 
+                    friction: random.float(.3, .5),
+                    position: new  Vector3(...position),
                 }
             })
         ]

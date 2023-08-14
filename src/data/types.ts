@@ -34,9 +34,11 @@ export interface Rocket {
 export interface Shimmer {
     position: Vector3
     id: string  
-    speed: number
+    speed: Tuple3
     index: number
     time: number
+    gravity: number 
+    friction: number
     lifetime: number
     radius: number
 }

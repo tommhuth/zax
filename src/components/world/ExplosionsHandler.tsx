@@ -1,9 +1,9 @@
 import { startTransition, useEffect, useMemo, useRef } from "react"
-import { AdditiveBlending, BufferAttribute, MultiplyBlending, Sprite } from "three"
+import { AdditiveBlending, BufferAttribute, Sprite } from "three"
 import { clamp, glsl, ndelta, setMatrixAt } from "../../utils/utils"
 import { useShader } from "../../utils/hooks"
 import { removeExplosion, useStore } from "../../data/store"
-import { useFrame, useLoader, useThree } from "@react-three/fiber"
+import { useFrame, useLoader } from "@react-three/fiber"
 import InstancedMesh from "../InstancedMesh"
 import { TextureLoader } from "three/src/loaders/TextureLoader"
 
