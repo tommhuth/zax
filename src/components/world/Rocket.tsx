@@ -43,7 +43,7 @@ function explode(position: Vector3, size: Tuple3) {
     let explosions = [
         [125, [.2, size[1] / 2 - .2, .3], .2],
         [0, [-.2, -size[1] / 2, -.25], .35]
-    ] as const
+    ] as [delay: number, offset: Tuple3, radius: number][]
 
     for (let [delay, [x, y, z], radius] of explosions) {
         setTimeout(() => {
