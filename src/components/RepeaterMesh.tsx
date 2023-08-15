@@ -3,8 +3,9 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D } from "three"
 import { useStore } from "../data/store"
 import { requestRepeater, setRepeater } from "../data/store/utils"
+import { RepeaterName } from "../data/types"
 
-export function useRepeater(name: string) {
+export function useRepeater(name: RepeaterName) {
     let [repeater, setRepeater] = useState<Object3D | null>(null)
     let hasRepeater = useRef(false)
     let hasData = !!useStore(i => i.repeaters[name])
@@ -46,7 +47,13 @@ const materials = {
     "": new MeshBasicMaterial({ color: "red", dithering: true }),
 }
 
-export default function RepeaterMesh({ name, count, object }: { object: Object3D, name: string, count: number }) {
+interface RepeaterMeshProps {
+    object: Object3D
+    name: RepeaterName
+    count: number 
+}
+
+export default function RepeaterMesh({ name, count, object }: RepeaterMeshProps) {
     let { scene } = useThree()
 
     useEffect(() => {
@@ -60,16 +67,15 @@ export default function RepeaterMesh({ name, count, object }: { object: Object3D
             }
         })
 
-        let reps = new Array(count).fill(null).map(() => object.clone())
+        let list = new Array(count).fill(null).map(() => object.clone())
 
-        reps.forEach(i => {
+        list.forEach(i => {
             i.visible = false
         })
 
+        scene.add(...list)
 
-        scene.add(...reps)
-
-        setRepeater(name, reps, count)
+        setRepeater(name, list, count)
     }, [object])
 
     return null

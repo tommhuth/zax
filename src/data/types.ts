@@ -4,6 +4,11 @@ import { Tuple2, Tuple3 } from "../types"
 import Counter from "./Counter"
 import { Client } from "./SpatialHashGrid3D"
 
+export type InstancedName = "line" | "box" | "sphere" | "device"
+    | "barrel1" | "barrel2" | "barrel3" | "barrel4" | "fireball"
+    | "turret" | "rocket" | "platform" | "cylinder" | "shimmer"
+
+export type RepeaterName = "building1" | "building2" | "building3" | "hangar"
 
 export interface Fireball {
     isPrimary?: boolean
@@ -33,11 +38,11 @@ export interface Rocket {
 }
 export interface Shimmer {
     position: Vector3
-    id: string  
+    id: string
     speed: Tuple3
     index: number
     time: number
-    gravity: number 
+    gravity: number
     friction: number
     lifetime: number
     radius: number
@@ -122,7 +127,7 @@ export interface SpawnedPlane {
 export interface SpawnedRocket {
     position: Tuple3
     id: string
-    speed?: number 
+    speed?: number
 }
 
 export interface SpawnedTurret {
@@ -135,15 +140,15 @@ export interface SpawnedBarrel {
     id: string
 }
 
-export interface WorldPartBuildingsGap extends WorldPart { 
+export interface WorldPartBuildingsGap extends WorldPart {
     type: WorldPartType.BUILDINGS_GAP
 }
 
-export interface WorldPartDefault extends WorldPart { 
+export interface WorldPartDefault extends WorldPart {
     type: WorldPartType.DEFAULT
 }
 
-export interface WorldPartBuildingsLow extends WorldPart { 
+export interface WorldPartBuildingsLow extends WorldPart {
     type: WorldPartType.BUILDINGS_LOW
 }
 
@@ -182,7 +187,7 @@ export interface Particle {
     rotation: Vector3
     index: number
     color: string
-    id: string 
+    id: string
 }
 
 export interface RepeaterMesh {

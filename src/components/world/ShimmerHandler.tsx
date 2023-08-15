@@ -1,4 +1,4 @@
-import { clamp, ndelta, setMatrixAt } from "../../utils/utils"
+import { clamp, ndelta, setMatrixAt } from "../../data/utils/utils"
 import { useFrame } from "@react-three/fiber"
 import InstancedMesh from "../InstancedMesh"
 import { startTransition } from "react"

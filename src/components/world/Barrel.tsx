@@ -1,8 +1,8 @@
 import { useFrame } from "@react-three/fiber"
 import { startTransition, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { Vector3 } from "three"
-import {  useStore } from "../../data/store"
-import { Barrel } from "../../data/types" 
+import { useStore } from "../../data/store"
+import { Barrel, InstancedName } from "../../data/types"
 import { useInstance } from "../InstancedMesh"
 import random from "@huth/random"
 import Config from "../../Config"
@@ -50,7 +50,9 @@ export default function Barrel({
     let removed = useRef(false)
     let color = "#ff0051"
     let [rotation] = useState(random.pick(...new Array(8 * 2).fill(null).map((i, index, list) => (index / list.length) * Math.PI * 2)))
-    let model = useMemo(() => random.pick("barrel1", "barrel2", "barrel3", "barrel4"), [])
+    let model: InstancedName = useMemo(() => {
+        return random.pick("barrel1", "barrel2", "barrel3", "barrel4")
+    }, [])
     let [index, instance] = useInstance(model, {
         color,
         position: [position.x, position.y - size[1] / 2, position.z],
@@ -60,7 +62,7 @@ export default function Barrel({
         setTimeout(() => removeBarrel(id), 300)
         removed.current = true
     }
- 
+
     useLayoutEffect(() => {
         if (health === 0) {
             startTransition(() => {
@@ -73,8 +75,8 @@ export default function Barrel({
     useFrame(() => {
         let { world, player } = useStore.getState()
 
-        if (instance && typeof index === "number" && !removed.current) { 
-            aabb.setFromCenterAndSize(position, _size.set(...size)) 
+        if (instance && typeof index === "number" && !removed.current) {
+            aabb.setFromCenterAndSize(position, _size.set(...size))
 
             if (!world.frustum.intersectsBox(aabb) && player.object && position.z > player.object.position.z) {
                 remove()
@@ -84,7 +86,7 @@ export default function Barrel({
 
     if (!Config.DEBUG) {
         return null
-    } 
+    }
 
     return (
         <mesh position={position.toArray()}>

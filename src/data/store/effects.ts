@@ -79,17 +79,17 @@ export function createExplosion({
     count = 12,
     radius = .75,
     fireballPath: [fireballStart, fireballDirection] = [[0, 0, 0], [0, 0, 0]],
-    fireballCount = 0,
+    fireballCount = 0, 
 }: CreateExplosionParams) {
     let baseLifetime = random.integer(1600, 1800)
     let instance = store.getState().instances.fireball
     let { cameraShake, object } = store.getState().player
     let playerZ = object?.position.z || 0
-    let shake = 1 - clamp(Math.abs(playerZ - position[2]) / 15, 0, 1)
+    let shake = 1 - clamp(Math.abs(playerZ - position[2]) / 8, 0, .75)
 
     radius *= random.float(1, 1.15)
 
-    setCameraShake(Math.min(cameraShake + .5 * shake, 1)) 
+    setCameraShake(Math.min(cameraShake + .15 + .25 * shake, 1)) 
     updateEffects({
         explosions: [
             {
