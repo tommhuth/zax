@@ -244,7 +244,7 @@ export function removeRocket(id: string) {
 
 export function createRocket(
     [x = 0, y = 0, z = -10] = [],
-    speed = random.float(2.5, 4),
+    speed = random.float(1.5, 3),
     health = 35,
 ) {
     let id = random.id()

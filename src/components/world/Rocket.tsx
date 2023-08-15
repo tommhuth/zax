@@ -29,7 +29,7 @@ function explode(position: Vector3, size: Tuple3) {
     setTimeout(() => {
         createParticles({
             position: position.toArray(),
-            speed: [5, 10],
+            speed: [5, 20],
             speedOffset: [[-10, 10], [-10, 10], [-10, 10]],
             positionOffset: [[-1.5, 1.5], [-.5, .5], [-1.5, 1.5]],
             normal: [0, 0, 0],
