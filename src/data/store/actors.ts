@@ -243,7 +243,7 @@ export function removeRocket(id: string) {
 }
 
 export function createRocket(
-    [x = 0, y = 0, z = -10] = [],
+    [x = 0, y = 0, z = 0] = [],
     speed = random.float(1.5, 3),
     health = 35,
 ) {

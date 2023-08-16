@@ -16,6 +16,8 @@ import { createExplosion, createParticles, createShimmer } from "../../data/stor
 let _size = new Vector3()
 
 function explode(position: Vector3, size: Tuple3) {
+    let shouldDoFireball = position.y < 2
+
     createShimmer({
         position: [
             position.x,
@@ -25,43 +27,63 @@ function explode(position: Vector3, size: Tuple3) {
         count: [30, 50],
         size: [3, 6, 3]
     })
-
-    setTimeout(() => {
+  
+    if (shouldDoFireball) { 
         createParticles({
             position: position.toArray(),
-            speed: [5, 20],
-            speedOffset: [[-10, 10], [-10, 10], [-10, 10]],
-            positionOffset: [[-1.5, 1.5], [-.5, .5], [-1.5, 1.5]],
-            normal: [0, 0, 0],
-            normalOffset: [[-1, 1], [-1, 1], [-1, 1]],
-            count: [16, 20],
+            speed: [15, 25],
+            speedOffset: [[-5, 5], [0, 5], [-5, 5]],
+            positionOffset: [[-.5, .5], [0, 1], [-.5, .5]],
+            normal: [0, 1, 0],
+            normalOffset: [[-.5, .5], [0, 0], [-.5, .5]],
+            count: [10, 15],
             radius: [.1, .45],
             color: "#fff",
         })
-    }, 300)
 
-    let explosions = [
-        [125, [.2, size[1] / 2 - .2, .3], .2],
-        [0, [-.2, -size[1] / 2, -.25], .35]
-    ] as [delay: number, offset: Tuple3, radius: number][]
+        createExplosion({
+            position: [position.x, 0, position.z],
+            count: 10,
+            radius: random.float(.65, .75),
+            fireballCount: 5,
+            fireballPath: [[position.x, 0, position.z], [0, 7, 0]]
+        })
+    } else {
+        let explosions = [
+            [125, [.2, size[1] / 2 - .2, .3], .2],
+            [0, [-.2, -size[1] / 2, -.25], .35]
+        ] as [delay: number, offset: Tuple3, radius: number][]
 
-    for (let [delay, [x, y, z], radius] of explosions) {
+        for (let [delay, [x, y, z], radius] of explosions) {
+            setTimeout(() => {
+                createExplosion({
+                    position: [position.x + x, position.y + y, position.z + z],
+                    count: 10,
+                    radius,
+                })
+            }, delay)
+        }
+
         setTimeout(() => {
             createExplosion({
-                position: [position.x + x, position.y + y, position.z + z],
-                count: 10,
-                radius,
-            })
-        }, delay)
-    }
+                position: [position.x, position.y, position.z],
+                count: 16,
+                radius: random.float(.6, .8),
+            }) 
 
-    setTimeout(() => {
-        createExplosion({
-            position: [position.x, position.y, position.z],
-            count: 16,
-            radius: random.float(.6, .8),
-        })
-    }, 320)
+            createParticles({
+                position: position.toArray(),
+                speed: [12, 20],
+                speedOffset: [[-0, 0], [-0, 0], [-0, 0]],
+                positionOffset: [[-.5, .5], [-1, 1], [-.5, .5]],
+                normal: [0, 0, 0],
+                normalOffset: [[-1, 1], [-1, 1], [-1, 1]],
+                count: [10, 15],
+                radius: [.1, .45],
+                color: "#fff",
+            })
+        }, 320)
+    }
 }
 
 export default function Rocket({
@@ -127,7 +149,7 @@ export default function Rocket({
                 rotation: [0, data.rotationY, 0]
             })
 
-            ref.current?.position.set(...position.toArray())
+            ref.current?.position.copy(position)
             client.position = position.toArray()
             grid.updateClient(client)
         }
