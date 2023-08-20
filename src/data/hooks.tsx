@@ -2,9 +2,9 @@ import { useFrame } from "@react-three/fiber"
 import { useMemo, useRef } from "react"
 import { Box3, IUniform, Matrix4, Quaternion, Shader, Vector3 } from "three"
 import { OBB } from "three/examples/jsm/math/OBB" 
-import { SpatialHashGrid3D, Client } from "../SpatialHashGrid3D"
-import { useStore } from "../store"
-import { Tuple3 } from "../../types"
+import { SpatialHashGrid3D, Client } from "./SpatialHashGrid3D"
+import { useStore } from "./store"
+import { Tuple3 } from "../types"
 import { glsl } from "./utils"
 
 interface ShaderPart {

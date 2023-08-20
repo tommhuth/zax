@@ -1,7 +1,7 @@
 import { useFrame, useThree } from "@react-three/fiber"
 import { memo, startTransition } from "react" 
 import { Particle } from "../../data/types"
-import { ndelta, setColorAt, setMatrixAt } from "../../data/utils/utils"
+import { ndelta, setColorAt, setMatrixAt } from "../../data/utils"
 import { store } from "../../data/store"
 import { removeParticle } from "../../data/store/effects"
 

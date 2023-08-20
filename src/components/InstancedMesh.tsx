@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { setColorAt, setMatrixAt, setMatrixNullAt } from "../data/utils/utils"
+import { setColorAt, setMatrixAt, setMatrixNullAt } from "../data/utils"
 import { ColorRepresentation, InstancedMesh as InstancedMeshThree, Vector3 } from "three"
 import { Tuple3, Tuple4 } from "../types"
 import { useStore } from "../data/store"

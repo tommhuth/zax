@@ -2,7 +2,7 @@ import { startTransition, useLayoutEffect, useMemo, useRef } from "react"
 import { Rocket } from "../../data/types"
 import { useInstance } from "../InstancedMesh"
 import { useFrame } from "@react-three/fiber"
-import { ndelta, setMatrixAt, setMatrixNullAt } from "../../data/utils/utils"
+import { ndelta, setMatrixAt, setMatrixNullAt } from "../../data/utils"
 import { Mesh, Vector3 } from "three"
 import random from "@huth/random"
 import { Tuple3 } from "../../types"
@@ -49,10 +49,10 @@ function explode(position: Vector3, size: Tuple3) {
             fireballPath: [[position.x, 0, position.z], [0, 7, 0]]
         })
     } else {
-        let explosions = [
+        let explosions: [delay: number, offset: Tuple3, radius: number][] = [
             [125, [.2, size[1] / 2 - .2, .3], .2],
             [0, [-.2, -size[1] / 2, -.25], .35]
-        ] as [delay: number, offset: Tuple3, radius: number][]
+        ] 
 
         for (let [delay, [x, y, z], radius] of explosions) {
             setTimeout(() => {

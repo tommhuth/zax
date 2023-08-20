@@ -1,13 +1,13 @@
-import { useFrame, useLoader } from "@react-three/fiber"
+import { useFrame, useLoader, useThree } from "@react-three/fiber"
 import { startTransition, useCallback, useEffect, useMemo, useRef } from "react"
-import { Group, Mesh, Vector3 } from "three" 
+import { Group, Mesh, Vector3 } from "three"
 import { Tuple3 } from "../types"
 import { WORLD_BOTTOM_EDGE, WORLD_CENTER_X, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE, WORLD_TOP_EDGE } from "./world/World"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
-import { clamp, ndelta } from "../data/utils/utils"
-import { useCollisionDetection } from "../data/utils/hooks"
+import { clamp, ndelta } from "../data/utils"
+import { useCollisionDetection, useShader } from "../data/hooks"
 import { Owner } from "../data/types"
-import { bulletSize, useStore } from "../data/store"
+import { bulletSize, pixelSize, useStore } from "../data/store"
 import { damagePlayer, setPlayerObject } from "../data/store/player"
 import { createBullet, damagePlane, damageRocket, damageTurret } from "../data/store/actors"
 import { damageBarrel } from "../data/store/world"
@@ -49,16 +49,16 @@ export default function Player({
         })
     }, [grid])
     let currentPosition = useMemo(() => new Vector3(), [])
-    let originalPosition = useMemo(() => new Vector3(), []) 
-    let speed = 6 
-    let handleRef = useCallback((object: Group) => {  
+    let originalPosition = useMemo(() => new Vector3(), [])
+    let speed = 7
+    let handleRef = useCallback((object: Group) => {
         if (!object) {
-            return 
+            return
         }
-        
-        playerGroupRef.current = object 
+
+        playerGroupRef.current = object
         setPlayerObject(object)
-    }, [])
+    }, []) 
 
     useCollisionDetection({
         position,
@@ -166,8 +166,8 @@ export default function Player({
             startTransition(() => {
                 createBullet({
                     position: [
-                        position.x, 
-                        position.y, 
+                        position.x,
+                        position.y,
                         position.z - (depth / 2 + bulletSize[2] / 2) * 1.5
                     ],
                     owner: Owner.PLAYER,
@@ -218,7 +218,9 @@ export default function Player({
                     castShadow
                     userData={{ type: "player" }}
                     position={[0, 0, 0]}
-                />
+                >
+                    <meshLambertMaterial color="red" attach={"material"} />
+                </primitive>
                 <mesh userData={{ type: "player" }} visible={false}>
                     <boxGeometry args={[...size, 1, 1, 1]} />
                     <meshBasicMaterial color="red" wireframe />
