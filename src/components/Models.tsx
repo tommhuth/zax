@@ -1,18 +1,78 @@
-import { useLoader } from "@react-three/fiber"
+import { useFrame, useLoader } from "@react-three/fiber"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import RepeaterMesh from "./RepeaterMesh"
-import InstancedMesh from "./InstancedMesh" 
+import InstancedMesh from "./InstancedMesh"
 import { Mesh } from "three"
+import { useShader } from "../data/hooks"
+import { glsl } from "../data/utils"
+import { useGLTF } from "@react-three/drei"
+import noise from "./../shaders/noise.glsl"
+
+
+export function FogMat({ color = "white", isInstance = true }) {
+    let { onBeforeCompile, uniforms } = useShader({
+        uniforms: {
+            uTime: { value: 0 }
+        },
+        vertex: {
+            head: glsl`
+                varying vec4 vPosition;   
+                uniform float uTime; 
+            `,
+            main: glsl` 
+                vec4 globalPosition = ${isInstance ? "instanceMatrix" : "modelMatrix"}  * vec4(position, 1.);
+
+                vPosition = globalPosition;
+            `
+        },
+        fragment: {
+            head: glsl` 
+                varying vec4 vPosition; 
+                uniform float uTime; 
+                ${noise}
+
+                float easeInOutCubic(float x) {
+                    return x < 0.5 ? 4. * x * x * x : 1. - pow(-2. * x + 2., 3.) / 2.;
+                }
+
+                float easeInOutSine(float x) {
+                    return -(cos(3.14159 * x) - 1.) / 2.;
+                }
+
+                float easeInOutQuad(float x) {
+                    return x < 0.5 ? 2. * x * x : 1. - pow(-2. * x + 2., 2.) / 2.;
+                }
+            `,
+            main: glsl`
+                float fogScale = .075;
+                float fogDensity = .8;
+                float heightRange = 4.;
+                float heightEffect = pow(1. - clamp(vPosition.y / heightRange, 0., 1.), 3.);
+                float fogEffect = easeInOutCubic((noise(vPosition.xyz * fogScale - uTime) + 1.) / 2.);
+
+                vec3 baseColor = gl_FragColor.rgb;
+                vec3 fogColor = vec3(.7, .8, 1.);
+
+                gl_FragColor = vec4(mix(baseColor, fogColor, heightEffect * fogEffect * fogDensity), 1.);
+            `
+        }
+    })
+
+    useFrame((state, delta) => {
+        uniforms.uTime.value += delta * .05
+        uniforms.uTime.needsUpdate = true
+    })
+
+    return (
+        <meshPhongMaterial onBeforeCompile={onBeforeCompile} color={color} attach={"material"} dithering />
+    )
+}
 
 export default function Models() {
     let [
-        building1, building2, building3, hangar, barrel1, barrel2, 
-        barrel3, barrel4, turret2, rocket, platform, device
+        barrel1, barrel2, barrel3, barrel4,
+        turret2, rocket, platform, device
     ] = useLoader(GLTFLoader, [
-        "/models/building1.glb",
-        "/models/building2.glb",
-        "/models/building3.glb",
-        "/models/hangar.glb",
         "/models/barrel1.glb",
         "/models/barrel2.glb",
         "/models/barrel3.glb",
@@ -21,78 +81,204 @@ export default function Models() {
         "/models/rocket.glb",
         "/models/platform.glb",
         "/models/device.glb",
-    ]) 
+    ])
 
     return (
         <>
+            <Building1 />
             <InstancedMesh name="box" count={30}>
                 <boxGeometry args={[1, 1, 1, 1, 1, 1]} attach="geometry" />
-                <meshPhongMaterial color="white" attach={"material"} dithering />
+                <FogMat />
             </InstancedMesh>
 
             <InstancedMesh name="sphere" count={100}>
                 <sphereGeometry args={[1, 3, 4]} attach="geometry" />
-                <meshPhongMaterial color="white" attach={"material"} dithering />
+                <FogMat />
             </InstancedMesh>
 
             <InstancedMesh name="line" count={35} colors={false}>
                 <boxGeometry args={[1, 1, 1, 1, 1, 1]} attach="geometry" />
                 <meshBasicMaterial
                     color={"#00f"}
-                    attach={"material"} 
+                    attach={"material"}
                 />
             </InstancedMesh>
 
             <InstancedMesh name="cylinder" count={20}>
                 <cylinderGeometry args={[.5, .5, 1, 10, 1]} attach="geometry" />
-                <meshPhongMaterial attach={"material"} dithering />
+                <FogMat />
             </InstancedMesh>
 
             <InstancedMesh name="barrel1" count={15}>
                 <primitive object={(barrel1.nodes.barrel as Mesh).geometry} attach="geometry" />
-                <meshPhongMaterial attach={"material"} dithering />
+                <FogMat />
             </InstancedMesh>
 
             <InstancedMesh name="barrel2" count={15}>
                 <primitive object={(barrel2.nodes.barrel2 as Mesh).geometry} attach="geometry" />
-                <meshPhongMaterial attach={"material"} dithering />
+                <FogMat />
             </InstancedMesh>
 
             <InstancedMesh name="barrel3" count={15}>
                 <primitive object={(barrel3.nodes.barrel3 as Mesh).geometry} attach="geometry" />
-                <meshPhongMaterial attach={"material"} dithering />
+                <FogMat />
             </InstancedMesh>
 
             <InstancedMesh name="barrel4" count={15}>
                 <primitive object={(barrel4.nodes.barrel4 as Mesh).geometry} attach="geometry" />
-                <meshPhongMaterial attach={"material"} dithering />
+                <FogMat />
             </InstancedMesh>
 
             <InstancedMesh name="turret" count={15}>
                 <primitive object={(turret2.nodes.turret2 as Mesh).geometry} attach="geometry" />
-                <meshPhongMaterial attach={"material"} dithering color="#fff" />
+                <FogMat />
             </InstancedMesh>
 
             <InstancedMesh name="rocket" count={15}>
                 <primitive object={(rocket.nodes.rocket as Mesh).geometry} attach="geometry" />
-                <meshPhongMaterial attach={"material"} dithering />
+                <FogMat />
             </InstancedMesh>
 
             <InstancedMesh name="platform" count={15}>
                 <primitive object={(platform.nodes.platform as Mesh).geometry} attach="geometry" />
-                <meshPhongMaterial attach={"material"} dithering />
+                <FogMat />
             </InstancedMesh>
 
             <InstancedMesh name="device" count={50}>
                 <primitive object={(device.nodes.device as Mesh).geometry} attach="geometry" />
-                <meshPhongMaterial attach={"material"} dithering />
+                <FogMat />
             </InstancedMesh>
 
             <RepeaterMesh
                 name="building1"
                 count={10}
-                object={building1.nodes.building1}
-            />
+            >
+                <Building1 />
+            </RepeaterMesh>
+
+            <RepeaterMesh
+                name="building2"
+                count={10}
+            >
+                <Building2 />
+            </RepeaterMesh>
+            <RepeaterMesh
+                name="building3"
+                count={10}
+            >
+                <Building3 />
+            </RepeaterMesh>
+            <RepeaterMesh
+                name="hangar"
+                count={10}
+            >
+                <Hanger />
+            </RepeaterMesh>
+        </>
+    )
+}
+
+export function Hanger(props) {
+    const { nodes }: { nodes: any } = useGLTF("/models/hangar.glb")
+
+    return (
+        <group {...props} dispose={null} scale={.3}>
+            <mesh
+                castShadow
+                receiveShadow
+                geometry={nodes.Cube.geometry}
+            >
+                <FogMat isInstance={false} color="white" />
+            </mesh>
+            <mesh
+                castShadow
+                receiveShadow
+                geometry={nodes.Cube_1.geometry}
+            >
+                <FogMat isInstance={false} color="black" />
+            </mesh>
+        </group>
+    )
+}
+
+export function Building3(props) {
+    const { nodes }: { nodes: any } = useGLTF("/models/building3.glb")
+
+    return (
+        <group {...props} dispose={null} scale={.3}>
+            <mesh
+                castShadow
+                receiveShadow
+                geometry={nodes.Cube003.geometry}
+            >
+                <FogMat isInstance={false} color="white" />
+            </mesh>
+            <mesh
+                castShadow
+                receiveShadow
+                geometry={nodes.Cube003_1.geometry}
+            >
+                <FogMat isInstance={false} color="black" />
+            </mesh>
+        </group>
+    )
+}
+
+export function Building2(props) {
+    const { nodes }: { nodes: any } = useGLTF("/models/building2.glb")
+
+    return (
+        <group {...props} dispose={null}>
+            <group position={[0, 0, 0]} scale={.3}>
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes.Cube006.geometry}
+                >
+                    <FogMat isInstance={false} color="white" />
+                </mesh>
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes.Cube006_1.geometry}
+                >
+                    <FogMat isInstance={false} color="black" />
+                </mesh>
+            </group>
+        </group>
+    )
+}
+
+function Building1() {
+    const { nodes }: { nodes: any } = useGLTF("/models/building1.glb")
+
+    return (
+        <group dispose={null}>
+            <group position={[0, 0, 0]} scale={.3}>
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes.Cube007.geometry}
+                >
+                    <FogMat isInstance={false} color="white" />
+                </mesh>
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes.Cube007_1.geometry}
+                >
+                    <FogMat isInstance={false} color="black" />
+                </mesh>
+            </group>
+        </group>
+    )
+}
+
+
+
+/*
+
+
             <RepeaterMesh
                 name="building2"
                 count={10}
@@ -108,6 +294,4 @@ export default function Models() {
                 count={10}
                 object={hangar.nodes.hangar}
             />
-        </>
-    )
-}
+            */

@@ -11,6 +11,7 @@ import { bulletSize, pixelSize, useStore } from "../data/store"
 import { damagePlayer, setPlayerObject } from "../data/store/player"
 import { createBullet, damagePlane, damageRocket, damageTurret } from "../data/store/actors"
 import { damageBarrel } from "../data/store/world"
+import { FogMat } from "./Models"
 
 let _edgemin = new Vector3(WORLD_LEFT_EDGE, WORLD_BOTTOM_EDGE, -100)
 let _edgemax = new Vector3(WORLD_RIGHT_EDGE, WORLD_TOP_EDGE, 100)
@@ -219,7 +220,7 @@ export default function Player({
                     userData={{ type: "player" }}
                     position={[0, 0, 0]}
                 >
-                    <meshLambertMaterial color="red" attach={"material"} />
+                    <FogMat isInstance={false} color="red" />
                 </primitive>
                 <mesh userData={{ type: "player" }} visible={false}>
                     <boxGeometry args={[...size, 1, 1, 1]} />
