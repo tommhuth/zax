@@ -64,7 +64,7 @@ export default function RepeaterMesh({ name, count, children }: RepeaterMeshProp
 
     return (
         <group ref={ref}>
-            {new Array(count).fill(null).map((i, index) => cloneElement(children, { key: index }))}
+            {new Array(count).fill(null).map((i, index) => cloneElement(children as any, { key: index }))}
         </group>
     )
 }
