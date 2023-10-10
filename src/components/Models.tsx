@@ -45,7 +45,7 @@ export function FogMat({ color = "white", isInstance = true }) {
             `,
             main: glsl`
                 float fogScale = .075;
-                float fogDensity = .8;
+                float fogDensity = .9;
                 float heightRange = 4.;
                 float heightEffect = pow(1. - clamp(vPosition.y / heightRange, 0., 1.), 3.);
                 float fogEffect = easeInOutCubic((noise(vPosition.xyz * fogScale - uTime) + 1.) / 2.);
