@@ -7,6 +7,7 @@ import { useShader } from "../data/hooks"
 import { glsl } from "../data/utils"
 import { useGLTF } from "@react-three/drei"
 import noise from "./../shaders/noise.glsl"
+import easings from "./../shaders/easings.glsl"
 
 
 export function FogMat({ color = "white", isInstance = true }) {
@@ -30,24 +31,14 @@ export function FogMat({ color = "white", isInstance = true }) {
                 varying vec4 vPosition; 
                 uniform float uTime; 
                 ${noise}
-
-                float easeInOutCubic(float x) {
-                    return x < 0.5 ? 4. * x * x * x : 1. - pow(-2. * x + 2., 3.) / 2.;
-                }
-
-                float easeInOutSine(float x) {
-                    return -(cos(3.14159 * x) - 1.) / 2.;
-                }
-
-                float easeInOutQuad(float x) {
-                    return x < 0.5 ? 2. * x * x : 1. - pow(-2. * x + 2., 2.) / 2.;
-                }
+                ${easings}
             `,
             main: glsl`
                 float fogScale = .075;
                 float fogDensity = .9;
                 float heightRange = 4.;
-                float heightEffect = pow(1. - clamp(vPosition.y / heightRange, 0., 1.), 3.);
+                float heightOffset = .35;
+                float heightEffect = easeInQuad(1. - clamp((vPosition.y - heightOffset) / heightRange, 0., 1.));
                 float fogEffect = easeInOutCubic((noise(vPosition.xyz * fogScale - uTime) + 1.) / 2.);
 
                 vec3 baseColor = gl_FragColor.rgb;
