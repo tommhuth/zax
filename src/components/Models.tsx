@@ -37,7 +37,7 @@ export function FogMat({ color = "white", isInstance = true }) {
                 float fogScale = .075;
                 float fogDensity = .9;
                 float heightRange = 4.;
-                float heightOffset = .35;
+                float heightOffset = .2;
                 float heightEffect = easeInQuad(1. - clamp((vPosition.y - heightOffset) / heightRange, 0., 1.));
                 float fogEffect = easeInOutCubic((noise(vPosition.xyz * fogScale - uTime) + 1.) / 2.);
 
