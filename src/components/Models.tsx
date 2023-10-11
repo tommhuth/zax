@@ -34,15 +34,21 @@ export function FogMat({ color = "white", isInstance = true }) {
                 ${easings}
             `,
             main: glsl`
-                float fogScale = .075;
+                float fogScale = .15;
+                float verticalScale = .6;
+                vec3 pos = vec3(
+                    vPosition.x * fogScale + uTime * 2., 
+                    vPosition.y * verticalScale + uTime * 1.25, 
+                    vPosition.z * fogScale * 1.5
+                );
                 float fogDensity = .9;
-                float heightRange = 4.;
+                float heightRange = 3.;
                 float heightOffset = .2;
                 float heightEffect = easeInQuad(1. - clamp((vPosition.y - heightOffset) / heightRange, 0., 1.));
-                float fogEffect = easeInOutCubic((noise(vPosition.xyz * fogScale - uTime) + 1.) / 2.);
+                float fogEffect = easeInOutCubic((noise(pos ) + 1.) / 2.);
 
                 vec3 baseColor = gl_FragColor.rgb;
-                vec3 fogColor = vec3(.7, .8, 1.);
+                vec3 fogColor = vec3(0.7, .8, 1.); // .7 .8 1
 
                 gl_FragColor = vec4(mix(baseColor, fogColor, heightEffect * fogEffect * fogDensity), 1.);
             `
@@ -50,7 +56,7 @@ export function FogMat({ color = "white", isInstance = true }) {
     })
 
     useFrame((state, delta) => {
-        uniforms.uTime.value += delta * .05
+        uniforms.uTime.value += delta * .2
         uniforms.uTime.needsUpdate = true
     })
 
