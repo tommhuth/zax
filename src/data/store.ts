@@ -9,7 +9,7 @@ import { makeDefault } from "./generators"
 import { SpatialHashGrid3D } from "./SpatialHashGrid3D"
 
 export let isSmallScreen = window.matchMedia("(max-height: 400px)").matches || window.matchMedia("(max-width: 800px)").matches
-export const pixelSize = 5 // isSmallScreen ? 4 : 6
+export const pixelSize = isSmallScreen ? 4 : 5
 export const dpr = 1 / pixelSize
 export const bulletSize: Tuple3 = [.2, .2, 1.5]
 
