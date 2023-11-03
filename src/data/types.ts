@@ -7,8 +7,9 @@ import { Client } from "./SpatialHashGrid3D"
 export type InstancedName = "line" | "box" | "sphere" | "device"
     | "barrel1" | "barrel2" | "barrel3" | "barrel4" | "fireball"
     | "turret" | "rocket" | "platform" | "cylinder" | "shimmer"
+    | "grass" | "plant"
 
-export type RepeaterName = "building1" | "building2" | "building3" | "hangar"
+export type RepeaterName = "building1" | "building2" | "building3" | "hangar" | "floor1" | "floor2" | "floor3" | "floor4"  
 
 export interface Fireball {
     isPrimary?: boolean
@@ -100,7 +101,8 @@ export interface Plane {
 export enum WorldPartType {
     DEFAULT = "default",
     BUILDINGS_GAP = "gapbuildings",
-    BUILDINGS_LOW = "lowbuildings"
+    BUILDINGS_LOW = "lowbuildings",
+    AIRSTRIP = "airstrip",
 }
 
 export interface WorldPart {
@@ -150,6 +152,10 @@ export interface WorldPartDefault extends WorldPart {
 
 export interface WorldPartBuildingsLow extends WorldPart {
     type: WorldPartType.BUILDINGS_LOW
+}
+
+export interface WorldPartAirstrip extends WorldPart {
+    type: WorldPartType.AIRSTRIP
 }
 
 

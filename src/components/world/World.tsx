@@ -9,13 +9,14 @@ import Building from "./Building"
 import Barrel from "./Barrel"
 import ParticleHandler from "./ParticleHandler"
 import BulletHandler from "./BulletHandler"
-import { WorldPartDefault, WorldPartBuildingsGap, WorldPartType, WorldPartBuildingsLow } from "../../data/types"
+import { WorldPartDefault, WorldPartBuildingsGap, WorldPartType, WorldPartBuildingsLow, WorldPartAirstrip } from "../../data/types"
 import BuildingsGap from "./parts/BuildingsGap"
 import BuildingsLow from "./parts/BuildingsLow"
 import Rocket from "./Rocket"
 import { createWorldPart } from "../../data/store/world"
 import ExplosionsHandler from "./ExplosionsHandler"
 import ShimmerHandler from "./ShimmerHandler"
+import Airstrip from "./parts/Airstrip"
 
 export const WORLD_CENTER_X = 1
 export const WORLD_LEFT_EDGE = -2
@@ -31,7 +32,7 @@ export default function World() {
     useFrame(() => {
         let { world: { parts }, player: { object: player } } = store.getState()
         let forwardWorldPart = parts[parts.length - 1]
-        let lastPartIsAtEdge = forwardWorldPart && player && forwardWorldPart.position.z > player.position.z - diagonal
+        let lastPartIsAtEdge = forwardWorldPart && player && forwardWorldPart.position.z - forwardWorldPart.size[1] > player.position.z - diagonal
 
         if (lastPartIsAtEdge || !forwardWorldPart) {
             startTransition(createWorldPart)
@@ -48,6 +49,8 @@ export default function World() {
                         return <BuildingsGap key={i.id} {...i as WorldPartBuildingsGap} />
                     case WorldPartType.BUILDINGS_LOW:
                         return <BuildingsLow key={i.id} {...i as WorldPartBuildingsLow} />
+                    case WorldPartType.AIRSTRIP:
+                        return <Airstrip key={i.id} {...i as WorldPartAirstrip} />
                     default:
                         throw new Error(`Unknown type: ${i.type}`)
                 }

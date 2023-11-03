@@ -24,7 +24,7 @@ export default function Wrapper() {
         let tid: ReturnType<typeof setTimeout>
         let onResize = () => {
             clearTimeout(tid)
-            setTimeout(() => setSize(getSize()), 200)
+            tid = setTimeout(() => setSize(getSize()), 50)
         }
 
         window.addEventListener("resize", onResize)
@@ -102,7 +102,7 @@ function EdgeOverlay() {
 
     return (
         <group ref={groupRef}>
-            <mesh rotation-x={-Math.PI / 2} position-y={12} position-x={-4} >
+            <mesh rotation-x={-Math.PI / 2} position-y={12} position-x={-3} >
                 <planeGeometry args={[12, 100, 1, 1]} />
                 <meshBasicMaterial color="black" />
             </mesh>

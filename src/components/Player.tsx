@@ -12,6 +12,7 @@ import { damagePlayer, setPlayerObject } from "../data/store/player"
 import { createBullet, damagePlane, damageRocket, damageTurret } from "../data/store/actors"
 import { damageBarrel } from "../data/store/world"
 import { FogMat } from "./Models"
+import { playerColor } from "../data/theme"
 
 let _edgemin = new Vector3(WORLD_LEFT_EDGE, WORLD_BOTTOM_EDGE, -100)
 let _edgemax = new Vector3(WORLD_RIGHT_EDGE, WORLD_TOP_EDGE, 100)
@@ -26,7 +27,7 @@ interface PlayerProps {
 
 export default function Player({
     size = [1.5, .5, depth],
-    z = 0,
+    z = 10,
     y = 1.5
 }: PlayerProps) {
     let playerGroupRef = useRef<Group | null>(null)
@@ -40,7 +41,7 @@ export default function Player({
     let lastImpactLocation = useStore(i => i.player.lastImpactLocation)
     let targetPosition = useMemo(() => new Vector3(WORLD_CENTER_X, _edgemin.y, z), [])
     let models = useLoader(GLTFLoader, "/models/space.glb")
-    let position = useMemo(() => new Vector3(WORLD_CENTER_X, y, z), [])
+    let position = useMemo(() => new Vector3(), [])
     let client = useMemo(() => {
         return grid.newClient([0, 0, z], size, {
             type: "player",
@@ -172,8 +173,7 @@ export default function Player({
                         position.z - (depth / 2 + bulletSize[2] / 2) * 1.5
                     ],
                     owner: Owner.PLAYER,
-                    damage: weapon.damage,
-                    color: weapon.color,
+                    damage: weapon.damage, 
                     rotation: -Math.PI * .5,
                     speed: weapon.speed,
                 })
@@ -181,6 +181,14 @@ export default function Player({
             })
         }
     })
+
+    useEffect(()=> {
+        if (models && playerGroupRef.current) {
+            playerGroupRef.current.position.x = WORLD_CENTER_X
+            playerGroupRef.current.position.y = y
+            playerGroupRef.current.position.z = z
+        }
+    }, [position, models])
 
     // movement
     useFrame((state, delta) => {
@@ -200,13 +208,13 @@ export default function Player({
             client.position = position.toArray()
             grid.updateClient(client)
         }
-    })
+    }) 
 
     return (
         <>
             <mesh ref={impactRef}>
                 <sphereGeometry args={[.5, 16, 16]} />
-                <meshBasicMaterial color={"blue"} />
+                <meshBasicMaterial color={"white"} />
             </mesh>
             <group
                 ref={handleRef}
@@ -220,7 +228,7 @@ export default function Player({
                     userData={{ type: "player" }}
                     position={[0, 0, 0]}
                 >
-                    <FogMat isInstance={false} color="red" />
+                    <FogMat isInstance={false} color={playerColor} />
                 </primitive>
                 <mesh userData={{ type: "player" }} visible={false}>
                     <boxGeometry args={[...size, 1, 1, 1]} />

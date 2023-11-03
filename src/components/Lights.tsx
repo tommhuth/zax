@@ -1,10 +1,10 @@
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
 import { DirectionalLight, PointLight } from "three"
-import { useStore } from "../data/store"  
+import { useStore } from "../data/store"
 
 export default function Lights() {
-    let lightRef = useRef<DirectionalLight>(null) 
+    let lightRef = useRef<DirectionalLight>(null)
     let explosionLightRef = useRef<PointLight>(null)
     let { scene, viewport } = useThree()
     let ticks = useRef(0)
@@ -27,7 +27,7 @@ export default function Lights() {
                 explosion.position[1] + 2,
                 explosion.position[2],
             )
-        } 
+        }
     }, [explosion])
 
     useFrame((state, delta) => {
@@ -47,17 +47,17 @@ export default function Lights() {
     })
 
     return (
-        <>
+        <>  
             <directionalLight
-                color={0xddddff}
-                position={[4, 14, 10]}
-                intensity={.55}
-            />
+                color={"#89daff"} // from right
+                position={[10, 20, 25]}
+                intensity={.7}
+            /> 
             <directionalLight
                 ref={lightRef}
-                color={0xffffff}
+                color={"#e8f6ff"}
                 position={[0, 15, 0]}
-                intensity={.7}
+                intensity={2}
                 castShadow
                 shadow-radius={1.5}
                 shadow-camera-near={0} // y
@@ -68,13 +68,13 @@ export default function Lights() {
                 shadow-camera-bottom={-diagonal * .5}
                 shadow-mapSize={[512, 512]}
                 shadow-bias={-0.001}
-            /> 
+            />
             <pointLight
                 color={"blue"}
                 ref={explosionLightRef}
                 distance={8}
             />
-            <ambientLight intensity={.2} color="lightblue" />
+            <hemisphereLight intensity={.5} color={"white"} groundColor={"blue"} />
         </>
     )
 }

@@ -13,3 +13,7 @@ float easeInQuad(float x) { return x * x; }
 float easeInSine(float x) { return 1. - cos((x * 3.14159) / 2.); }
 
 float easeInCubic(float x) { return x * x * x; }
+
+float easeOutCubic(float x) {
+return 1. - pow(1. - x, 3.);
+}

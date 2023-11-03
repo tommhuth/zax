@@ -1,12 +1,13 @@
 import { startTransition, useEffect, useMemo, useRef } from "react"
-import { AdditiveBlending, BufferAttribute, Sprite } from "three"
+import { AdditiveBlending, BufferAttribute, Color, Sprite } from "three"
 import { clamp, glsl, ndelta, setMatrixAt } from "../../data/utils"
-import { useShader } from "../../data/hooks" 
-import { useFrame, useLoader } from "@react-three/fiber"
+import { useShader } from "../../data/hooks"
+import { useFrame, useLoader, useThree } from "@react-three/fiber"
 import InstancedMesh from "../InstancedMesh"
 import { TextureLoader } from "three/src/loaders/TextureLoader"
 import { useStore } from "../../data/store"
 import { removeExplosion } from "../../data/store/effects"
+import { explosionColor, explosionEndColor, explosionMidColor, explosionStartColor } from "../../data/theme"
 
 function easeOutQuart(x: number): number {
     return 1 - Math.pow(1 - x, 4)
@@ -27,6 +28,7 @@ export default function ExplosionsHandler() {
     let latestExplosion = useStore(i => i.effects.explosions[0])
     let glowMap = useLoader(TextureLoader, "/textures/glow.png")
     let ref = useRef<Sprite>(null)
+    let { camera } = useThree()
     let centerAttributes = useMemo(() => {
         return new Float32Array(new Array(100 * 3).fill(0))
     }, [])
@@ -35,13 +37,19 @@ export default function ExplosionsHandler() {
     }, [])
     let instance = useStore(i => i.instances.fireball?.mesh)
     let { onBeforeCompile } = useShader({
+        uniforms: {
+            uStartColor: { value: new Color(explosionStartColor) },
+            uMidColor: { value: new Color(explosionMidColor) },
+            uEndColor: { value: new Color(explosionEndColor) },
+        },
         vertex: {
             head: glsl` 
                 attribute vec3 aCenter;   
                 varying float vDistance;
                 varying float vLifetime;
                 varying vec3 vPosition;
-                attribute float aLifetime; 
+                attribute float aLifetime;  
+                varying vec3 vGlobalNormal;  
                 
                 float easeInOutQuint(float x) {
                     return x < 0.5 ? 16. * x * x * x * x * x : 1. - pow(-2. * x + 2., 5.) / 2.;
@@ -62,7 +70,7 @@ export default function ExplosionsHandler() {
  
                 vDistance = clamp(length(globalPosition.xyz - aCenter) / radius, 0., 1.); // );
                 vLifetime = aLifetime;
-                vPosition = globalPosition.xyz; 
+                vPosition = globalPosition.xyz;  
             `
         },
         fragment: {
@@ -70,6 +78,10 @@ export default function ExplosionsHandler() {
                 varying float vDistance; 
                 varying float vLifetime;
                 varying vec3 vPosition; 
+                uniform vec3 uStartColor; 
+                uniform vec3 uMidColor; 
+                uniform vec3 uEndColor;  
+                varying vec3 vGlobalNormal;  
                 
                 float easeInOutCubic(float x) {
                     return x < 0.5 ? 4. * x * x * x : 1. - pow(-2. * x + 2., 3.) / 2.;
@@ -83,18 +95,29 @@ export default function ExplosionsHandler() {
                     return x * x * x;
                 }
             `,
-            main: glsl`   
-                vec3 start = vec3(.0, 0.3, 1.); 
-                vec3 mid = vec3(0.05, .9, 1.)  ; 
-                vec3 end = vec3(0., 0.1, .450); // vec3(.0, .3, .85)  ; 
+            main: glsl`     
+                /*
+                    vec3 c1 = mix(uStartColor, uMidColor, easeInOutCubic(vDistance));
+                    vec3 c2 = mix(c1, uEndColor, (vLifetime));
+                    vec3 cameraLook = vec3(-59.23724356957945, -50.000000000000014, -53.08744356953773);
+                    
+                    float a = clamp(-dot(vGlobalNormal, normalize(cameraLook)), 0., 1.);
+    
+                    vec3 xx = gl_FragColor.rgb;
+                    xx.r = 0.;
+                    xx.g *= a;
+                    xx.b *= a;
 
-                vec3 c1 = mix(start, mid, easeInOutCubic(vDistance));
-                vec3 c2 = mix(c1, end,   (vLifetime));
-
-                gl_FragColor = vec4(c2, 1.);
+                    gl_FragColor = vec4(xx, 1.);
+                */
+                    gl_FragColor = vec4(mix(gl_FragColor.rgb, uEndColor, 1. - vDistance), 1.);
             `
         }
     })
+
+    useEffect(() => {
+        console.log(camera.position)
+    }, [camera])
 
     useEffect(() => {
         if (!instance || !latestExplosion) {
@@ -162,13 +185,13 @@ export default function ExplosionsHandler() {
             ref.current.position.y += 6
             ref.current.position.x += 5
             ref.current.position.z += 5
-            ref.current.material.opacity = 1
+            ref.current.material.opacity = .8
         }
     }, [latestExplosion])
 
     useFrame(() => {
         if (ref.current) {
-            ref.current.material.opacity *= .95
+            ref.current.material.opacity *= .9
         }
     })
 
@@ -187,11 +210,16 @@ export default function ExplosionsHandler() {
                         args={[lifetimeAttributes, 1, false, 1]}
                     />
                 </sphereGeometry>
-                <meshBasicMaterial onBeforeCompile={onBeforeCompile} color={"white"} />
+                <meshPhongMaterial transparent onBeforeCompile={onBeforeCompile} color={explosionColor} />
             </InstancedMesh>
 
-            <sprite ref={ref} scale={10}>
-                <spriteMaterial color="blue" map={glowMap} transparent blending={AdditiveBlending} />
+            <sprite ref={ref} scale={10} >
+                <spriteMaterial
+                    depthWrite={false}
+                    color={explosionColor}
+                    map={glowMap}
+                    transparent 
+                />
             </sprite>
         </>
     )

@@ -9,6 +9,7 @@ import Config from "../../Config"
 import { Tuple3 } from "../../types"
 import { createExplosion, createParticles, createShimmer } from "../../data/store/effects"
 import { removeBarrel } from "../../data/store/world"
+import { barellParticleColor, barellcolor } from "../../data/theme"
 
 let _size = new Vector3()
 
@@ -47,14 +48,12 @@ export default function Barrel({
     id,
     health,
 }: Barrel) {
-    let removed = useRef(false)
-    let color = "#ff0051"
+    let removed = useRef(false) 
     let [rotation] = useState(random.pick(...new Array(8 * 2).fill(null).map((i, index, list) => (index / list.length) * Math.PI * 2)))
     let model: InstancedName = useMemo(() => {
         return random.pick("barrel1", "barrel2", "barrel3", "barrel4")
     }, [])
-    let [index, instance] = useInstance(model, {
-        color,
+    let [index, instance] = useInstance(model, { 
         position: [position.x, position.y - size[1] / 2, position.z],
         rotation: [0, rotation, 0]
     })
@@ -67,7 +66,7 @@ export default function Barrel({
         if (health === 0) {
             startTransition(() => {
                 remove()
-                explode(position, size, color)
+                explode(position, size, barellParticleColor)
             })
         }
     }, [health])

@@ -13,7 +13,7 @@ export function createBullet({
     size = bulletSize,
     speed = 10,
     damage,
-    color,
+    color = "#fff",
 }) { 
     let id = random.id()
     let obb = new OBB(new Vector3(...position), new Vector3(...size.map(i => i / 2)))

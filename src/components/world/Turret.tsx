@@ -14,6 +14,7 @@ import { Tuple3 } from "../../types"
 import { createBullet, removeTurret } from "../../data/store/actors"
 import { store, useStore } from "../../data/store"
 import { createExplosion, createParticles, createShimmer } from "../../data/store/effects"
+import { turretColor, turretParticleColor } from "../../data/theme"
 
 function explode(position: Vector3, size: Tuple3) {
     createShimmer({
@@ -37,7 +38,7 @@ function explode(position: Vector3, size: Tuple3) {
         normal: [0, 1, 0],
         count: [6, 12],
         radius: [.1, .45],
-        color: "#fff",
+        color: turretParticleColor,
     })
 }
 
@@ -45,7 +46,7 @@ function Turret({ id, size, position, health, fireFrequency, rotation, aabb }: T
     let removed = useRef(false)
     let { viewport } = useThree()
     let [index, instance] = useInstance("turret", {
-        color: "#fff", 
+        color: turretColor, 
         position: [position.x, position.y - .1, position.z],
         rotation: [0, -rotation + Math.PI * .5, 0],
     })
@@ -58,10 +59,12 @@ function Turret({ id, size, position, health, fireFrequency, rotation, aabb }: T
     }
 
     useEffect(() => {
-        if (health && health !== 100 && instance && typeof index === "number") {
+        if (health !== 100 && instance && typeof index === "number") {
+            return 
+            
             return animate({
-                from: "#9a9aa4",
-                to: "#ffffff",
+                from: "#fff",
+                to: turretColor,
                 duration: 200,
                 render(color) {
                     setColorAt(instance, index as number, color)
@@ -99,8 +102,7 @@ function Turret({ id, size, position, health, fireFrequency, rotation, aabb }: T
                         position.x + offsetx,
                         position.y + size[1] / 2 - .15,
                         position.z + offsetz
-                    ],
-                    color: "white",
+                    ], 
                     damage: 5,
                     speed: bulletSpeed,
                     rotation: rotation,

@@ -1,6 +1,6 @@
 {
     "name": "r3f",
-    "version": "1.0.0",
+    "version": "1.0.0", 
     "browserslist": "last 2 version and not < 0.2% and not ie > 1 and not dead and not op_mini all",
     "sideEffects": [
         "*.scss",
@@ -29,7 +29,7 @@
         "@huth/animate": "^2.0.0",
         "@huth/random": "^4.0.0",
         "@react-three/drei": "^9.48.6",
-        "@react-three/fiber": "^8.13.5",
+        "@react-three/fiber": "^8.14.6",
         "@react-three/postprocessing": "^2.15.0",
         "@types/three": "^0.154.0",
         "@typescript-eslint/eslint-plugin": "^5.42.1",
@@ -52,7 +52,7 @@
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "sass-loader": "^12.6.0",
-        "three": "^0.154.0",
+        "three": "^0.157.0",
         "ts-loader": "^9.3.1",
         "typescript": "^4.8.3",
         "use-animation-frame": "^0.1.5",

@@ -1,6 +1,5 @@
-import { useThree } from "@react-three/fiber"
 import React, { cloneElement, useCallback, useEffect, useRef, useState } from "react"
-import { Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D } from "three"
+import { Group, Object3D } from "three"
 import { useStore } from "../data/store"
 import { requestRepeater, setRepeater } from "../data/store/utils"
 import { RepeaterName } from "../data/types"

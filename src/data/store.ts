@@ -9,7 +9,7 @@ import { makeDefault } from "./generators"
 import { SpatialHashGrid3D } from "./SpatialHashGrid3D"
 
 export let isSmallScreen = window.matchMedia("(max-height: 400px)").matches || window.matchMedia("(max-width: 800px)").matches
-export const pixelSize = isSmallScreen ? 4 : 6
+export const pixelSize = 5 // isSmallScreen ? 4 : 6
 export const dpr = 1 / pixelSize
 export const bulletSize: Tuple3 = [.2, .2, 1.5]
 
@@ -54,7 +54,7 @@ const store = create<Store>(() => ({
         grid: new SpatialHashGrid3D([4, 3, 4]),
         frustum: new Frustum(),
         parts: [
-            makeDefault({ position: new Vector3(0, 0, 0), size: [10, 20] }),
+            makeDefault({ position: new Vector3(0, 0, 20), size: [10, 20] }),
         ],
         buildings: [],
         planes: [],
@@ -71,7 +71,7 @@ const store = create<Store>(() => ({
     instances: {},
     repeaters: {},
     player: {
-        speed: 8,
+        speed: 0,
         cameraShake: 0,
         health: 100,
         score: 0,

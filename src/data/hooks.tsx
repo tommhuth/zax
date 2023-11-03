@@ -19,7 +19,7 @@ interface UseShaderParams {
 }
 
 export function useShader({
-    uniforms: incomingUniforms = {},
+    uniforms: incomingUniforms = {}, 
     vertex = {
         head: "",
         main: "",
@@ -31,7 +31,7 @@ export function useShader({
 }: UseShaderParams) {
     let uniforms = useMemo(() => {
         return Object.entries(incomingUniforms)
-            .map(([key, value]) => ({ [key]: { needsUpdate: false, ...value } }))
+            .map(([key, value]) => ({ [key]: { needsUpdate: true, ...value } }))
             .reduce((previous, current) => ({ ...previous, ...current }), {})
     }, [])
 
@@ -41,7 +41,7 @@ export function useShader({
             shader.uniforms = {
                 ...shader.uniforms,
                 ...uniforms
-            }
+            } 
 
             shader.vertexShader = shader.vertexShader.replace("#include <common>", glsl`
                 #include <common>

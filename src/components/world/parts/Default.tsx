@@ -3,44 +3,59 @@ import WorldPartWrapper from "../WorldPartWrapper"
 import Turret from "../spawner/Turret"
 import EdgeBuilding from "../decoration/EdgeBuilding"
 import Barrel from "../spawner/Barrel"
-import Plane from "../spawner/Plane"
 import Building from "../spawner/Building"
 import Rocket from "../spawner/Rocket"
-import { WORLD_CENTER_X, WORLD_LEFT_EDGE } from "../World"
- 
+import { WORLD_CENTER_X, WORLD_LEFT_EDGE, WORLD_RIGHT_EDGE } from "../World"
+import { useState } from "react"
+import random from "@huth/random"
+import makeCycler from "../../../data/cycler"
+import Floor from "../Floor"
+import Plant from "../decoration/Plant"
+
+
+let t = makeCycler(["floor1", "floor2"], .35)
 
 export default function Default({
-    id, 
-    position, 
-    size, 
+    id,
+    position,
+    size,
 }: WorldPartDefault) {
+    let [floort] = useState(() => t.next())
+
     return (
         <WorldPartWrapper
             size={size}
             position={position}
             id={id}
         >
-            <EdgeBuilding z={position.z + size[1] / 2} />
+            <Floor
+                type={"floor1"}
+                scale={[random.pick(-1, 1), 1, random.pick(-1, 1)]}
+                position={[position.x + WORLD_CENTER_X, 0, position.z - size[1] / 2]}
+            />
 
-            <Turret 
-                position={[WORLD_CENTER_X + 3, 0, position.z + 4]}
+            <EdgeBuilding z={position.z - size[1] / 2} />
+            <Turret
+                position={[WORLD_CENTER_X + 3, 0, position.z - 4]}
             />
-            <Turret 
-                position={[WORLD_CENTER_X + 3, 0, position.z + -4]}
+            <Turret
+                position={[WORLD_CENTER_X + 3, 0, position.z - 10]}
             />
-            <Building 
-                position={[WORLD_CENTER_X, 0, position.z +  2]}
+            <Building
+                position={[WORLD_CENTER_X, 0, position.z - 2]}
                 size={[3, 1, 3]}
             />
-            <Rocket 
-                position={[WORLD_CENTER_X, -2, position.z + 6]}
+            <Rocket
+                position={[WORLD_CENTER_X, -2, position.z - 6]}
             />
-            <Barrel 
-                position={[WORLD_CENTER_X + 3, 0, position.z +  0]}
+            <Barrel
+                position={[WORLD_CENTER_X - 3, 0, position.z - 7]}
             />
-            <Barrel 
-                position={[WORLD_LEFT_EDGE + 3, 0, position.z +  -4]}
+            <Barrel
+                position={[WORLD_LEFT_EDGE + 3, 0, position.z - 16]}
             />
         </WorldPartWrapper>
     )
 }
+
+// 

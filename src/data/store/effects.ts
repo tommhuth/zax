@@ -49,7 +49,7 @@ export function createShimmer({
                     index: instance.index.next(),
                     gravity: random.float(.1, 1.5),
                     speed: speed.toArray(),
-                    time: random.integer(-400, -250),
+                    time: random.integer(-300, -250),
                     radius: random.float(...radius),
                     lifetime: random.integer(1500, 6000),
                     friction: random.float(.3, .5),

@@ -15,15 +15,13 @@ export default function EdgeBuilding({
     x = 0,
     z = 0,
     y = 0,
-    type = random.pick("building1", "building2", "building3", "hangar")
+    type = random.pick("building1", "building2", "building3")
 }: EdgeBuildingProps) {
-    let building = useRepeater(type)
-    let hasDone = useRef(false)
+    let building = useRepeater(type) 
 
     useEffect(() => {
-        if (building && !hasDone.current) {
-            hasDone.current = true
-            building.mesh.position.set(x + WORLD_LEFT_EDGE - 2, y, z)
+        if (building?.mesh) { 
+            building.mesh.position.set(x + WORLD_LEFT_EDGE - 5.5, y, z)
         }
     }, [building])
 
